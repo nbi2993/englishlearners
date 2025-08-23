@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IVS English Learners Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      /* A soft, motivational gradient for a modern learning platform */
+      .main-content-bg {
+        background-color: #f0f9ff; /* sky-50, fallback */
+        background-image: linear-gradient(170deg, hsl(206, 100%, 97%) 0%, hsl(190, 100%, 96%) 50%, hsl(215, 25%, 97%) 100%);
+      }
+      .dark .main-content-bg {
+        background-color: #0f172a; /* slate-900, fallback */
+        background-image: linear-gradient(170deg, hsl(215, 28%, 12%) 0%, hsl(215, 28%, 10%) 50%, hsl(215, 28%, 14%) 100%);
+      }
+    </style>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            },
+            colors: {
+              primary: {
+                DEFAULT: '#14b8a6', // teal-500
+                hover: '#0d9488'  // teal-600
+              },
+              secondary: '#64748b', // slate-500
+              light: '#f1f5f9',     // slate-100
+              dark: '#1e293b',      // slate-800
+              accent: {
+                DEFAULT: '#f59e0b', // amber-500
+                hover: '#d97706'  // amber-600
+              }
+            },
+            boxShadow: {
+              'soft': '0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07)',
+              'soft-md': '0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.07)',
+            }
+          }
+        }
+      }
+    </script>
+  <script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
+    "react/": "https://esm.sh/react@^19.1.0/",
+    "react": "https://esm.sh/react@^19.1.0",
+    "@google/genai": "https://esm.sh/@google/genai@^1.10.0",
+    "@heroicons/react/": "https://esm.sh/@heroicons/react@^2.2.0/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-slate-100 dark:bg-slate-900 font-sans">
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
