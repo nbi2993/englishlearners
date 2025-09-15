@@ -43,8 +43,7 @@ Please grade this essay for a K-12 English learner. Provide structured feedback 
 Response must be valid JSON only.`;
 
     const result = await model.generateContent(prompt);
-    const response = result.response;
-    const text = response.text();
+    const text = result.response.text();
     
     try {
       const feedback = JSON.parse(text) as WritingFeedback;
@@ -69,60 +68,6 @@ Response must be valid JSON only.`;
   } catch (error) {
     console.error('Error in gradeWriting:', error);
     throw new Error('Failed to grade writing. Please try again later.');
-  }
-};
-  const prompt = `Topic: "${topic}"\n\nEssay: "${text}"\n\nPlease grade this essay for a K-12 English learner. Provide feedback on grammar, vocabulary, and coherence. Give an overall score out of 100.`;
-
-  try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        maxOutputTokens: 1024,
-        temperature: 0.7,
-        responseSchema: {
-          type: Type.OBJECT,
-          required: ['overall', 'grammar', 'vocabulary', 'coherence', 'score'],
-          properties: {
-            overall: { type: Type.STRING, description: 'Overall feedback on the essay.' },
-            grammar: { type: Type.STRING, description: 'Specific feedback on grammar.' },
-            vocabulary: { type: Type.STRING, description: 'Specific feedback on vocabulary usage.' },
-            coherence: { type: Type.STRING, description: 'Specific feedback on the structure and flow.' },
-            score: { type: Type.INTEGER, description: 'A score from 0 to 100.' }
-          }
-        }
-      }
-    });
-
-    if (!response || !response.response) {
-      throw new Error('Failed to generate feedback');
-    }
-
-    const result = response.response as WritingFeedback;
-    
-    // Cache the result
-    cache.set(cacheKey, {
-      data: result,
-      timestamp: Date.now()
-    });
-
-    return result;
-  } catch (error) {
-    console.error('Error in gradeWriting:', error);
-    throw new Error('Failed to grade writing. Please try again later.');
-        required: ["overall", "grammar", "vocabulary", "coherence", "score"]
-      },
-      temperature: 0.2
-    },
-  });
-
-  try {
-    const jsonString = response.text.trim();
-    return JSON.parse(jsonString) as WritingFeedback;
-  } catch (e) {
-    console.error("Failed to parse Gemini JSON response:", e);
-    throw new Error("Could not get feedback from AI. Please try again.");
   }
 };
 

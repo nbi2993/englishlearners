@@ -71,7 +71,7 @@ const ContinueLearningCard: React.FC<{ course: Course; onSelectCourse: (course: 
 );
 
 
-const Dashboard: React.FC<DashboardProps> = React.memo(({ user, courses, onSelectCourse, lastViewedCourse }) => {
+const Dashboard = React.memo<React.FC<DashboardProps>>(({ user, courses, onSelectCourse, lastViewedCourse }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredCourses = useMemo(() => {

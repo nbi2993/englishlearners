@@ -12,17 +12,16 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "allowJs": true,
+    "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "types": ["node"],
+    "allowJs": true,
+    "types": ["node", "react", "react-dom"],
+    "baseUrl": ".",
     "paths": {
       "@/*": ["./*"]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "*.ts", "*.tsx"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": ["./**/*.ts", "./**/*.tsx"],
+  "exclude": ["node_modules"]
 }
 }
