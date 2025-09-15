@@ -1,8 +1,9 @@
-import React, { useState, useMemo, useEffect } from 'react';
+
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Course, User, View, Lesson } from './types';
 import { MOCK_USER } from './constants';
 import { curriculumData } from './data/curriculum';
-const Dashboard = React.lazy(() => import('./components/Dashboard'));
+import Dashboard from './components/Dashboard';
 import LessonView from './components/LessonView';
 import TeacherDashboard from './components/TeacherDashboard';
 import WritingGrader from './components/WritingGrader';
@@ -48,15 +49,14 @@ const colorMap: { [key: string]: string } = {
 
 export default function App() {
   const [user, setUser] = useState<User>(MOCK_USER);
-  const [view, setView] = useState<View>('dashboard');
+  const [view, setView] = useState<View>(() => user.role === 'teacher' ? 'teacher-dashboard' : 'dashboard');
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
-  const [lastViewedCourse, setLastViewedCourse] = useState<Course | null>(() => {
-    const saved = localStorage.getItem('lastViewedCourse');
-    return saved ? JSON.parse(saved) : null;
-  });
+  const [lastViewedCourse, setLastViewedCourse] = useState<Course | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [language, setLanguage] = useState<Language>('vi');
   const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('theme') as Theme) || 'system');
+  const previousRoleRef = useRef<User['role']>(user.role);
+
 
   useEffect(() => {
     const handleSystemThemeChange = (e: MediaQueryListEvent) => {
@@ -78,7 +78,16 @@ export default function App() {
     }
 
     return () => systemPrefersDark.removeEventListener('change', handleSystemThemeChange);
-}, [theme]);
+  }, [theme]);
+
+  useEffect(() => {
+    if (previousRoleRef.current !== user.role) {
+        // Role has changed, update the view to the corresponding dashboard
+        setView(user.role === 'teacher' ? 'teacher-dashboard' : 'dashboard');
+    }
+    // Update the ref *after* the check to compare against the next render
+    previousRoleRef.current = user.role;
+  }, [user.role]);
 
 
   const courses: Course[] = useMemo(() => {

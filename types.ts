@@ -1,3 +1,4 @@
+
 // types.ts
 
 export type View = 'dashboard' | 'lesson' | 'teacher-dashboard' | 'writing-grader' | 'speaking-partner' | 'settings';
@@ -9,6 +10,7 @@ export interface User {
   level: string;
   points: number;
   badges: string[];
+  role: 'student' | 'teacher';
   age?: string | number;
   gradeLevel?: string;
   gender?: string;

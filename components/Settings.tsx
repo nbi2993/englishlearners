@@ -1,8 +1,10 @@
+
 import React, { useState } from 'react';
 import type { User } from '../types';
 
 type Language = 'en' | 'vi';
 type Theme = 'light' | 'dark' | 'system';
+type Role = 'student' | 'teacher';
 
 interface SettingsProps {
   user: User;
@@ -43,9 +45,10 @@ const Settings: React.FC<SettingsProps> = ({ user, setUser, language, setLanguag
   const [gradeLevel, setGradeLevel] = useState(user.gradeLevel || '');
   const [gender, setGender] = useState(user.gender || '');
   const [selectedAvatar, setSelectedAvatar] = useState(user.avatar);
+  const [role, setRole] = useState<Role>(user.role);
 
   const handleSaveChanges = () => {
-    setUser({ ...user, name, age, gradeLevel, gender, avatar: selectedAvatar });
+    setUser({ ...user, name, age, gradeLevel, gender, avatar: selectedAvatar, role });
     alert('Changes saved!');
   };
   
@@ -169,6 +172,28 @@ const Settings: React.FC<SettingsProps> = ({ user, setUser, language, setLanguag
                     </div>
             </FormField>
           </FormRow>
+          <div className="mt-6">
+              <FormRow>
+                  <FormField label="Account Type">
+                      <div className="flex rounded-md bg-slate-100 dark:bg-slate-700 p-1">
+                          <button
+                              onClick={() => setRole('student')}
+                              className={`w-full py-1.5 rounded text-sm font-semibold transition-colors flex items-center justify-center gap-2 ${role === 'student' ? 'bg-white dark:bg-blue-600 text-blue-700 dark:text-white shadow' : 'text-gray-600 dark:text-gray-300'}`}
+                          >
+                              <i className="fa-solid fa-user-graduate"></i>
+                              Student
+                          </button>
+                          <button
+                              onClick={() => setRole('teacher')}
+                              className={`w-full py-1.5 rounded text-sm font-semibold transition-colors flex items-center justify-center gap-2 ${role === 'teacher' ? 'bg-white dark:bg-blue-600 text-blue-700 dark:text-white shadow' : 'text-gray-600 dark:text-gray-300'}`}
+                          >
+                              <i className="fa-solid fa-chalkboard-user"></i>
+                              Teacher
+                          </button>
+                      </div>
+                  </FormField>
+              </FormRow>
+          </div>
       </SettingsCard>
       
       <div className="flex justify-end">
