@@ -1,33 +1,71 @@
-import { GoogleGenAI, Type, Chat } from "@google/genai";
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, GenerateContentRequest, GenerateContentResponse } from "@google/generative-ai";
 import type { WritingFeedback } from '../types';
 
-const API_KEY = process.env.API_KEY;
+const API_KEY = process.env.API_KEY || process.env.GEMINI_API_KEY;
+const CACHE_DURATION = 1000 * 60 * 60; // 1 hour
 
 if (!API_KEY) {
-  console.error("API_KEY environment variable not set.");
-  // In a real app, you might want to show an error to the user.
-  // For this demo, we will proceed but API calls will fail.
+  throw new Error("API_KEY environment variable not set. Please configure your GEMINI_API_KEY in the environment variables.");
 }
 
-const ai = new GoogleGenAI({ apiKey: API_KEY! });
+const ai = new GoogleGenAI({ apiKey: API_KEY });
+
+// Simple in-memory cache
+const cache = new Map<string, { data: WritingFeedback; timestamp: number }>();
+
+const getCacheKey = (topic: string, text: string) => `${topic}-${text}`;
+
+const isCacheValid = (timestamp: number) => {
+  return Date.now() - timestamp < CACHE_DURATION;
+};
 
 export const gradeWriting = async (topic: string, text: string): Promise<WritingFeedback> => {
+  const cacheKey = getCacheKey(topic, text);
+  const cachedResult = cache.get(cacheKey);
+
+  if (cachedResult && isCacheValid(cachedResult.timestamp)) {
+    return cachedResult.data;
+  }
   const prompt = `Topic: "${topic}"\n\nEssay: "${text}"\n\nPlease grade this essay for a K-12 English learner. Provide feedback on grammar, vocabulary, and coherence. Give an overall score out of 100.`;
 
-  const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
-    contents: prompt,
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: Type.OBJECT,
-        properties: {
-          overall: { type: Type.STRING, description: 'Overall feedback on the essay.' },
-          grammar: { type: Type.STRING, description: 'Specific feedback on grammar.' },
-          vocabulary: { type: Type.STRING, description: 'Specific feedback on vocabulary usage.' },
-          coherence: { type: Type.STRING, description: 'Specific feedback on the structure and flow.' },
-          score: { type: Type.INTEGER, description: 'A score from 0 to 100.' },
-        },
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+        maxOutputTokens: 1024,
+        temperature: 0.7,
+        responseSchema: {
+          type: Type.OBJECT,
+          required: ['overall', 'grammar', 'vocabulary', 'coherence', 'score'],
+          properties: {
+            overall: { type: Type.STRING, description: 'Overall feedback on the essay.' },
+            grammar: { type: Type.STRING, description: 'Specific feedback on grammar.' },
+            vocabulary: { type: Type.STRING, description: 'Specific feedback on vocabulary usage.' },
+            coherence: { type: Type.STRING, description: 'Specific feedback on the structure and flow.' },
+            score: { type: Type.INTEGER, description: 'A score from 0 to 100.' }
+          }
+        }
+      }
+    });
+
+    if (!response || !response.response) {
+      throw new Error('Failed to generate feedback');
+    }
+
+    const result = response.response as WritingFeedback;
+    
+    // Cache the result
+    cache.set(cacheKey, {
+      data: result,
+      timestamp: Date.now()
+    });
+
+    return result;
+  } catch (error) {
+    console.error('Error in gradeWriting:', error);
+    throw new Error('Failed to grade writing. Please try again later.');
         required: ["overall", "grammar", "vocabulary", "coherence", "score"]
       },
       temperature: 0.2

@@ -9,7 +9,7 @@ interface DashboardProps {
   lastViewedCourse: Course | null;
 }
 
-const UserProfile: React.FC<{ user: User }> = ({ user }) => (
+const UserProfile: React.FC<{ user: User }> = React.memo(({ user }) => (
   <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md flex items-center flex-wrap gap-4">
     <div className="w-20 h-20 rounded-full bg-blue-100 dark:bg-gray-700 flex items-center justify-center border-4 border-blue-500">
         <i className={`fa-solid ${user.avatar} text-4xl text-blue-600 dark:text-blue-400`}></i>
@@ -35,15 +35,15 @@ const UserProfile: React.FC<{ user: User }> = ({ user }) => (
       ))}
     </div>
   </div>
-);
+));
 
-const ContinueLearningCard: React.FC<{ course: Course; onSelectCourse: (course: Course) => void }> = ({ course, onSelectCourse }) => (
+const ContinueLearningCard: React.FC<{ course: Course; onSelectCourse: (course: Course) => void }> = React.memo(({ course, onSelectCourse }) => (
     <div 
         className="bg-gradient-to-r from-blue-500 to-indigo-600 dark:from-blue-700 dark:to-indigo-800 p-6 rounded-xl shadow-lg flex items-center justify-between cursor-pointer transform hover:scale-105 transition-transform duration-300"
         onClick={() => onSelectCourse(course)}
     >
         <div className="flex items-center">
-            <img src={course.imageUrl} alt={course.title} className="w-24 h-24 rounded-lg object-cover border-4 border-white/50" />
+            <img src={course.imageUrl} alt={course.title} className="w-24 h-24 rounded-lg object-cover border-4 border-white/50" loading="lazy" />
             <div className="ml-6 text-white">
                 <p className="text-sm font-semibold opacity-80 uppercase tracking-wider">Continue Learning</p>
                 <h3 className="text-2xl font-bold">{course.title}</h3>
