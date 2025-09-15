@@ -75,44 +75,71 @@ const LessonView: React.FC<LessonViewProps> = ({ course }) => {
     <div className="container mx-auto px-4 py-8">
       <div className="flex gap-6">
         {/* Left sidebar - Units list */}
-        <div className="w-1/4 bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
-          <div className="flex items-center gap-2 mb-4">
-            <button onClick={() => window.history.back()} className="text-gray-600 hover:text-gray-800">
-              ← Bảng điều khiển
-            </button>
-            <span className="text-gray-400">|</span>
-            <span className="text-gray-600">{course.title.vi}</span>
-          </div>
-          
-          <div className="mb-4">
-            <select 
-              value={currentUnitIndex}
-              onChange={(e) => {
-                setCurrentUnitIndex(Number(e.target.value));
-                setCurrentLessonIndex(0);
-              }}
-              className="w-full p-2 border rounded bg-white dark:bg-gray-700"
-            >
-              {course.units.map((unit, index) => (
-                <option key={unit.id} value={index}>{unit.title.vi}</option>
-              ))}
-            </select>
+        <div className="w-1/4 bg-white dark:bg-gray-800 rounded-xl shadow-lg flex flex-col">
+          {/* Navigation header */}
+          <div className="p-4 border-b border-gray-200">
+            <div className="flex items-center gap-2 text-sm">
+              <button onClick={() => window.history.back()} className="text-gray-600 hover:text-gray-800">
+                ← Bảng điều khiển
+              </button>
+              <span className="text-gray-400">/</span>
+              <span className="text-gray-600">{course.title.vi}</span>
+              {currentUnit && (
+                <>
+                  <span className="text-gray-400">/</span>
+                  <span className="text-gray-600">{`Bài ${currentUnitIndex + 1}`}</span>
+                </>
+              )}
+            </div>
           </div>
 
-          <div className="space-y-1">
-            {course.units[currentUnitIndex]?.lessons.map((lesson, lessonIndex) => (
-              <button
-                key={lessonIndex}
-                onClick={() => setCurrentLessonIndex(lessonIndex)}
-                className={`w-full text-left px-4 py-3 rounded ${
-                  currentLessonIndex === lessonIndex
-                    ? 'bg-[#E1F9F6] text-[#00A99D]'
-                    : 'hover:bg-gray-50'
-                }`}
-              >
-                <div className="font-medium">{lesson.title.vi}</div>
-              </button>
-            ))}
+          {/* Units list with expandable lessons */}
+          <div className="flex-1 overflow-y-auto">
+            <div className="p-4">
+              {course.units.map((unit, index) => (
+                <div key={unit.id} className="mb-2">
+                  <button
+                    onClick={() => {
+                      setCurrentUnitIndex(index);
+                      setCurrentLessonIndex(0);
+                    }}
+                    className={`w-full text-left p-3 rounded-lg transition-colors ${
+                      currentUnitIndex === index 
+                        ? 'bg-[#E1F9F6] text-[#00A99D]' 
+                        : 'hover:bg-gray-50'
+                    }`}
+                  >
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">{`Bài ${index + 1}: ${unit.title.vi}`}</span>
+                      {currentUnitIndex === index && (
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                        </svg>
+                      )}
+                    </div>
+                  </button>
+                  
+                  {/* Lessons list for current unit */}
+                  {currentUnitIndex === index && (
+                    <div className="ml-4 mt-2 space-y-1">
+                      {unit.lessons.map((lesson, lessonIndex) => (
+                        <button
+                          key={lessonIndex}
+                          onClick={() => setCurrentLessonIndex(lessonIndex)}
+                          className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-colors ${
+                            currentLessonIndex === lessonIndex
+                              ? 'bg-[#E1F9F6] text-[#00A99D]'
+                              : 'hover:bg-gray-50'
+                          }`}
+                        >
+                          <div className="font-medium">{lesson.title.vi}</div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
