@@ -29,9 +29,10 @@ export const gradeWriting = async (topic: string, text: string): Promise<Writing
   }
 
   try {
+    const essayText = text; // Store text in a new variable to avoid TDZ issue
     const prompt = `Topic: "${topic}"
 
-Essay: "${text}"
+Essay: "${essayText}"
 
 Please grade this essay for a K-12 English learner. Provide structured feedback in JSON format with the following fields:
 - overall: Overall feedback on the essay
@@ -43,10 +44,10 @@ Please grade this essay for a K-12 English learner. Provide structured feedback 
 Response must be valid JSON only.`;
 
     const result = await model.generateContent(prompt);
-    const text = result.response.text();
+    const responseText = result.response.text();
     
     try {
-      const feedback = JSON.parse(text) as WritingFeedback;
+      const feedback = JSON.parse(responseText) as WritingFeedback;
       
       // Validate the response structure
       if (!feedback.overall || !feedback.grammar || !feedback.vocabulary || 

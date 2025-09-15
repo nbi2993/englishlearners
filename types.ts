@@ -32,7 +32,6 @@ export interface User {
   email?: string;
   gradeLevel?: string;
   studentProfile?: StudentProfile;
-  studentProfile?: StudentProfile;
   teacherProfile?: TeacherProfile;
 }
 
