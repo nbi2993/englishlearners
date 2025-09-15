@@ -16,7 +16,7 @@ export const g12Data: CurriculumLevel = {
     level: 12,
     title: { en: 'Grade 12', vi: 'Lớp 12' },
     subtitle: { en: 'Global Success', vi: 'Tiếng Anh 12 - Global Success' },
-    ebookPdfUrl: 'https://drive.google.com/file/d/1YKCWeMP4Mqdfv-piL_g6UwQLfze84Zog/view?usp=drive_link',
+    ebookPdfUrl: 'https://drive.google.com/file/d/14ZDrFOzmaXGjgZXC-GI7ChzduQhkTdVn/view?usp=drive_link',
     units: [
         {
             id: 1201,

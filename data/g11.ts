@@ -16,7 +16,7 @@ export const g11Data: CurriculumLevel = {
     level: 11,
     title: { en: 'Grade 11', vi: 'Lớp 11' },
     subtitle: { en: 'Global Success', vi: 'Tiếng Anh 11 - Global Success' },
-    ebookPdfUrl: 'https://drive.google.com/file/d/1T-FfoJUUbuyDDunohmy-Q-meHntx5zqD/view?usp=drive_link',
+    ebookPdfUrl: 'https://drive.google.com/file/d/1-v-PIbluLEMH5hXqU_lvCd3TWSYoTGnV/view?usp=drive_link',
     units: [
         {
             id: 1101,
