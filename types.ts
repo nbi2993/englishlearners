@@ -3,6 +3,76 @@
 
 export type View = 'dashboard' | 'lesson' | 'teacher-dashboard' | 'writing-grader' | 'speaking-partner' | 'settings';
 
+export interface BilingualText {
+  en: string;
+  vi: string;
+}
+
+export interface VocabularyItem {
+  term: string;
+  pronunciation?: string;
+  vietnamese: string;
+  imageUrl?: string;
+}
+
+export interface GrammarItem {
+  title: BilingualText;
+  explanation: {
+    en: string[];
+    vi: string[];
+  };
+}
+
+export interface Activity {
+  type: string;
+  description: {
+    en: string[];
+    vi: string[];
+  };
+}
+
+export interface Lesson {
+  id: number;
+  title: BilingualText;
+  aims?: {
+    en: string[];
+    vi: string[];
+  };
+  vocabulary?: VocabularyItem[];
+  grammar?: GrammarItem[];
+  activities?: Activity[];
+  content?: string;
+  day?: number;
+}
+
+export interface Unit {
+  id: number;
+  title: BilingualText;
+  lessons: Lesson[];
+}
+
+export interface CurriculumLevel {
+  level: number;
+  title: BilingualText;
+  subtitle: BilingualText;
+  ebookPdfUrl?: string;
+  units: Unit[];
+}
+
+export interface Course {
+  id: string;
+  title: BilingualText;
+  subtitle: BilingualText;
+  level: 'Preschool' | 'Primary' | 'Junior High' | 'High School';
+  imageUrl?: string;
+  description?: string;
+  units: Unit[];
+  color?: string;
+  progress?: number;
+  ebookPdfUrl?: string;
+  rawLevel?: CurriculumLevel;  
+}
+
 export interface TeacherProfile {
   subjectsAndLevels: string[];
   yearsOfExperience: number;
@@ -48,27 +118,6 @@ export interface Chat {
   }>;
 }
 
-export interface Lesson {
-  id: string;
-  title: string;
-  type: 'ebook' | 'video' | 'quiz';
-  content: string;
-  rawLesson: CurriculumLesson;
-}
-
-export interface Course {
-  id: string;
-  title: string;
-  series: string;
-  level: 'Preschool' | 'Primary' | 'Junior High' | 'High School';
-  imageUrl: string;
-  description: string;
-  lessons: Lesson[];
-  color: string;
-  progress: number;
-  rawLevel: CurriculumLevel;
-}
-
 export interface WritingFeedback {
   overall: string;
   grammar: string;
@@ -81,8 +130,6 @@ export interface ChatMessage {
   role: 'user' | 'model';
   text: string;
 }
-
-// Based on data/curriculum.ts and other data files
 
 interface LocalizedString {
     en: string;
