@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import type { WritingFeedback } from '../types';
+import type { WritingFeedback, Chat } from '../types';
 
 const API_KEY = process.env.API_KEY || process.env.GEMINI_API_KEY;
 const CACHE_DURATION = 1000 * 60 * 60; // 1 hour
@@ -73,14 +73,6 @@ Response must be valid JSON only.`;
 };
 
 
-interface Chat {
-  model: string;
-  config: {
-    systemInstruction?: string;
-    temperature?: number;
-  }
-}
-
 export const createChat = async (): Promise<Chat> => {
     return {
         model: 'gemini-pro',
@@ -88,6 +80,10 @@ export const createChat = async (): Promise<Chat> => {
             systemInstruction: "You are a friendly and encouraging English tutor for K-12 students. Your name is Sparky. Keep your answers concise and helpful. Use simple language and emojis to make learning fun. Your goal is to help students practice their English conversation skills.",
             temperature: 0.8
         },
+        sendMessageStream: async ({ message }: { message: string }) => {
+            const result = await model.generateContent(message);
+            return result;
+        }
     };
 };
 

@@ -40,7 +40,12 @@ export interface Chat {
   config: {
     systemInstruction?: string;
     temperature?: number;
-  }
+  };
+  sendMessageStream: (params: { message: string }) => Promise<{
+    response: {
+      text: () => string;
+    }
+  }>;
 }
 
 export interface Lesson {
