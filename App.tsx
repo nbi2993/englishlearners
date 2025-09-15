@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { Course, User, View, Lesson } from './types';
 import { MOCK_USER } from './constants';
 import { curriculumData } from './data/curriculum';
-import Dashboard from './components/Dashboard';
+const Dashboard = React.lazy(() => import('./components/Dashboard'));
 import LessonView from './components/LessonView';
 import TeacherDashboard from './components/TeacherDashboard';
 import WritingGrader from './components/WritingGrader';
@@ -48,9 +48,12 @@ const colorMap: { [key: string]: string } = {
 
 export default function App() {
   const [user, setUser] = useState<User>(MOCK_USER);
-  const [view, setView] = useState<View>('teacher-dashboard');
+  const [view, setView] = useState<View>('dashboard');
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
-  const [lastViewedCourse, setLastViewedCourse] = useState<Course | null>(null);
+  const [lastViewedCourse, setLastViewedCourse] = useState<Course | null>(() => {
+    const saved = localStorage.getItem('lastViewedCourse');
+    return saved ? JSON.parse(saved) : null;
+  });
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [language, setLanguage] = useState<Language>('vi');
   const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('theme') as Theme) || 'system');

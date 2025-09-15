@@ -1,6 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, lazy, Suspense } from 'react';
 import type { User, Course } from '../types';
-import CourseCard from './CourseCard';
+
+// Lazy load CourseCard component
+const CourseCard = lazy(() => import('./CourseCard'));
 
 interface DashboardProps {
   user: User;
@@ -37,6 +39,14 @@ const UserProfile: React.FC<{ user: User }> = React.memo(({ user }) => (
   </div>
 ));
 
+const LoadingPlaceholder = () => (
+  <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md animate-pulse">
+    <div className="h-48 bg-gray-200 dark:bg-gray-700 rounded-lg mb-4"></div>
+    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
+    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+  </div>
+);
+
 const ContinueLearningCard: React.FC<{ course: Course; onSelectCourse: (course: Course) => void }> = React.memo(({ course, onSelectCourse }) => (
     <div 
         className="bg-gradient-to-r from-blue-500 to-indigo-600 dark:from-blue-700 dark:to-indigo-800 p-6 rounded-xl shadow-lg flex items-center justify-between cursor-pointer transform hover:scale-105 transition-transform duration-300"
@@ -61,7 +71,7 @@ const ContinueLearningCard: React.FC<{ course: Course; onSelectCourse: (course: 
 );
 
 
-const Dashboard: React.FC<DashboardProps> = ({ user, courses, onSelectCourse, lastViewedCourse }) => {
+const Dashboard: React.FC<DashboardProps> = React.memo(({ user, courses, onSelectCourse, lastViewedCourse }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredCourses = useMemo(() => {
