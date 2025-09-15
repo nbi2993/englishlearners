@@ -72,28 +72,30 @@ Response must be valid JSON only.`;
 };
 
 
-export const createChat = (): Chat => {
-    return ai.chats.create({
-        model: 'gemini-2.5-flash',
+interface Chat {
+  model: string;
+  config: {
+    systemInstruction?: string;
+    temperature?: number;
+  }
+}
+
+export const createChat = async (): Promise<Chat> => {
+    return {
+        model: 'gemini-pro',
         config: {
             systemInstruction: "You are a friendly and encouraging English tutor for K-12 students. Your name is Sparky. Keep your answers concise and helpful. Use simple language and emojis to make learning fun. Your goal is to help students practice their English conversation skills.",
             temperature: 0.8
         },
-    });
+    };
 };
 
 export const translateToVietnamese = async (text: string): Promise<string> => {
   const prompt = `Translate the following English text to Vietnamese for a K-12 student. Return only the translated text.\n\nEnglish: "${text}"`;
 
   try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
-      config: {
-        temperature: 0.1,
-      },
-    });
-    return response.text.trim();
+    const result = await model.generateContent(prompt);
+    return result.response.text().trim();
   } catch (error) {
     console.error("Error translating text:", error);
     throw new Error("Failed to translate text.");
