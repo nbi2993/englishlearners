@@ -20,7 +20,7 @@ const TeacherDashboard: React.FC = () => {
     const [isAddClassModalOpen, setAddClassModalOpen] = useState(false);
     const [isAddStudentModalOpen, setAddStudentModalOpen] = useState(false);
     
-    const [sortConfig, setSortConfig] = useState<{ key: SortKey; order: SortOrder }>({ key: 'name', order: 'asc' });
+    const [sortConfig, setSortConfig] = useState<{ key: keyof Student; order: SortOrder }>({ key: 'name', order: 'asc' });
 
     const currentClass = classes[selectedClassId];
     const students = currentClass?.students || [];
@@ -62,7 +62,11 @@ const TeacherDashboard: React.FC = () => {
 
     const handleAddClass = (className: string) => {
         const newClassId = `class-${Date.now()}`;
-        const newClass = { name: className, students: [] };
+        const newClass = { 
+            name: className, 
+            grade: 'Grade 1', // Default grade
+            students: [] 
+        };
         setClasses(prev => ({ ...prev, [newClassId]: newClass }));
         setSelectedClassId(newClassId);
     };
@@ -74,10 +78,14 @@ const TeacherDashboard: React.FC = () => {
             name: studentName,
             avatar: `https://i.pravatar.cc/150?u=${studentName}`,
             lastActivity: 'Just now',
+            lastActive: 'Just now',
             progress: 0,
             averageScore: 0,
             timeSpent: '0h 0m',
             isStruggling: false,
+            grade: currentClass.grade || 'N/A',
+            level: 'Beginner',
+            attendance: 0,
             scoreHistory: [],
             assignments: [],
         };

@@ -98,26 +98,20 @@ export default function App() {
   const courses: Course[] = useMemo(() => {
     return curriculumData.flatMap(category =>
       category.levels.map(levelData => {
-        const description = `${levelData.subtitle[language]}. This course covers units like ${levelData.units.slice(0, 2).map(u => u.title[language]).join(', ')}${levelData.units.length > 2 ? ' and more' : ''}.`;
+        const description = `${levelData.subtitle.vi}. This course covers units like ${levelData.units.slice(0, 2).map(u => u.title.vi).join(', ')}${levelData.units.length > 2 ? ' and more' : ''}.`;
         
         return {
           id: `${category.category.en.replace(/\s+/g, '-').toLowerCase()}-${levelData.level}`,
-          title: levelData.title[language],
-          series: category.category[language],
+          title: levelData.title,
+          subtitle: levelData.subtitle,
           level: levelMap[category.category.en] || 'Primary',
           imageUrl: `https://picsum.photos/seed/${levelData.title.en.replace(/[^a-zA-Z0-9]/g, '-')}/400/300`,
           description: description,
-          lessons: levelData.units.flatMap(unit =>
-            unit.lessons.map((lesson): Lesson => ({
-              id: lesson.id.toString(),
-              title: lesson.title[language],
-              type: 'ebook',
-              content: `Aims:\n- ${lesson.aims[language].join('\n- ')}`,
-              rawLesson: lesson,
-            }))
-          ),
+          series: category.category.en,
+          units: levelData.units,
           color: colorMap[category.category.en] || 'bg-gray-700',
           progress: Math.floor(Math.random() * 80) + 5, // random progress
+          ebookPdfUrl: levelData.ebookPdfUrl,
           rawLevel: levelData,
         }
       })
@@ -196,7 +190,7 @@ export default function App() {
             <button onClick={() => setIsSidebarOpen(true)} className="text-gray-600 dark:text-gray-300">
                 <i className="fa-solid fa-bars text-xl"></i>
             </button>
-            <h1 className="text-lg font-bold">{currentTitle}</h1>
+            <h1 className="text-lg font-bold">{typeof currentTitle === 'string' ? currentTitle : currentTitle[language]}</h1>
             <div className="flex items-center space-x-2">
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 {user.role === 'teacher' ? 'Teacher Mode' : 'Student Mode'}

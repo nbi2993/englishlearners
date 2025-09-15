@@ -1,4 +1,3 @@
-
 // types.ts
 
 export type View = 'dashboard' | 'lesson' | 'teacher-dashboard' | 'writing-grader' | 'speaking-partner' | 'settings';
@@ -6,6 +5,45 @@ export type View = 'dashboard' | 'lesson' | 'teacher-dashboard' | 'writing-grade
 export interface BilingualText {
   en: string;
   vi: string;
+}
+
+export interface ScoreEntry {
+  date: string;
+  score: number;
+  type?: string; // Making type optional since it's not used in the mock data
+}
+
+export interface Assignment {
+  id: string;
+  title: string;
+  dueDate: string;
+  status: 'Completed' | 'Pending' | 'Overdue';
+  score?: number;
+}
+
+export interface Classes {
+  [key: string]: {
+    name: string;
+    grade: string;
+    students: Student[];
+  };
+}
+
+export interface Student {
+  id: string;
+  name: string;
+  avatar: string;
+  grade: string;
+  level: string;
+  attendance: number;
+  lastActive: string;
+  progress: number;
+  averageScore: number;
+  timeSpent: string;
+  isStruggling: boolean;
+  lastActivity: string;
+  scoreHistory: ScoreEntry[];
+  assignments: Assignment[];
 }
 
 export interface VocabularyItem {
@@ -21,6 +59,14 @@ export interface GrammarItem {
     en: string[];
     vi: string[];
   };
+}
+
+export type GrammarPoint = GrammarItem;
+
+export interface CurriculumLesson extends Lesson {
+  vocabPreview?: string[];
+  grammarPreview?: string[];
+  objectives?: string[];
 }
 
 export interface Activity {
@@ -51,6 +97,21 @@ export interface Unit {
   lessons: Lesson[];
 }
 
+export interface Course {
+  id: string;
+  title: BilingualText;
+  subtitle?: BilingualText;
+  level: 'Preschool' | 'Primary' | 'Junior High' | 'High School';
+  imageUrl: string;
+  description: string;
+  series: string;
+  units: Unit[];
+  color: string;
+  progress: number;
+  ebookPdfUrl?: string;
+  rawLevel?: CurriculumLevel;  
+}
+
 export interface CurriculumLevel {
   level: number;
   title: BilingualText;
@@ -59,18 +120,17 @@ export interface CurriculumLevel {
   units: Unit[];
 }
 
-export interface Course {
-  id: string;
+export interface CurriculumCategory {
+  category: BilingualText;
+  levels: CurriculumLevel[];
+}
+
+export type Curriculum = CurriculumCategory[];
+
+export interface OtherProgram {
   title: BilingualText;
-  subtitle: BilingualText;
-  level: 'Preschool' | 'Primary' | 'Junior High' | 'High School';
-  imageUrl?: string;
-  description?: string;
-  units: Unit[];
-  color?: string;
-  progress?: number;
-  ebookPdfUrl?: string;
-  rawLevel?: CurriculumLevel;  
+  description: BilingualText;
+  driveLink: string;
 }
 
 export interface TeacherProfile {
@@ -92,7 +152,7 @@ export interface StudentProfile {
 export interface User {
   id: string;
   name: string;
-  avatar: string; // font-awesome class
+  avatar: string;
   level: string;
   points: number;
   badges: string[];
@@ -103,19 +163,6 @@ export interface User {
   gradeLevel?: string;
   studentProfile?: StudentProfile;
   teacherProfile?: TeacherProfile;
-}
-
-export interface Chat {
-  model: string;
-  config: {
-    systemInstruction?: string;
-    temperature?: number;
-  };
-  sendMessageStream: (params: { message: string }) => Promise<{
-    response: {
-      text: () => string;
-    }
-  }>;
 }
 
 export interface WritingFeedback {
@@ -131,99 +178,17 @@ export interface ChatMessage {
   text: string;
 }
 
-interface LocalizedString {
-    en: string;
-    vi: string;
+export interface ChatConfig {
+  systemInstruction?: string;
+  temperature?: number;
 }
 
-export interface VocabularyItem {
-    term: string;
-    pronunciation: string;
-    vietnamese: string;
-    imageUrl?: string;
+export interface Chat {
+  model: string;
+  config: ChatConfig;
+  sendMessageStream: (params: { message: string }) => Promise<{
+    response: {
+      text: () => string;
+    }
+  }>;
 }
-
-export interface GrammarPoint {
-    title: LocalizedString;
-    explanation: {
-        en: string[];
-        vi: string[];
-    };
-}
-
-export interface Activity {
-    type: string;
-    description: {
-        en: string[];
-        vi: string[];
-    };
-}
-
-export interface CurriculumLesson {
-    id: number;
-    title: LocalizedString;
-    aims: {
-        en: string[];
-        vi: string[];
-    };
-    vocabulary: VocabularyItem[];
-    grammar: GrammarPoint[];
-    activities: Activity[];
-    day?: number;
-}
-
-export interface Unit {
-    id: number;
-    title: LocalizedString;
-    lessons: CurriculumLesson[];
-}
-
-export interface CurriculumLevel {
-    level: number;
-    title: LocalizedString;
-
-    subtitle: LocalizedString;
-    ebookPdfUrl: string;
-    units: Unit[];
-}
-
-export interface CurriculumCategory {
-    category: LocalizedString;
-    levels: CurriculumLevel[];
-}
-
-export type Curriculum = CurriculumCategory[];
-
-export interface OtherProgram {
-    title: LocalizedString;
-    description: LocalizedString;
-    driveLink: string;
-}
-
-// For TeacherDashboard
-export interface Assignment {
-    id: string;
-    title: string;
-    dueDate: string;
-    status: 'Completed' | 'Pending' | 'Overdue';
-}
-
-export interface Student {
-    id: string;
-    name: string;
-    avatar: string;
-    lastActivity: string;
-    progress: number;
-    averageScore: number;
-    timeSpent: string;
-    isStruggling: boolean;
-    scoreHistory: { date: string; score: number }[];
-    assignments: Assignment[];
-}
-
-export interface ClassData {
-    name: string;
-    students: Student[];
-}
-
-export type Classes = Record<string, ClassData>;

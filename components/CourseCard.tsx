@@ -18,15 +18,18 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onSelectCourse }) => {
       onClick={() => onSelectCourse(course)}
     >
       <div className="relative">
-        <img className="h-40 w-full object-cover" src={course.imageUrl} alt={course.title} />
+        <img className="h-40 w-full object-cover" src={course.imageUrl} alt={course.title.vi} />
         <div className="absolute top-2 right-2 bg-black/50 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1.5">
             <i className="fa-solid fa-book-open"></i>
-            <span>{course.lessons.length} Lessons</span>
+            <span>{course.units.length} Units</span>
         </div>
       </div>
       <div className="p-5 flex flex-col flex-grow">
         <p className={`text-sm font-semibold ${course.color.replace('bg-', 'text-')}`}>{course.series}</p>
-        <h4 className="text-xl font-bold text-gray-800 dark:text-white mt-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{course.title}</h4>
+        <h4 className="text-xl font-bold text-gray-800 dark:text-white mt-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+          {course.title.vi}
+          <span className="text-sm text-gray-500 dark:text-gray-400 ml-2">({course.title.en})</span>
+        </h4>
         <p className="text-gray-500 dark:text-gray-400 text-sm mt-2 flex-grow">{course.description}</p>
         
         {course.rawLevel?.ebookPdfUrl && (

@@ -53,10 +53,10 @@ const ContinueLearningCard = React.memo<{ course: Course; onSelectCourse: (cours
         onClick={() => onSelectCourse(course)}
     >
         <div className="flex items-center">
-            <img src={course.imageUrl} alt={course.title} className="w-24 h-24 rounded-lg object-cover border-4 border-white/50" loading="lazy" />
+            <img src={course.imageUrl} alt={course.title.vi} className="w-24 h-24 rounded-lg object-cover border-4 border-white/50" loading="lazy" />
             <div className="ml-6 text-white">
                 <p className="text-sm font-semibold opacity-80 uppercase tracking-wider">Continue Learning</p>
-                <h3 className="text-2xl font-bold">{course.title}</h3>
+                <h3 className="text-2xl font-bold">{course.title.vi}</h3>
                 <p className="opacity-90">{course.series}</p>
             </div>
         </div>
@@ -76,10 +76,12 @@ const Dashboard: React.FC<DashboardProps> = ({ user, courses, onSelectCourse, la
 
   const filteredCourses = useMemo(() => {
     if (!searchTerm) return courses;
+    const searchTermLower = searchTerm.toLowerCase();
     return courses.filter(course =>
-      course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      course.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      course.series.toLowerCase().includes(searchTerm.toLowerCase())
+      course.title.vi.toLowerCase().includes(searchTermLower) ||
+      course.title.en.toLowerCase().includes(searchTermLower) ||
+      course.description.toLowerCase().includes(searchTermLower) ||
+      course.series.toLowerCase().includes(searchTermLower)
     );
   }, [courses, searchTerm]);
 
