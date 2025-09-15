@@ -7,7 +7,9 @@ import { sm1Data } from './sm1';
 import { sm2Data } from './sm2';
 import { sm3Data } from './sm3';
 import { sm4Data } from './sm4';
-import { prepareToHighData, theNewHigh1Data, theNewHigh2Data, theNewHigh3Data } from './thpt';
+import { g10Data } from './g10';
+import { g11Data } from './g11';
+import { g12Data } from './g12';
 
 const IMG_BASE = 'https://storage.googleapis.com/maker-suite-project-files-prod/upload/flashcard_images/';
 const GD_BASE = `${IMG_BASE}goaldigger_`;
@@ -556,10 +558,9 @@ export const curriculumData: Curriculum = [
     {
         category: { en: 'Highschool IVS-Mastery', vi: 'Trung học phổ thông IVS-Mastery' },
         levels: [
-            prepareToHighData,
-            theNewHigh1Data,
-            theNewHigh2Data,
-            theNewHigh3Data,
+            g10Data,
+            g11Data,
+            g12Data,
         ]
     }
 ];
