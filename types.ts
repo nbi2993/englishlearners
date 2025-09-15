@@ -3,6 +3,22 @@
 
 export type View = 'dashboard' | 'lesson' | 'teacher-dashboard' | 'writing-grader' | 'speaking-partner' | 'settings';
 
+export interface TeacherProfile {
+  subjectsAndLevels: string[];
+  yearsOfExperience: number;
+  classes: string[];
+  specializations: string[];
+  rating: number;
+  reviews: number;
+}
+
+export interface StudentProfile {
+  grade: string;
+  learningStyle?: string;
+  interests?: string[];
+  recentScores?: number[];
+}
+
 export interface User {
   id: string;
   name: string;
@@ -12,8 +28,10 @@ export interface User {
   badges: string[];
   role: 'student' | 'teacher';
   age?: string | number;
-  gradeLevel?: string;
   gender?: string;
+  email?: string;
+  teacherProfile?: TeacherProfile;
+  studentProfile?: StudentProfile;
 }
 
 export interface Lesson {

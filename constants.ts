@@ -1,17 +1,44 @@
 
 import type { User, Classes } from './types';
 
-export const MOCK_USER: User = {
-  id: 'user-01',
-  name: 'Alex',
-  avatar: 'fa-user-astronaut',
+export const MOCK_TEACHER: User = {
+  id: 'teacher-01', 
+  name: 'Alex Thompson',
+  avatar: 'fa-user-tie',
+  level: 'Senior Teacher',
+  points: 5250,
+  badges: ['Master Educator', 'Student Favorite', 'Innovation Leader'],
+  role: 'teacher',
+  teacherProfile: {
+    subjectsAndLevels: ['English - Primary', 'English - Secondary'],
+    specializations: ['Grammar', 'Conversation'],
+    yearsOfExperience: 5,
+    classes: ['sw-6', 'sm-4'],
+    rating: 4.8,
+    reviews: 120
+  },
+  age: 32,
+  gender: 'Male',
+  email: 'alex.thompson@ivs.edu.vn'
+};
+
+export const MOCK_STUDENT: User = {
+  id: 'student-01',
+  name: 'Minh Anh',
+  avatar: 'fa-user-graduate',
   level: 'Primary - Grade 5',
   points: 1250,
   badges: ['Grammar Guru', 'Perfect Pronunciation', 'Bookworm'],
-  role: 'teacher',
+  role: 'student',
+  studentProfile: {
+    grade: 'Grade 5',
+    learningStyle: 'Visual',
+    interests: ['Reading', 'Music', 'Games'],
+    recentScores: [85, 92, 88, 90]
+  },
   age: 10,
-  gradeLevel: 'Grade 5',
-  gender: 'Male',
+  gender: 'Female',
+  email: 'minh.anh@student.ivs.edu.vn'
 };
 
 export const MOCK_CLASSES: Classes = {

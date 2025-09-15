@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Course, User, View, Lesson } from './types';
-import { MOCK_USER } from './constants';
+import { MOCK_TEACHER, MOCK_STUDENT } from './constants';
 import { curriculumData } from './data/curriculum';
 import Dashboard from './components/Dashboard';
 import LessonView from './components/LessonView';
@@ -10,6 +10,7 @@ import WritingGrader from './components/WritingGrader';
 import SpeakingPartner from './components/SpeakingPartner';
 import Sidebar from './components/Sidebar';
 import Settings from './components/Settings';
+import UserRoleSelector from './components/UserRoleSelector';
 
 type Language = 'en' | 'vi';
 type Theme = 'light' | 'dark' | 'system';
@@ -48,13 +49,17 @@ const colorMap: { [key: string]: string } = {
 };
 
 export default function App() {
-  const [user, setUser] = useState<User>(MOCK_USER);
+  const [user, setUser] = useState<User>(() => {
+    const savedUser = localStorage.getItem('user');
+    return savedUser ? JSON.parse(savedUser) : MOCK_STUDENT;
+  });
   const [view, setView] = useState<View>(() => user.role === 'teacher' ? 'teacher-dashboard' : 'dashboard');
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [lastViewedCourse, setLastViewedCourse] = useState<Course | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [language, setLanguage] = useState<Language>('vi');
   const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('theme') as Theme) || 'system');
+  const [showRoleSelector, setShowRoleSelector] = useState<boolean>(() => !localStorage.getItem('user'));
   const previousRoleRef = useRef<User['role']>(user.role);
 
 
@@ -156,9 +161,28 @@ export default function App() {
     }
   };
 
+  const handleUserSelect = (selectedUser: User) => {
+    setUser(selectedUser);
+    setView(selectedUser.role === 'teacher' ? 'teacher-dashboard' : 'dashboard');
+    localStorage.setItem('user', JSON.stringify(selectedUser));
+    setShowRoleSelector(false);
+  };
+
+  if (showRoleSelector) {
+    return <UserRoleSelector onSelectUser={handleUserSelect} />;
+  }
+
   return (
     <div className="flex h-screen bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200">
-      <Sidebar currentView={view} setView={handleSetView} isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} language={language} translations={translations} />
+      <Sidebar 
+        currentView={view} 
+        setView={handleSetView} 
+        isSidebarOpen={isSidebarOpen} 
+        setIsSidebarOpen={setIsSidebarOpen} 
+        language={language} 
+        translations={translations}
+        userRole={user.role}
+      />
       
       {isSidebarOpen && (
         <div 
@@ -173,7 +197,11 @@ export default function App() {
                 <i className="fa-solid fa-bars text-xl"></i>
             </button>
             <h1 className="text-lg font-bold">{currentTitle}</h1>
-            <div className="w-6"></div>
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-500 dark:text-gray-400">
+                {user.role === 'teacher' ? 'Teacher Mode' : 'Student Mode'}
+              </span>
+            </div>
         </header>
         <div className="flex-1 p-4 sm:p-6 md:p-8">
             {renderView()}
