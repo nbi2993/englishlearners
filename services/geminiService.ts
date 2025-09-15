@@ -1,11 +1,11 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import type { WritingFeedback } from '../types';
 
-const API_KEY = process.env.GEMINI_API_KEY;
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
 if (!API_KEY) {
-  console.error("GEMINI_API_KEY environment variable not set.");
-  throw new Error("GEMINI_API_KEY environment variable not set");
+  console.error("VITE_GEMINI_API_KEY environment variable not set.");
+  throw new Error("VITE_GEMINI_API_KEY environment variable not set");
 }
 
 const genAI = new GoogleGenerativeAI(API_KEY);
