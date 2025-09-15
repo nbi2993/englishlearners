@@ -1,98 +1,71 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import type { WritingFeedback, Chat } from '../types';
+import { GoogleGenAI, Type, Chat } from "@google/genai";
+import type { WritingFeedback } from '../types';
 
-const API_KEY = window.VITE_GEMINI_API_KEY || import.meta.env.VITE_GEMINI_API_KEY;
-const CACHE_DURATION = 1000 * 60 * 60; // 1 hour
+const API_KEY = process.env.API_KEY;
 
 if (!API_KEY) {
-  throw new Error("API_KEY environment variable not set. Please configure your GEMINI_API_KEY in the environment variables.");
+  console.error("API_KEY environment variable not set.");
+  // In a real app, you might want to show an error to the user.
+  // For this demo, we will proceed but API calls will fail.
 }
 
-const genAI = new GoogleGenerativeAI(API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-
-// Simple in-memory cache
-const cache = new Map<string, { data: WritingFeedback; timestamp: number }>();
-
-const getCacheKey = (topic: string, text: string) => `${topic}-${text}`;
-
-const isCacheValid = (timestamp: number) => {
-  return Date.now() - timestamp < CACHE_DURATION;
-};
+const ai = new GoogleGenAI({ apiKey: API_KEY! });
 
 export const gradeWriting = async (topic: string, text: string): Promise<WritingFeedback> => {
-  const cacheKey = getCacheKey(topic, text);
-  const cachedResult = cache.get(cacheKey);
+  const prompt = `Topic: "${topic}"\n\nEssay: "${text}"\n\nPlease grade this essay for a K-12 English learner. Provide feedback on grammar, vocabulary, and coherence. Give an overall score out of 100.`;
 
-  if (cachedResult && isCacheValid(cachedResult.timestamp)) {
-    return cachedResult.data;
-  }
+  const response = await ai.models.generateContent({
+    model: 'gemini-2.5-flash',
+    contents: prompt,
+    config: {
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: Type.OBJECT,
+        properties: {
+          overall: { type: Type.STRING, description: 'Overall feedback on the essay.' },
+          grammar: { type: Type.STRING, description: 'Specific feedback on grammar.' },
+          vocabulary: { type: Type.STRING, description: 'Specific feedback on vocabulary usage.' },
+          coherence: { type: Type.STRING, description: 'Specific feedback on the structure and flow.' },
+          score: { type: Type.INTEGER, description: 'A score from 0 to 100.' },
+        },
+        required: ["overall", "grammar", "vocabulary", "coherence", "score"]
+      },
+      temperature: 0.2
+    },
+  });
 
   try {
-    const essayText = text; // Store text in a new variable to avoid TDZ issue
-    const prompt = `Topic: "${topic}"
-
-Essay: "${essayText}"
-
-Please grade this essay for a K-12 English learner. Provide structured feedback in JSON format with the following fields:
-- overall: Overall feedback on the essay
-- grammar: Specific feedback on grammar
-- vocabulary: Specific feedback on vocabulary usage
-- coherence: Specific feedback on the structure and flow
-- score: A number from 0 to 100
-
-Response must be valid JSON only.`;
-
-    const result = await model.generateContent(prompt);
-    const responseText = result.response.text();
-    
-    try {
-      const feedback = JSON.parse(responseText) as WritingFeedback;
-      
-      // Validate the response structure
-      if (!feedback.overall || !feedback.grammar || !feedback.vocabulary || 
-          !feedback.coherence || typeof feedback.score !== 'number') {
-        throw new Error('Invalid response format');
-      }
-
-      // Cache the result
-      cache.set(cacheKey, {
-        data: feedback,
-        timestamp: Date.now()
-      });
-
-      return feedback;
-    } catch (parseError) {
-      console.error('Error parsing AI response:', parseError);
-      throw new Error('Failed to parse writing feedback');
-    }
-  } catch (error) {
-    console.error('Error in gradeWriting:', error);
-    throw new Error('Failed to grade writing. Please try again later.');
+    const jsonString = response.text.trim();
+    return JSON.parse(jsonString) as WritingFeedback;
+  } catch (e) {
+    console.error("Failed to parse Gemini JSON response:", e);
+    throw new Error("Could not get feedback from AI. Please try again.");
   }
 };
 
 
-export const createChat = async (): Promise<Chat> => {
-    return {
-        model: 'gemini-pro',
+export const createChat = (): Chat => {
+    return ai.chats.create({
+        model: 'gemini-2.5-flash',
         config: {
             systemInstruction: "You are a friendly and encouraging English tutor for K-12 students. Your name is Sparky. Keep your answers concise and helpful. Use simple language and emojis to make learning fun. Your goal is to help students practice their English conversation skills.",
             temperature: 0.8
         },
-        sendMessageStream: async ({ message }: { message: string }) => {
-            const result = await model.generateContent(message);
-            return result;
-        }
-    };
+    });
 };
 
 export const translateToVietnamese = async (text: string): Promise<string> => {
   const prompt = `Translate the following English text to Vietnamese for a K-12 student. Return only the translated text.\n\nEnglish: "${text}"`;
 
   try {
-    const result = await model.generateContent(prompt);
-    return result.response.text().trim();
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
+        temperature: 0.1,
+      },
+    });
+    return response.text.trim();
   } catch (error) {
     console.error("Error translating text:", error);
     throw new Error("Failed to translate text.");

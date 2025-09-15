@@ -8,7 +8,6 @@ interface SidebarProps {
   setIsSidebarOpen: (isOpen: boolean) => void;
   language: 'en' | 'vi';
   translations: any;
-  userRole: 'student' | 'teacher';
 }
 
 const NavItem: React.FC<{
@@ -30,7 +29,7 @@ const NavItem: React.FC<{
   </button>
 );
 
-const Sidebar: React.FC<SidebarProps> = ({ currentView, setView, isSidebarOpen, setIsSidebarOpen, language, translations, userRole }) => {
+const Sidebar: React.FC<SidebarProps> = ({ currentView, setView, isSidebarOpen, setIsSidebarOpen, language, translations }) => {
   const t = translations[language];
 
   return (
@@ -47,25 +46,19 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, setView, isSidebarOpen, 
         </button>
       </div>
       <nav className="flex-1 space-y-2">
-        {userRole === 'student' ? (
-          <NavItem
-            icon="fa-table-columns"
-            label={t.dashboard}
-            isActive={currentView === 'dashboard' || currentView === 'lesson'}
-            onClick={() => setView('dashboard')}
-          />
-        ) : (
-          <NavItem
-            icon="fa-user-tie"
-            label={t['teacher-dashboard']}
-            isActive={currentView === 'teacher-dashboard'}
-            onClick={() => setView('teacher-dashboard')}
-          />
-        )}
-        
+        <NavItem
+          icon="fa-table-columns"
+          label={t.dashboard}
+          isActive={currentView === 'dashboard' || currentView === 'lesson'}
+          onClick={() => setView('dashboard')}
+        />
+        <NavItem
+          icon="fa-user-tie"
+          label={t['teacher-dashboard']}
+          isActive={currentView === 'teacher-dashboard'}
+          onClick={() => setView('teacher-dashboard')}
+        />
         <h3 className="px-4 pt-4 pb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">AI Tools</h3>
-        
-        {/* AI tools available for both roles */}
         <NavItem
           icon="fa-comments"
           label={t['speaking-partner']}

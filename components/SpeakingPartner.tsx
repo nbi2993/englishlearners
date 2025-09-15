@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import type { Chat } from '../types';
+import type { Chat } from "@google/genai";
 import { createChat } from '../services/geminiService';
 import type { ChatMessage } from '../types';
 
@@ -12,21 +12,16 @@ const SpeakingPartner: React.FC = () => {
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        const initializeChat = async () => {
-            const initialChat = await createChat();
-            setChat(initialChat);
-            setMessages([{ role: 'model', text: "Hi there! I'm Sparky, your AI speaking partner. Let's chat about anything you like! What's on your mind today? 😊" }]);
-        };
-        initializeChat();
+        const initialChat = createChat();
+        setChat(initialChat);
+        setMessages([{ role: 'model', text: "Hi there! I'm Sparky, your AI speaking partner. Let's chat about anything you like! What's on your mind today? 😊" }]);
     }, []);
 
-    const scrollToBottom = useCallback(() => {
+    const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, []);
+    };
 
-    useEffect(() => {
-        scrollToBottom();
-    }, [messages, scrollToBottom]);
+    useEffect(scrollToBottom, [messages]);
 
     const handleSend = useCallback(async () => {
         if (!userInput.trim() || !chat || isLoading) return;
@@ -38,11 +33,22 @@ const SpeakingPartner: React.FC = () => {
 
         try {
             const result = await chat.sendMessageStream({ message: userInput });
-            const response = result.response.text();
-            setMessages(prev => [...prev, { role: 'model', text: response }]);
+            
+            let modelResponse = '';
+            setMessages(prev => [...prev, { role: 'model', text: '' }]);
+
+            for await (const chunk of result) {
+                modelResponse += chunk.text;
+                setMessages(prev => {
+                    const newMessages = [...prev];
+                    newMessages[newMessages.length - 1].text = modelResponse;
+                    return newMessages;
+                });
+            }
+
         } catch (error) {
-            console.error('Error sending message:', error);
-            setMessages(prev => [...prev, { role: 'model', text: "I'm sorry, I encountered an error. Could you try again?" }]);
+            console.error("Error sending message:", error);
+            setMessages(prev => [...prev, { role: 'model', text: "Oops! I'm having a little trouble connecting. Please try again." }]);
         } finally {
             setIsLoading(false);
         }

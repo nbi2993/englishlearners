@@ -1,8 +1,6 @@
-import React, { useState, useMemo, lazy, Suspense } from 'react';
+import React, { useState, useMemo } from 'react';
 import type { User, Course } from '../types';
-
-// Lazy load CourseCard component
-const CourseCard = lazy(() => import('./CourseCard'));
+import CourseCard from './CourseCard';
 
 interface DashboardProps {
   user: User;
@@ -11,7 +9,7 @@ interface DashboardProps {
   lastViewedCourse: Course | null;
 }
 
-const UserProfile: React.FC<{ user: User }> = React.memo(({ user }) => (
+const UserProfile: React.FC<{ user: User }> = ({ user }) => (
   <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md flex items-center flex-wrap gap-4">
     <div className="w-20 h-20 rounded-full bg-blue-100 dark:bg-gray-700 flex items-center justify-center border-4 border-blue-500">
         <i className={`fa-solid ${user.avatar} text-4xl text-blue-600 dark:text-blue-400`}></i>
@@ -37,26 +35,18 @@ const UserProfile: React.FC<{ user: User }> = React.memo(({ user }) => (
       ))}
     </div>
   </div>
-));
-
-const LoadingPlaceholder = () => (
-  <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md animate-pulse">
-    <div className="h-48 bg-gray-200 dark:bg-gray-700 rounded-lg mb-4"></div>
-    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
-    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
-  </div>
 );
 
-const ContinueLearningCard = React.memo<{ course: Course; onSelectCourse: (course: Course) => void }>(({ course, onSelectCourse }) => (
+const ContinueLearningCard: React.FC<{ course: Course; onSelectCourse: (course: Course) => void }> = ({ course, onSelectCourse }) => (
     <div 
         className="bg-gradient-to-r from-blue-500 to-indigo-600 dark:from-blue-700 dark:to-indigo-800 p-6 rounded-xl shadow-lg flex items-center justify-between cursor-pointer transform hover:scale-105 transition-transform duration-300"
         onClick={() => onSelectCourse(course)}
     >
         <div className="flex items-center">
-            <img src={course.imageUrl} alt={course.title.vi} className="w-24 h-24 rounded-lg object-cover border-4 border-white/50" loading="lazy" />
+            <img src={course.imageUrl} alt={course.title} className="w-24 h-24 rounded-lg object-cover border-4 border-white/50" />
             <div className="ml-6 text-white">
                 <p className="text-sm font-semibold opacity-80 uppercase tracking-wider">Continue Learning</p>
-                <h3 className="text-2xl font-bold">{course.title.vi}</h3>
+                <h3 className="text-2xl font-bold">{course.title}</h3>
                 <p className="opacity-90">{course.series}</p>
             </div>
         </div>
@@ -68,7 +58,7 @@ const ContinueLearningCard = React.memo<{ course: Course; onSelectCourse: (cours
             <i className="fa-solid fa-arrow-right text-white text-3xl"></i>
         </div>
     </div>
-));
+);
 
 
 const Dashboard: React.FC<DashboardProps> = ({ user, courses, onSelectCourse, lastViewedCourse }) => {
@@ -76,12 +66,10 @@ const Dashboard: React.FC<DashboardProps> = ({ user, courses, onSelectCourse, la
 
   const filteredCourses = useMemo(() => {
     if (!searchTerm) return courses;
-    const searchTermLower = searchTerm.toLowerCase();
     return courses.filter(course =>
-      course.title.vi.toLowerCase().includes(searchTermLower) ||
-      course.title.en.toLowerCase().includes(searchTermLower) ||
-      course.description.toLowerCase().includes(searchTermLower) ||
-      course.series.toLowerCase().includes(searchTermLower)
+      course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      course.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      course.series.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [courses, searchTerm]);
 
