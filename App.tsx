@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Course, User, View, Lesson } from './types';
-import { MOCK_TEACHER, MOCK_STUDENT } from './constants';
+import { MOCK_USER } from './constants';
 import { curriculumData } from './data/curriculum';
 import Dashboard from './components/Dashboard';
 import LessonView from './components/LessonView';
@@ -10,7 +10,6 @@ import WritingGrader from './components/WritingGrader';
 import SpeakingPartner from './components/SpeakingPartner';
 import Sidebar from './components/Sidebar';
 import Settings from './components/Settings';
-import UserRoleSelector from './components/UserRoleSelector';
 
 type Language = 'en' | 'vi';
 type Theme = 'light' | 'dark' | 'system';
@@ -49,17 +48,13 @@ const colorMap: { [key: string]: string } = {
 };
 
 export default function App() {
-  const [user, setUser] = useState<User>(() => {
-    const savedUser = localStorage.getItem('user');
-    return savedUser ? JSON.parse(savedUser) : MOCK_STUDENT;
-  });
+  const [user, setUser] = useState<User>(MOCK_USER);
   const [view, setView] = useState<View>(() => user.role === 'teacher' ? 'teacher-dashboard' : 'dashboard');
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [lastViewedCourse, setLastViewedCourse] = useState<Course | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [language, setLanguage] = useState<Language>('vi');
   const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('theme') as Theme) || 'system');
-  const [showRoleSelector, setShowRoleSelector] = useState<boolean>(() => !localStorage.getItem('user'));
   const previousRoleRef = useRef<User['role']>(user.role);
 
 
@@ -98,20 +93,26 @@ export default function App() {
   const courses: Course[] = useMemo(() => {
     return curriculumData.flatMap(category =>
       category.levels.map(levelData => {
-        const description = `${levelData.subtitle.vi}. This course covers units like ${levelData.units.slice(0, 2).map(u => u.title.vi).join(', ')}${levelData.units.length > 2 ? ' and more' : ''}.`;
+        const description = `${levelData.subtitle[language]}. This course covers units like ${levelData.units.slice(0, 2).map(u => u.title[language]).join(', ')}${levelData.units.length > 2 ? ' and more' : ''}.`;
         
         return {
           id: `${category.category.en.replace(/\s+/g, '-').toLowerCase()}-${levelData.level}`,
-          title: levelData.title,
-          subtitle: levelData.subtitle,
+          title: levelData.title[language],
+          series: category.category[language],
           level: levelMap[category.category.en] || 'Primary',
           imageUrl: `https://picsum.photos/seed/${levelData.title.en.replace(/[^a-zA-Z0-9]/g, '-')}/400/300`,
           description: description,
-          series: category.category.en,
-          units: levelData.units,
+          lessons: levelData.units.flatMap(unit =>
+            unit.lessons.map((lesson): Lesson => ({
+              id: lesson.id.toString(),
+              title: lesson.title[language],
+              type: 'ebook',
+              content: `Aims:\n- ${lesson.aims[language].join('\n- ')}`,
+              rawLesson: lesson,
+            }))
+          ),
           color: colorMap[category.category.en] || 'bg-gray-700',
           progress: Math.floor(Math.random() * 80) + 5, // random progress
-          ebookPdfUrl: levelData.ebookPdfUrl,
           rawLevel: levelData,
         }
       })
@@ -141,7 +142,7 @@ export default function App() {
       case 'dashboard':
         return <Dashboard user={user} courses={courses} onSelectCourse={handleSelectCourse} lastViewedCourse={lastViewedCourse} />;
       case 'lesson':
-        return selectedCourse ? <LessonView course={selectedCourse} /> : <Dashboard user={user} courses={courses} onSelectCourse={handleSelectCourse} lastViewedCourse={lastViewedCourse}/>;
+        return selectedCourse ? <LessonView course={selectedCourse} setView={handleSetView} /> : <Dashboard user={user} courses={courses} onSelectCourse={handleSelectCourse} lastViewedCourse={lastViewedCourse}/>;
       case 'teacher-dashboard':
         return <TeacherDashboard />;
       case 'writing-grader':
@@ -155,28 +156,9 @@ export default function App() {
     }
   };
 
-  const handleUserSelect = (selectedUser: User) => {
-    setUser(selectedUser);
-    setView(selectedUser.role === 'teacher' ? 'teacher-dashboard' : 'dashboard');
-    localStorage.setItem('user', JSON.stringify(selectedUser));
-    setShowRoleSelector(false);
-  };
-
-  if (showRoleSelector) {
-    return <UserRoleSelector onSelectUser={handleUserSelect} />;
-  }
-
   return (
     <div className="flex h-screen bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200">
-      <Sidebar 
-        currentView={view} 
-        setView={handleSetView} 
-        isSidebarOpen={isSidebarOpen} 
-        setIsSidebarOpen={setIsSidebarOpen} 
-        language={language} 
-        translations={translations}
-        userRole={user.role}
-      />
+      <Sidebar currentView={view} setView={handleSetView} isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} language={language} translations={translations} />
       
       {isSidebarOpen && (
         <div 
@@ -190,12 +172,8 @@ export default function App() {
             <button onClick={() => setIsSidebarOpen(true)} className="text-gray-600 dark:text-gray-300">
                 <i className="fa-solid fa-bars text-xl"></i>
             </button>
-            <h1 className="text-lg font-bold">{typeof currentTitle === 'string' ? currentTitle : currentTitle[language]}</h1>
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-500 dark:text-gray-400">
-                {user.role === 'teacher' ? 'Teacher Mode' : 'Student Mode'}
-              </span>
-            </div>
+            <h1 className="text-lg font-bold">{currentTitle}</h1>
+            <div className="w-6"></div>
         </header>
         <div className="flex-1 p-4 sm:p-6 md:p-8">
             {renderView()}
