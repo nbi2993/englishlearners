@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import type { WritingFeedback, Chat } from '../types';
 
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+const API_KEY = window.VITE_GEMINI_API_KEY || import.meta.env.VITE_GEMINI_API_KEY;
 const CACHE_DURATION = 1000 * 60 * 60; // 1 hour
 
 if (!API_KEY) {
