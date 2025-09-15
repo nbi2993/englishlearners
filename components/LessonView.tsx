@@ -76,74 +76,82 @@ const LessonView: React.FC<LessonViewProps> = ({ course }) => {
       <div className="flex gap-6">
         {/* Left sidebar - Units list */}
         <div className="w-1/4 bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
-          <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">Units</h2>
-          <div className="space-y-2">
-            {course.units.map((unit: Unit, index: number) => (
-              <div key={unit.id}>
-                <button
-                  onClick={() => {
-                    setCurrentUnitIndex(index);
-                    setCurrentLessonIndex(0);
-                  }}
-                  className={`w-full text-left p-3 rounded-lg transition-colors ${
-                    currentUnitIndex === index
-                      ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200'
-                      : 'hover:bg-gray-100 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  <div className="font-medium">{unit.title.vi}</div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">
-                    {unit.lessons.length} lessons
-                  </div>
-                </button>
-                {currentUnitIndex === index && (
-                  <div className="ml-4 mt-2 space-y-1">
-                    {unit.lessons.map((lesson: Lesson, lessonIndex: number) => (
-                      <button
-                        key={lessonIndex}
-                        onClick={() => setCurrentLessonIndex(lessonIndex)}
-                        className={`w-full text-left p-2 rounded-lg text-sm transition-colors ${
-                          currentLessonIndex === lessonIndex
-                            ? 'bg-blue-50 dark:bg-blue-800 text-blue-600 dark:text-blue-200'
-                            : 'hover:bg-gray-50 dark:hover:bg-gray-700'
-                        }`}
-                      >
-                        {lesson.title.vi}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+          <div className="flex items-center gap-2 mb-4">
+            <button onClick={() => window.history.back()} className="text-gray-600 hover:text-gray-800">
+              ← Bảng điều khiển
+            </button>
+            <span className="text-gray-400">|</span>
+            <span className="text-gray-600">{course.title.vi}</span>
+          </div>
+          
+          <div className="mb-4">
+            <select 
+              value={currentUnitIndex}
+              onChange={(e) => {
+                setCurrentUnitIndex(Number(e.target.value));
+                setCurrentLessonIndex(0);
+              }}
+              className="w-full p-2 border rounded bg-white dark:bg-gray-700"
+            >
+              {course.units.map((unit, index) => (
+                <option key={unit.id} value={index}>{unit.title.vi}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="space-y-1">
+            {course.units[currentUnitIndex]?.lessons.map((lesson, lessonIndex) => (
+              <button
+                key={lessonIndex}
+                onClick={() => setCurrentLessonIndex(lessonIndex)}
+                className={`w-full text-left px-4 py-3 rounded ${
+                  currentLessonIndex === lessonIndex
+                    ? 'bg-[#E1F9F6] text-[#00A99D]'
+                    : 'hover:bg-gray-50'
+                }`}
+              >
+                <div className="font-medium">{lesson.title.vi}</div>
+              </button>
             ))}
           </div>
         </div>
 
         {/* Main content */}
         <div className="flex-1 bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
-                {course.title.vi}
-                <span className="text-gray-500 dark:text-gray-400 text-xl ml-2">({course.title.en})</span>
-              </h1>
-              {currentUnit && (
-                <h2 className="text-xl text-gray-600 dark:text-gray-300 mt-2">
-                  Unit: {currentUnit.title.vi}
-                </h2>
-              )}
+          <div className="mb-8">
+            <h1 className="text-2xl font-bold mb-4">
+              {currentLesson?.title.vi}
+            </h1>
+            
+            <div className="flex space-x-4 border-b">
+              <button className="px-4 py-2 text-[#00A99D] border-b-2 border-[#00A99D]">
+                Mục tiêu
+              </button>
+              <button className="px-4 py-2 text-gray-500 hover:text-gray-700">
+                Từ vựng
+              </button>
+              <button className="px-4 py-2 text-gray-500 hover:text-gray-700">
+                Thẻ ghi nhớ
+              </button>
+              <button className="px-4 py-2 text-gray-500 hover:text-gray-700">
+                Ngữ pháp
+              </button>
+              <button className="px-4 py-2 text-gray-500 hover:text-gray-700">
+                Hoạt động
+              </button>
             </div>
           </div>
 
           {currentLesson ? (
-            <div className="prose dark:prose-invert lg:prose-xl max-w-none space-y-8">
-              {/* Lesson header */}
-              <div className="border-b pb-4">
-                <h3 className="text-2xl font-bold mb-2">
-                  {currentLesson.title.vi}
-                  <span className="text-gray-500 dark:text-gray-400 ml-2">
-                    ({currentLesson.title.en})
-                  </span>
-                </h3>
+            <div className="prose dark:prose-invert max-w-none">
+              {/* Lesson content */}
+              <div className="mb-8">
+                <h3 className="text-lg font-medium mb-4">Mục tiêu học tập</h3>
+                <ul className="list-disc pl-5 space-y-2">
+                  {currentLesson.aims?.vi.map((aim, index) => (
+                    <li key={index}>{aim}</li>
+                  ))}
+                </ul>
               </div>
 
               {/* Aims section */}
