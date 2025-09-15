@@ -1,5 +1,17 @@
 import { CurriculumLevel } from '../types';
 
+const createLessonsForUnit = (unitId: number, baseTitle: { en: string; vi: string; }, sessions: { en: string; vi: string; }[]) => {
+    return sessions.map((session, index) => ({
+        id: unitId * 100 + index + 1,
+        day: index + 1,
+        title: session,
+        aims: { en: [`Develop skills related to ${baseTitle.en}`], vi: [`Phát triển kỹ năng liên quan đến ${baseTitle.vi}`] },
+        vocabulary: [],
+        grammar: [],
+        activities: []
+    }));
+};
+
 export const g10Data: CurriculumLevel = {
     level: 10,
     title: { en: 'Grade 10', vi: 'Lớp 10' },
@@ -71,16 +83,4 @@ export const g10Data: CurriculumLevel = {
             )
         }
     ]
-};
-
-const createLessonsForUnit = (unitId: number, baseTitle: { en: string; vi: string; }, sessions: { en: string; vi: string; }[]) => {
-    return sessions.map((session, index) => ({
-        id: unitId * 100 + index + 1,
-        day: index + 1,
-        title: session,
-        aims: { en: [`Develop skills related to ${baseTitle.en}`], vi: [`Phát triển kỹ năng liên quan đến ${baseTitle.vi}`] },
-        vocabulary: [],
-        grammar: [],
-        activities: []
-    }));
 };
