@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import type { Chat } from "@google/genai";
+import type { Chat } from '../types';
 import { createChat } from '../services/geminiService';
 import type { ChatMessage } from '../types';
 

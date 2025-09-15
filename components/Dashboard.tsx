@@ -47,7 +47,7 @@ const LoadingPlaceholder = () => (
   </div>
 );
 
-const ContinueLearningCard: React.FC<{ course: Course; onSelectCourse: (course: Course) => void }> = React.memo(({ course, onSelectCourse }) => (
+const ContinueLearningCard = React.memo<{ course: Course; onSelectCourse: (course: Course) => void }>(({ course, onSelectCourse }) => (
     <div 
         className="bg-gradient-to-r from-blue-500 to-indigo-600 dark:from-blue-700 dark:to-indigo-800 p-6 rounded-xl shadow-lg flex items-center justify-between cursor-pointer transform hover:scale-105 transition-transform duration-300"
         onClick={() => onSelectCourse(course)}
@@ -68,7 +68,7 @@ const ContinueLearningCard: React.FC<{ course: Course; onSelectCourse: (course: 
             <i className="fa-solid fa-arrow-right text-white text-3xl"></i>
         </div>
     </div>
-);
+));
 
 
 const Dashboard: React.FC<DashboardProps> = ({ user, courses, onSelectCourse, lastViewedCourse }) => {

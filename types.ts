@@ -30,8 +30,18 @@ export interface User {
   age?: string | number;
   gender?: string;
   email?: string;
-  teacherProfile?: TeacherProfile;
+  gradeLevel?: string;
   studentProfile?: StudentProfile;
+  studentProfile?: StudentProfile;
+  teacherProfile?: TeacherProfile;
+}
+
+export interface Chat {
+  model: string;
+  config: {
+    systemInstruction?: string;
+    temperature?: number;
+  }
 }
 
 export interface Lesson {
