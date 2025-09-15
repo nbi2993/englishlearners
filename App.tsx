@@ -175,7 +175,7 @@ export default function App() {
             <h1 className="text-lg font-bold">{currentTitle}</h1>
             <div className="w-6"></div>
         </header>
-        <div className="flex-1 p-4 sm:p-6 md:p-8">
+        <div className={`flex-1 ${view === 'lesson' ? '' : 'p-4 sm:p-6 md:p-8'}`}>
             {renderView()}
         </div>
       </main>

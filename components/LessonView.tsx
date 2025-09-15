@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import type { Course, CurriculumLesson, View } from '../types';
 
 interface LessonViewProps {
@@ -13,6 +13,16 @@ const LessonView: React.FC<LessonViewProps> = ({ course, setView }) => {
   const [selectedLesson, setSelectedLesson] = useState<CurriculumLesson | null>(course.rawLevel.units[0]?.lessons[0] || null);
   const [expandedUnitId, setExpandedUnitId] = useState<number | null>(course.rawLevel.units[0]?.id || null);
   const [activeTab, setActiveTab] = useState<ActiveTab>('aims');
+  const [showContent, setShowContent] = useState(false);
+
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkIsMobile = () => setIsMobile(window.innerWidth < 768);
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
+
 
   const currentUnit = useMemo(() => 
     course.rawLevel.units.find(u => u.lessons.some(l => l.id === selectedLesson?.id)),
@@ -39,6 +49,9 @@ const LessonView: React.FC<LessonViewProps> = ({ course, setView }) => {
   const handleSelectLesson = (lesson: CurriculumLesson) => {
       setSelectedLesson(lesson);
       setActiveTab('aims'); // Reset to first tab on new lesson selection
+      if (isMobile) {
+        setShowContent(true);
+      }
   }
 
   const renderTabContent = () => {
@@ -123,46 +136,57 @@ const LessonView: React.FC<LessonViewProps> = ({ course, setView }) => {
   ];
 
   return (
-    <div className="flex h-full max-h-[calc(100vh-6rem)] md:max-h-[calc(100vh-8rem)] rounded-lg shadow-inner overflow-hidden">
-      <aside className="w-80 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700 p-4 overflow-y-auto shrink-0 flex flex-col">
-        <h2 className="text-xl font-bold mb-4 text-slate-800 dark:text-white shrink-0">{course.title}</h2>
-        <nav className="flex-1 space-y-1">
-            {course.rawLevel.units.map((unit) => (
-              <div key={unit.id}>
-                <button 
-                  onClick={() => handleUnitToggle(unit.id)}
-                  className={`w-full text-left p-3 rounded-md flex justify-between items-center transition-colors ${expandedUnitId === unit.id ? 'bg-slate-100 dark:bg-slate-800' : 'hover:bg-slate-100 dark:hover:bg-slate-800'}`}
-                  aria-expanded={expandedUnitId === unit.id}
-                >
-                  <span className="font-semibold text-slate-700 dark:text-slate-200">{unit.title.vi || unit.title.en}</span>
-                  <i className={`fa-solid fa-chevron-down transform transition-transform text-slate-500 ${expandedUnitId === unit.id ? 'rotate-180' : ''}`}></i>
-                </button>
-                {expandedUnitId === unit.id && (
-                  <ul className="pl-3 mt-1 border-l-2 border-cyan-500 ml-3">
-                    {unit.lessons.map(lesson => (
-                      <li key={lesson.id}>
-                        <button
-                          onClick={() => handleSelectLesson(lesson)}
-                          className={`w-full text-left p-2 my-1 rounded-md text-sm transition-colors ${
-                            selectedLesson.id === lesson.id 
-                              ? 'bg-cyan-100 text-cyan-800 font-semibold dark:bg-cyan-500 dark:text-white' 
-                              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                          }`}
-                        >
-                          {lesson.title.vi || lesson.title.en}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            ))}
-        </nav>
+    <div className="flex h-full md:rounded-lg md:shadow-inner overflow-hidden">
+      <aside className={`w-full md:w-80 md:bg-white md:dark:bg-slate-900 md:border-r md:border-slate-200 md:dark:border-slate-700 overflow-y-auto shrink-0 flex-col ${isMobile && showContent ? 'hidden' : 'flex'}`}>
+        <div className="p-4 flex-1 flex flex-col bg-slate-100 dark:bg-slate-900">
+            <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-md flex-1 flex flex-col">
+              <h2 className="text-xl font-bold mb-4 text-slate-800 dark:text-white shrink-0">{course.title}</h2>
+              <nav className="flex-1 space-y-1 overflow-y-auto pr-2 -mr-2">
+                  {course.rawLevel.units.map((unit) => (
+                    <div key={unit.id}>
+                      <button 
+                        onClick={() => handleUnitToggle(unit.id)}
+                        className={`w-full text-left p-3 rounded-md flex justify-between items-center transition-colors ${expandedUnitId === unit.id ? 'bg-slate-100 dark:bg-slate-700' : 'hover:bg-slate-100 dark:hover:bg-slate-600'}`}
+                        aria-expanded={expandedUnitId === unit.id}
+                      >
+                        <span className="font-semibold text-slate-700 dark:text-slate-200">{unit.title.vi || unit.title.en}</span>
+                        <i className={`fa-solid ${expandedUnitId === unit.id ? 'fa-chevron-up' : 'fa-chevron-down'} text-slate-500`}></i>
+                      </button>
+                      {expandedUnitId === unit.id && (
+                        <div className="pl-4 mt-2 ml-2 relative border-l-2 border-slate-200 dark:border-slate-600">
+                          <ul className="space-y-1">
+                              {unit.lessons.map(lesson => (
+                                <li key={lesson.id}>
+                                  <button
+                                    onClick={() => handleSelectLesson(lesson)}
+                                    className={`w-full text-left p-3 my-1 rounded-md text-sm transition-colors ${
+                                      selectedLesson.id === lesson.id 
+                                        ? 'bg-cyan-500 text-white font-semibold' 
+                                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
+                                    }`}
+                                  >
+                                    {lesson.title.vi || lesson.title.en}
+                                  </button>
+                                </li>
+                              ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+              </nav>
+            </div>
+        </div>
       </aside>
 
-      <main className="flex-1 bg-cyan-50 dark:bg-slate-800/60 p-6 overflow-y-auto flex flex-col relative">
-          <div className="flex-shrink-0">
-            <div className="text-sm text-slate-500 dark:text-slate-400 mb-2">
+      <main className={`flex-1 bg-cyan-50 dark:bg-slate-800/60 p-6 overflow-y-auto flex flex-col relative ${isMobile && !showContent ? 'hidden' : 'flex'}`}>
+          {isMobile && (
+             <button onClick={() => setShowContent(false)} className="md:hidden absolute top-4 left-4 z-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-full w-10 h-10 flex items-center justify-center text-slate-600 dark:text-slate-300 shadow-md">
+                <i className="fa-solid fa-arrow-left"></i>
+            </button>
+          )}
+          <div className="flex-shrink-0 pt-10 md:pt-0">
+            <div className="text-sm text-slate-500 dark:text-slate-400 mb-2 hidden md:block">
               <button onClick={() => setView('dashboard')} className="hover:underline transition-colors">
                 <i className="fa-solid fa-arrow-left mr-2"></i> Bảng điều khiển
               </button>
@@ -171,7 +195,7 @@ const LessonView: React.FC<LessonViewProps> = ({ course, setView }) => {
             <h1 className="text-4xl font-extrabold text-slate-800 dark:text-white mb-6">{selectedLesson.title.vi || selectedLesson.title.en}</h1>
 
             <div className="border-b border-slate-300 dark:border-slate-600">
-                <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+                <nav className="-mb-px flex space-x-6 overflow-x-auto" aria-label="Tabs">
                     {tabs.map(tab => (
                         <button key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
@@ -193,7 +217,7 @@ const LessonView: React.FC<LessonViewProps> = ({ course, setView }) => {
             {renderTabContent()}
           </div>
           
-          <div className="mt-auto flex justify-center gap-4 py-4 flex-shrink-0 bg-cyan-50 dark:bg-slate-800/60">
+          <div className="mt-auto flex justify-center gap-4 py-4 flex-shrink-0 bg-cyan-50 dark:bg-slate-800/60 sticky bottom-0">
              <button className="px-6 py-3 bg-amber-500 text-white font-semibold rounded-lg shadow-md hover:bg-amber-600 transition-transform hover:scale-105 flex items-center gap-2">
                 <i className="fa-solid fa-bolt"></i>
                 Kiểm tra kiến thức
