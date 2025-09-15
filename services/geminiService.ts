@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, GenerateContentRequest, GenerateContentResponse } from "@google/generative-ai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import type { WritingFeedback } from '../types';
 
 const API_KEY = process.env.API_KEY || process.env.GEMINI_API_KEY;
@@ -8,7 +8,8 @@ if (!API_KEY) {
   throw new Error("API_KEY environment variable not set. Please configure your GEMINI_API_KEY in the environment variables.");
 }
 
-const ai = new GoogleGenAI({ apiKey: API_KEY });
+const genAI = new GoogleGenerativeAI(API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
 // Simple in-memory cache
 const cache = new Map<string, { data: WritingFeedback; timestamp: number }>();
@@ -26,6 +27,50 @@ export const gradeWriting = async (topic: string, text: string): Promise<Writing
   if (cachedResult && isCacheValid(cachedResult.timestamp)) {
     return cachedResult.data;
   }
+
+  try {
+    const prompt = `Topic: "${topic}"
+
+Essay: "${text}"
+
+Please grade this essay for a K-12 English learner. Provide structured feedback in JSON format with the following fields:
+- overall: Overall feedback on the essay
+- grammar: Specific feedback on grammar
+- vocabulary: Specific feedback on vocabulary usage
+- coherence: Specific feedback on the structure and flow
+- score: A number from 0 to 100
+
+Response must be valid JSON only.`;
+
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    const text = response.text();
+    
+    try {
+      const feedback = JSON.parse(text) as WritingFeedback;
+      
+      // Validate the response structure
+      if (!feedback.overall || !feedback.grammar || !feedback.vocabulary || 
+          !feedback.coherence || typeof feedback.score !== 'number') {
+        throw new Error('Invalid response format');
+      }
+
+      // Cache the result
+      cache.set(cacheKey, {
+        data: feedback,
+        timestamp: Date.now()
+      });
+
+      return feedback;
+    } catch (parseError) {
+      console.error('Error parsing AI response:', parseError);
+      throw new Error('Failed to parse writing feedback');
+    }
+  } catch (error) {
+    console.error('Error in gradeWriting:', error);
+    throw new Error('Failed to grade writing. Please try again later.');
+  }
+};
   const prompt = `Topic: "${topic}"\n\nEssay: "${text}"\n\nPlease grade this essay for a K-12 English learner. Provide feedback on grammar, vocabulary, and coherence. Give an overall score out of 100.`;
 
   try {
