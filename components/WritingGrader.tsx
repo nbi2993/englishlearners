@@ -34,7 +34,7 @@ const WritingGrader: React.FC<{ language: 'en' | 'vi'; translations: any; }> = (
     const FeedbackCard: React.FC<{ title: string; content: string; }> = ({ title, content }) => (
         <div className="card-glass p-4">
             <h4 className="font-semibold text-blue-600 dark:text-blue-400 mb-2">{title}</h4>
-            <p className="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-wrap">{content}</p>
+            <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap">{content}</p>
         </div>
     );
 
@@ -43,13 +43,13 @@ const WritingGrader: React.FC<{ language: 'en' | 'vi'; translations: any; }> = (
             <div className="text-center mb-8">
                 <i className="fa-solid fa-pen-ruler text-4xl text-blue-500 mb-3"></i>
                 <h1 className="text-3xl font-bold">AI Writing Grader</h1>
-                <p className="text-slate-500 dark:text-slate-400 mt-2">Get instant feedback on your writing. Enter a topic and your text below.</p>
+                <p className="text-slate-700 dark:text-slate-400 mt-2">Get instant feedback on your writing. Enter a topic and your text below.</p>
             </div>
 
             <div className="card-glass p-6 md:p-8">
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
-                        <label htmlFor="topic" className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
+                        <label htmlFor="topic" className="block text-sm font-bold text-slate-800 dark:text-slate-300 mb-2">
                             Topic
                         </label>
                         <input
@@ -62,7 +62,7 @@ const WritingGrader: React.FC<{ language: 'en' | 'vi'; translations: any; }> = (
                         />
                     </div>
                     <div>
-                        <label htmlFor="writing-text" className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
+                        <label htmlFor="writing-text" className="block text-sm font-bold text-slate-800 dark:text-slate-300 mb-2">
                             Your Writing
                         </label>
                         <textarea
@@ -99,7 +99,7 @@ const WritingGrader: React.FC<{ language: 'en' | 'vi'; translations: any; }> = (
                     <h2 className="text-2xl font-bold mb-4 text-center">Feedback Results</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="md:col-span-2 flex flex-col items-center justify-center card-glass p-6">
-                            <h3 className="text-lg font-semibold text-slate-500 dark:text-slate-400">Overall Score</h3>
+                            <h3 className="text-lg font-semibold text-slate-700 dark:text-slate-400">Overall Score</h3>
                             <p className="text-6xl font-bold text-blue-600 dark:text-blue-400 my-2">{feedback.score}<span className="text-3xl">/100</span></p>
                         </div>
                         <FeedbackCard title="Overall" content={feedback.overall} />

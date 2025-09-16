@@ -22,7 +22,7 @@ const NavItem: React.FC<{
     className={`flex items-center w-full px-3 py-2.5 text-sm font-medium transition-colors duration-200 rounded-lg relative ${
       isActive
         ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
-        : 'text-slate-600 dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/5'
+        : 'text-slate-700 dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/5'
     }`}
   >
     {isActive && <div className="absolute left-0 top-2 bottom-2 w-1 bg-blue-600 dark:bg-blue-400 rounded-r-full"></div>}
@@ -47,7 +47,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, currentView, setView, isSidebar
         <div className="flex items-center justify-between mb-8 h-12">
           <div className="flex items-center">
               <i className="fa-solid fa-graduation-cap text-3xl text-blue-600 dark:text-blue-400"></i>
-              <h1 className="text-xl font-bold ml-3 text-slate-800 dark:text-white">IVS English</h1>
+              <h1 className="text-xl font-bold ml-3 text-slate-900 dark:text-white">IVS English</h1>
           </div>
           <button onClick={() => setIsSidebarOpen(false)} className="md:hidden h-10 w-10 flex-center rounded-full hover:bg-black/10 dark:hover:bg-white/10">
               <i className="fa-solid fa-times text-xl"></i>
@@ -68,7 +68,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, currentView, setView, isSidebar
                 onClick={() => setView('teacher-dashboard')}
             />
           )}
-          <h3 className="px-3 pt-6 pb-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">AI Tools</h3>
+          <h3 className="px-3 pt-6 pb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">AI Tools</h3>
           <NavItem
             icon="fa-comments"
             label={t['speaking-partner']}

@@ -45,12 +45,28 @@ const TeacherDashboard: React.FC<{ language: 'en' | 'vi'; translations: any; }> 
         const newStudent: Student = {
             id: `s${Date.now()}`, name: studentName, avatar: `https://i.pravatar.cc/150?u=${encodeURIComponent(studentName)}`,
             lastActivity: 'Just now', progress: 0, averageScore: 0, timeSpent: '0m',
-            isStruggling: false, scoreHistory: [], assignments: [],
+            isStruggling: false, scoreHistory: [], assignments: [], grades: [], notes: ''
         };
         
         const updatedClasses = { ...classes };
         updatedClasses[selectedClassId].students.push(newStudent);
         setClasses(updatedClasses);
+    };
+    
+    const handleUpdateStudent = (updatedStudent: Student) => {
+        if (!selectedClassId) return;
+
+        const updatedClasses = { ...classes };
+        const studentIndex = updatedClasses[selectedClassId].students.findIndex(s => s.id === updatedStudent.id);
+        
+        if (studentIndex > -1) {
+            updatedClasses[selectedClassId].students[studentIndex] = updatedStudent;
+            setClasses(updatedClasses);
+            // Also update the selectedStudent if it's the one being edited
+            if (selectedStudent?.id === updatedStudent.id) {
+                setSelectedStudent(updatedStudent);
+            }
+        }
     };
 
     const classIds = Object.keys(classes);
@@ -78,7 +94,7 @@ const TeacherDashboard: React.FC<{ language: 'en' | 'vi'; translations: any; }> 
                                     </button>
                                 ))
                             ) : (
-                                <p className="text-sm text-slate-500 dark:text-slate-400 p-2">No classes yet. Add one to start.</p>
+                                <p className="text-sm text-slate-700 dark:text-slate-400 p-2">No classes yet. Add one to start.</p>
                             )}
                         </div>
                         <button onClick={() => setAddClassModalOpen(true)} className="w-full mt-4 btn btn-secondary text-sm">
@@ -92,7 +108,7 @@ const TeacherDashboard: React.FC<{ language: 'en' | 'vi'; translations: any; }> 
                         <div className="card-glass h-full flex flex-col items-center justify-center text-center p-8">
                             <i className="fa-solid fa-chalkboard-user text-6xl text-slate-400 dark:text-slate-500 mb-4"></i>
                             <h2 className="text-2xl font-bold">Welcome to your Dashboard!</h2>
-                            <p className="text-slate-500 dark:text-slate-400 mt-2 mb-6 max-w-sm">Create your first class to add students, assign homework, and track progress.</p>
+                            <p className="text-slate-700 dark:text-slate-400 mt-2 mb-6 max-w-sm">Create your first class to add students, assign homework, and track progress.</p>
                             <button onClick={() => setAddClassModalOpen(true)} className="btn btn-primary">
                                 <i className="fa-solid fa-plus mr-2"></i> Create Your First Class
                             </button>
@@ -114,7 +130,7 @@ const TeacherDashboard: React.FC<{ language: 'en' | 'vi'; translations: any; }> 
                                     {selectedClass.students.map(student => (
                                         <StudentCard key={student.id} student={student} onReportClick={() => handleOpenReport(student)} />
                                     ))}
-                                    <button onClick={() => setAddStudentModalOpen(true)} className="card-glass border-2 border-dashed border-slate-300 dark:border-slate-600 flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100/50 dark:hover:bg-slate-700/50 transition-colors rounded-2xl min-h-[220px]">
+                                    <button onClick={() => setAddStudentModalOpen(true)} className="card-glass border-2 border-dashed border-slate-300 dark:border-slate-600 flex flex-col items-center justify-center text-slate-700 dark:text-slate-400 hover:bg-slate-100/50 dark:hover:bg-slate-700/50 transition-colors rounded-2xl min-h-[220px]">
                                         <i className="fa-solid fa-plus text-2xl"></i>
                                         <span className="mt-2 font-semibold">Add Student</span>
                                     </button>
@@ -123,7 +139,7 @@ const TeacherDashboard: React.FC<{ language: 'en' | 'vi'; translations: any; }> 
                                 <div className="card-glass h-full flex flex-col items-center justify-center text-center p-8 border-2 border-dashed border-slate-300 dark:border-slate-600">
                                     <i className="fa-solid fa-user-plus text-6xl text-slate-400 dark:text-slate-500 mb-4"></i>
                                     <h2 className="text-2xl font-bold">This class is empty</h2>
-                                    <p className="text-slate-500 dark:text-slate-400 mt-2 mb-6">Add your first student to begin tracking their progress and assignments.</p>
+                                    <p className="text-slate-700 dark:text-slate-400 mt-2 mb-6">Add your first student to begin tracking their progress and assignments.</p>
                                     <button onClick={() => setAddStudentModalOpen(true)} className="btn btn-primary">
                                         <i className="fa-solid fa-plus mr-2"></i> Add Student
                                     </button>
@@ -135,7 +151,11 @@ const TeacherDashboard: React.FC<{ language: 'en' | 'vi'; translations: any; }> 
             </div>
             
             {isReportModalOpen && selectedStudent && (
-                <StudentReportModal student={selectedStudent} onClose={() => setReportModalOpen(false)} />
+                <StudentReportModal 
+                    student={selectedStudent} 
+                    onClose={() => setReportModalOpen(false)}
+                    onUpdateStudent={handleUpdateStudent}
+                />
             )}
             {isTestModalOpen && <CreateTestModal onClose={() => setTestModalOpen(false)} />}
             {isHomeworkModalOpen && selectedClass && (

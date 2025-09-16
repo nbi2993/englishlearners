@@ -7,10 +7,10 @@
   /* Light Theme */
   --bg-color-light: #f8fafc; /* slate-50 */
   --text-primary-light: #0f172a; /* slate-900 */
-  --text-secondary-light: #64748b; /* slate-500 */
-  --card-bg-light: rgba(255, 255, 255, 0.7);
-  --card-border-light: rgba(226, 232, 240, 0.8); /* slate-200 */
-  --sidebar-bg-light: rgba(248, 250, 252, 0.6); /* Slightly more opaque */
+  --text-secondary-light: #334155; /* slate-700 */
+  --card-bg-light: #ffffff; /* Solid white for better contrast */
+  --card-border-light: #e2e8f0; /* Solid slate-200 */
+  --sidebar-bg-light: #f8fafc; /* Solid slate-50 */
   --input-bg-light: #ffffff;
   --input-border-light: #cbd5e1; /* slate-300 */
   --hover-bg-light: #f1f5f9; /* slate-100 */
@@ -181,22 +181,22 @@ a:focus-visible {
   border: 1px solid var(--card-border-light);
   box-shadow: var(--shadow-md);
   border-radius: var(--border-radius-lg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s, transform 0.3s;
 }
 .dark .card-glass {
   background-color: var(--card-bg-dark);
   border: 1px solid var(--card-border-dark);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .sidebar-glass {
   background-color: var(--sidebar-bg-light);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
 }
 .dark .sidebar-glass {
   background-color: var(--sidebar-bg-dark);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 .modal-content {

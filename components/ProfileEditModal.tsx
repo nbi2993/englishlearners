@@ -34,8 +34,8 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({ user, setUser, onCl
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 transition-opacity animate-fade-in">
       <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl p-6 w-full max-w-md m-4 transform transition-all animate-slide-in-up">
         <div className="flex justify-between items-center mb-4 border-b dark:border-slate-700 pb-3">
-          <h4 className="text-xl font-bold text-slate-800 dark:text-white">Edit Profile</h4>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-2xl">&times;</button>
+          <h4 className="text-xl font-bold text-slate-900 dark:text-white">Edit Profile</h4>
+          <button onClick={onClose} className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 text-2xl">&times;</button>
         </div>
         
         <div className="space-y-6">
@@ -48,7 +48,7 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({ user, setUser, onCl
                 </button>
             </div>
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Name</label>
+              <label htmlFor="name" className="block text-sm font-medium text-slate-800 dark:text-slate-300 mb-1">Name</label>
               <input
                 id="name"
                 type="text"
@@ -62,7 +62,7 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({ user, setUser, onCl
         <div className="mt-8 flex justify-end space-x-3">
             <button 
                 onClick={onClose}
-                className="px-4 py-2 bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-200 font-semibold rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500 transition-colors"
+                className="px-4 py-2 bg-slate-200 dark:bg-slate-600 text-slate-900 dark:text-slate-200 font-semibold rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500 transition-colors"
             >
                 Cancel
             </button>

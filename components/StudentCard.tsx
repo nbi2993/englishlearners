@@ -18,17 +18,17 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, onReportClick }) => 
         <img className="w-16 h-16 rounded-full" src={student.avatar} alt={student.name} />
         <div>
             <h4 className="font-bold text-lg">{student.name}</h4>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Active: {student.lastActivity}</p>
+            <p className="text-xs text-slate-700 dark:text-slate-400">Active: {student.lastActivity}</p>
         </div>
       </div>
       
       <div className="space-y-3 text-sm">
         <div className="flex items-center justify-between">
-            <span className="text-slate-500 dark:text-slate-400"><i className="fa-solid fa-chart-line mr-2 w-4 text-center"></i>Progress</span>
+            <span className="text-slate-700 dark:text-slate-400"><i className="fa-solid fa-chart-line mr-2 w-4 text-center"></i>Progress</span>
             <span className="font-semibold">{student.progress}%</span>
         </div>
         <div className="flex items-center justify-between">
-            <span className="text-slate-500 dark:text-slate-400"><i className="fa-solid fa-star-half-alt mr-2 w-4 text-center"></i>Avg. Score</span>
+            <span className="text-slate-700 dark:text-slate-400"><i className="fa-solid fa-star-half-alt mr-2 w-4 text-center"></i>Avg. Score</span>
             <span className="font-semibold">{student.averageScore}</span>
         </div>
       </div>

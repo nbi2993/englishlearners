@@ -129,6 +129,14 @@ export interface Assignment {
     status: 'Completed' | 'Pending' | 'Overdue';
 }
 
+export interface Grade {
+  id: string;
+  name: string;
+  score: number;
+  coefficient: 1 | 2 | 3;
+  date: string;
+}
+
 export interface Student {
     id: string;
     name: string;
@@ -140,6 +148,8 @@ export interface Student {
     isStruggling: boolean;
     scoreHistory: { date: string; score: number }[];
     assignments: Assignment[];
+    grades: Grade[];
+    notes?: string;
 }
 
 export interface ClassData {

@@ -10,13 +10,11 @@ let aiInstance: GoogleGenAI | null = null;
  */
 function getAiInstance(): GoogleGenAI {
   if (!aiInstance) {
-    // The API key MUST be obtained exclusively from the environment variable `process.env.API_KEY`.
-    // This is a strict requirement from the coding guidelines.
     const API_KEY = process.env.API_KEY;
 
     if (!API_KEY) {
       // This error will be caught by the calling functions in the components.
-      throw new Error("API key is not set. Please ensure the API_KEY environment variable is configured correctly in your deployment settings (e.g., Netlify).");
+      throw new Error("API_KEY is not set in environment variables. Please set it and redeploy.");
     }
 
     aiInstance = new GoogleGenAI({ apiKey: API_KEY });

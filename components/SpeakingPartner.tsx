@@ -72,7 +72,7 @@ const SpeakingPartner: React.FC<{ language: 'en' | 'vi'; translations: any; }> =
             <div className="text-center mb-6">
                  <i className="fa-solid fa-comments text-4xl text-emerald-500 mb-3"></i>
                 <h1 className="text-3xl font-bold">AI Speaking Partner</h1>
-                <p className="text-slate-500 dark:text-slate-400 mt-2">Practice your English conversation with Sparky, your friendly AI tutor!</p>
+                <p className="text-slate-700 dark:text-slate-400 mt-2">Practice your English conversation with Sparky, your friendly AI tutor!</p>
             </div>
 
             <div className="card-glass flex-grow flex flex-col overflow-hidden">

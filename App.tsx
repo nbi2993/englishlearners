@@ -160,7 +160,7 @@ const App: React.FC = () => {
             />
             <main className="flex-1 flex flex-col overflow-hidden">
                 <header className="md:hidden h-16 flex-shrink-0 flex items-center justify-between px-4 sticky top-0 z-10">
-                     <button onClick={() => setIsSidebarOpen(true)} className="h-10 w-10 flex-center text-slate-600 dark:text-slate-300 rounded-full hover:bg-black/10 dark:hover:bg-white/10">
+                     <button onClick={() => setIsSidebarOpen(true)} className="h-10 w-10 flex-center text-slate-700 dark:text-slate-300 rounded-full hover:bg-black/10 dark:hover:bg-white/10">
                         <i className="fa-solid fa-bars text-lg"></i>
                     </button>
                     <h1 className="text-lg font-bold">IVS English</h1>

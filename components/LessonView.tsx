@@ -15,7 +15,7 @@ const TabButton: React.FC<{ label: string; isActive: boolean; onClick: () => voi
         className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-300 whitespace-nowrap ${
             isActive
                 ? 'bg-white dark:bg-slate-900 shadow-md text-blue-600 dark:text-blue-400'
-                : 'text-slate-600 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-slate-700/50'
+                : 'text-slate-700 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-slate-700/50'
         }`}
     >
         {label}
@@ -34,7 +34,7 @@ const VocabularyCard: React.FC<{ item: VocabularyItem }> = ({ item }) => {
                 <div className="absolute w-full h-full card-glass backface-hidden flex flex-col items-center justify-center p-4 text-center">
                     {item.imageUrl && <img src={item.imageUrl} alt={item.term} className="w-20 h-20 object-contain mb-2" />}
                     <p className="text-lg font-bold">{item.term}</p>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">{item.pronunciation}</p>
+                    <p className="text-sm text-slate-700 dark:text-slate-400">{item.pronunciation}</p>
                 </div>
                 {/* Back */}
                 <div className="absolute w-full h-full card-glass bg-blue-100/50 dark:bg-blue-900/50 backface-hidden rotate-y-180 flex flex-col items-center justify-center p-4">
@@ -55,7 +55,7 @@ const LessonView: React.FC<LessonViewProps> = ({ lesson, course, onBack, languag
         return (
           <div className="card-glass p-6">
             <h3 className="text-xl font-bold mb-4">Lesson Aims</h3>
-            <ul className="list-disc list-inside space-y-2 text-slate-700 dark:text-slate-300">
+            <ul className="list-disc list-inside space-y-2 text-slate-800 dark:text-slate-300">
               {(aims[language] || aims.en).map((aim, index) => <li key={index}>{aim}</li>)}
             </ul>
           </div>
@@ -76,7 +76,7 @@ const LessonView: React.FC<LessonViewProps> = ({ lesson, course, onBack, languag
             {grammar.map((point, index) => (
               <div key={index}>
                 <h4 className="font-semibold text-lg text-blue-700 dark:text-blue-400">{(point.title[language] || point.title.en)}</h4>
-                <div className="mt-2 space-y-1 text-slate-700 dark:text-slate-300">
+                <div className="mt-2 space-y-1 text-slate-800 dark:text-slate-300">
                     {(point.explanation[language] || point.explanation.en).map((line, i) => <p key={i}>{line}</p>)}
                 </div>
               </div>
@@ -90,7 +90,7 @@ const LessonView: React.FC<LessonViewProps> = ({ lesson, course, onBack, languag
              {activities.map((activity, index) => (
               <div key={index}>
                 <h4 className="font-semibold text-lg">{activity.type}</h4>
-                <div className="mt-2 space-y-1 text-slate-700 dark:text-slate-300">
+                <div className="mt-2 space-y-1 text-slate-800 dark:text-slate-300">
                      {(activity.description[language] || activity.description.en).map((line, i) => <p key={i}>{line}</p>)}
                 </div>
               </div>

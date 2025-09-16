@@ -19,7 +19,7 @@ const Settings: React.FC<SettingsProps> = ({ user, setUser, language, setLanguag
         <div className="card-glass p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
                 <h3 className="text-lg font-bold">{title}</h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{description}</p>
+                <p className="text-sm text-slate-700 dark:text-slate-400 mt-1">{description}</p>
             </div>
             <div className="flex-shrink-0 w-full md:w-auto">
                 {children}
@@ -36,7 +36,7 @@ const Settings: React.FC<SettingsProps> = ({ user, setUser, language, setLanguag
     const SegmentedButton: React.FC<{isActive: boolean, onClick: () => void, children: React.ReactNode}> = ({isActive, onClick, children}) => (
         <button 
             onClick={onClick}
-            className={`flex-1 flex items-center justify-center gap-2 px-3 py-1.5 text-sm font-semibold rounded-md transition-all ${isActive ? 'bg-white dark:bg-slate-700 shadow' : 'text-slate-600 dark:text-slate-300'}`}
+            className={`flex-1 flex items-center justify-center gap-2 px-3 py-1.5 text-sm font-semibold rounded-md transition-all ${isActive ? 'bg-white dark:bg-slate-700 shadow' : 'text-slate-700 dark:text-slate-300'}`}
         >
             {children}
         </button>
@@ -53,7 +53,7 @@ const Settings: React.FC<SettingsProps> = ({ user, setUser, language, setLanguag
                     </div>
                     <div>
                         <h2 className="text-2xl font-bold">{user.name}</h2>
-                        <p className="text-slate-500 dark:text-slate-400">{user.level}</p>
+                        <p className="text-slate-700 dark:text-slate-400">{user.level}</p>
                     </div>
                     <button onClick={() => setProfileModalOpen(true)} className="ml-auto btn btn-secondary">
                         Edit Profile

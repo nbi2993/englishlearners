@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import type { User, Course, OtherProgram, Lesson } from '../types';
 import CourseCard from './CourseCard';
 import ProfileEditModal from './ProfileEditModal';
@@ -24,7 +24,7 @@ const StatCard: React.FC<{ icon: string; value: string | number; label: string; 
         </div>
         <div>
             <div className={`text-2xl font-bold ${valueColor}`}>{value}</div>
-            <div className="text-sm text-slate-500 dark:text-slate-400">{label}</div>
+            <div className="text-sm text-slate-700 dark:text-slate-400">{label}</div>
         </div>
     </div>
 );
@@ -34,10 +34,10 @@ const WelcomeHub: React.FC<{user: User, onEditProfile: () => void, language: 'en
         <div className="relative z-10">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h1 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white">
+                    <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
                         {language === 'vi' ? `Chào mừng, ${user.name}!` : `Welcome, ${user.name}!`}
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-300 mt-1">
+                    <p className="text-slate-700 dark:text-slate-300 mt-1">
                         {language === 'vi' ? 'Sẵn sàng cho một ngày học tuyệt vời!' : 'Ready for a great day of learning!'}
                     </p>
                 </div>
@@ -62,8 +62,8 @@ const WelcomeHub: React.FC<{user: User, onEditProfile: () => void, language: 'en
 const LessonListItem: React.FC<{ lesson: Lesson; onClick: () => void; }> = ({ lesson, onClick }) => (
     <button onClick={onClick} className="w-full text-left p-4 rounded-lg bg-slate-50/50 dark:bg-slate-800/20 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-all flex justify-between items-center border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
         <div>
-            <p className="font-semibold text-slate-800 dark:text-white">{lesson.rawLesson.day ? `Day ${lesson.rawLesson.day}: ` : ''}{lesson.title}</p>
-            <p className="text-sm text-slate-500 dark:text-slate-400">{lesson.rawLesson.aims.en[0]}</p>
+            <p className="font-semibold text-slate-900 dark:text-white">{lesson.rawLesson.day ? `Day ${lesson.rawLesson.day}: ` : ''}{lesson.title}</p>
+            <p className="text-sm text-slate-700 dark:text-slate-400">{lesson.rawLesson.aims.en[0]}</p>
         </div>
         <i className="fa-solid fa-chevron-right text-slate-400"></i>
     </button>
@@ -82,6 +82,35 @@ const Dashboard: React.FC<DashboardProps> = ({
 }) => {
     const [isProfileModalOpen, setProfileModalOpen] = useState(false);
     
+    const groupedCourses = useMemo(() => {
+        return courses.reduce((acc, course) => {
+            const category = course.series;
+            if (!acc[category]) {
+                acc[category] = [];
+            }
+            acc[category].push(course);
+            return acc;
+        }, {} as Record<string, Course[]>);
+    }, [courses]);
+    
+    const [openCategories, setOpenCategories] = useState<string[]>([]);
+
+    useEffect(() => {
+        // Automatically open the first category when courses load
+        const firstCategory = Object.keys(groupedCourses)[0];
+        if (firstCategory) {
+            setOpenCategories([firstCategory]);
+        }
+    }, [groupedCourses]);
+
+    const toggleCategory = (category: string) => {
+        setOpenCategories(prev => 
+            prev.includes(category) 
+                ? prev.filter(c => c !== category) 
+                : [...prev, category]
+        );
+    };
+
     if (selectedCourse) {
         return (
             <div className="animate-fade-in p-4 sm:p-6 lg:p-8">
@@ -94,8 +123,8 @@ const Dashboard: React.FC<DashboardProps> = ({
                         {/* Image could go here */}
                     </div>
                     <div>
-                        <h1 className="text-3xl font-bold text-slate-800 dark:text-white">{selectedCourse.title}</h1>
-                        <p className="text-slate-500 dark:text-slate-400 mt-1">{selectedCourse.description}</p>
+                        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">{selectedCourse.title}</h1>
+                        <p className="text-slate-700 dark:text-slate-400 mt-1">{selectedCourse.description}</p>
                         <a href={selectedCourse.rawLevel.ebookPdfUrl} target="_blank" rel="noopener noreferrer" className="mt-4 btn btn-primary">
                             View eBook PDF <i className="fa-solid fa-external-link-alt ml-2"></i>
                         </a>
@@ -121,11 +150,29 @@ const Dashboard: React.FC<DashboardProps> = ({
             <WelcomeHub user={user} onEditProfile={() => setProfileModalOpen(true)} language={language} />
 
             <section>
-                <h2 className="text-2xl font-bold mb-4">{language === 'vi' ? 'Khóa học của bạn' : 'Your Courses'}</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {courses.filter(course => course).map(course => (
-                        <CourseCard key={course.id} course={course} onClick={() => setSelectedCourse(course)} />
-                    ))}
+                <h2 className="text-2xl font-bold mb-4">{language === 'vi' ? 'Chương trình học' : 'Curriculum'}</h2>
+                <div className="space-y-4">
+                    {Object.entries(groupedCourses).map(([category, courseList]) => {
+                        const isOpen = openCategories.includes(category);
+                        return (
+                            <div key={category} className="card-glass overflow-hidden">
+                                <button
+                                    onClick={() => toggleCategory(category)}
+                                    className="w-full p-4 text-left flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/20 hover:bg-slate-100 dark:hover:bg-slate-700/50"
+                                >
+                                    <h3 className="text-lg font-bold">{category}</h3>
+                                    <i className={`fa-solid fa-chevron-down transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}></i>
+                                </button>
+                                {isOpen && (
+                                     <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-fade-in">
+                                        {courseList.map(course => (
+                                            <CourseCard key={course.id} course={course} onClick={() => setSelectedCourse(course)} />
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
                 </div>
             </section>
             
@@ -135,7 +182,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                     {otherPrograms.map(program => (
                         <a href={program.driveLink} target="_blank" rel="noopener noreferrer" key={program.title.en} className="block p-6 card-glass hover:shadow-lg hover:-translate-y-1 transition-all">
                             <h3 className="font-bold text-lg text-blue-600 dark:text-blue-400">{program.title[language]}</h3>
-                            <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm">{program.description[language]}</p>
+                            <p className="text-slate-700 dark:text-slate-400 mt-2 text-sm">{program.description[language]}</p>
                         </a>
                     ))}
                 </div>
