@@ -10,11 +10,14 @@ let aiInstance: GoogleGenAI | null = null;
  */
 function getAiInstance(): GoogleGenAI {
   if (!aiInstance) {
-    const API_KEY = process.env.API_KEY;
+    // Vite exposes environment variables via `import.meta.env`.
+    // Variables must be prefixed with VITE_ to be exposed to the client.
+    // Using `(import.meta as any)` to bypass potential TypeScript errors if `vite/client` types aren't configured.
+    const API_KEY = (import.meta as any).env.VITE_API_KEY;
 
     if (!API_KEY) {
       // This error will be caught by the calling functions in the components.
-      throw new Error("API key is not set in environment variables. AI features are disabled.");
+      throw new Error("VITE_API_KEY is not set in environment variables. Please set it in your Netlify settings or a .env file and redeploy.");
     }
 
     aiInstance = new GoogleGenAI({ apiKey: API_KEY });
