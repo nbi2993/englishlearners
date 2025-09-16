@@ -1,71 +1,81 @@
-import { GoogleGenAI, Type, Chat } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import type { WritingFeedback } from '../types';
 
-const API_KEY = process.env.API_KEY;
-
-if (!API_KEY) {
-  console.error("API_KEY environment variable not set.");
-  // In a real app, you might want to show an error to the user.
-  // For this demo, we will proceed but API calls will fail.
+declare module 'vite' {
+  interface ImportMetaEnv {
+    readonly VITE_API_KEY: string
+  }
 }
 
-const ai = new GoogleGenAI({ apiKey: API_KEY! });
+export class ChatSession {
+  private chat: any;
+
+  constructor() {
+    if (!API_KEY) {
+      throw new Error("API key is not set");
+    }
+    const genAI = new GoogleGenerativeAI(API_KEY);
+    this.chat = genAI.getGenerativeModel({ model: "gemini-pro", generationConfig: {
+      temperature: 0.8,
+    }}).startChat({
+      history: [],
+      generationConfig: {
+        maxOutputTokens: 2048,
+      },
+    });
+  }
+
+  async sendMessage(message: string) {
+    const result = await this.chat.sendMessage(message);
+    const response = await result.response;
+    return { text: response.text() };
+  }
+
+  async sendMessageStream(message: string) {
+    const result = await this.chat.sendMessage(message);
+    const response = await result.response;
+    return [{ text: response.text() }];
+  }
+}
+
+const API_KEY = import.meta.env.VITE_API_KEY;
+
+if (!API_KEY) {
+  console.error("API key is not set in environment variables");
+  throw new Error("API key is not set");
+}
+
+const genAI = new GoogleGenerativeAI(API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
 export const gradeWriting = async (topic: string, text: string): Promise<WritingFeedback> => {
-  const prompt = `Topic: "${topic}"\n\nEssay: "${text}"\n\nPlease grade this essay for a K-12 English learner. Provide feedback on grammar, vocabulary, and coherence. Give an overall score out of 100.`;
-
-  const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
-    contents: prompt,
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: Type.OBJECT,
-        properties: {
-          overall: { type: Type.STRING, description: 'Overall feedback on the essay.' },
-          grammar: { type: Type.STRING, description: 'Specific feedback on grammar.' },
-          vocabulary: { type: Type.STRING, description: 'Specific feedback on vocabulary usage.' },
-          coherence: { type: Type.STRING, description: 'Specific feedback on the structure and flow.' },
-          score: { type: Type.INTEGER, description: 'A score from 0 to 100.' },
-        },
-        required: ["overall", "grammar", "vocabulary", "coherence", "score"]
-      },
-      temperature: 0.2
-    },
-  });
+  const prompt = `Topic: "${topic}"\n\nEssay: "${text}"\n\nPlease grade this essay for a K-12 English learner. Provide feedback on grammar, vocabulary, and coherence. Give an overall score out of 100. Return the response in the following JSON format:
+  {
+    "overall": "Overall feedback here",
+    "grammar": "Grammar feedback here",
+    "vocabulary": "Vocabulary feedback here",
+    "coherence": "Coherence feedback here",
+    "score": 85
+  }`;
 
   try {
-    const jsonString = response.text.trim();
-    return JSON.parse(jsonString) as WritingFeedback;
-  } catch (e) {
-    console.error("Failed to parse Gemini JSON response:", e);
-    throw new Error("Could not get feedback from AI. Please try again.");
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const responseText = response.text();
+    return JSON.parse(responseText) as WritingFeedback;
+  } catch (error) {
+    console.error("Error grading writing:", error);
+    throw new Error("Failed to grade writing");
   }
-};
-
-
-export const createChat = (): Chat => {
-    return ai.chats.create({
-        model: 'gemini-2.5-flash',
-        config: {
-            systemInstruction: "You are a friendly and encouraging English tutor for K-12 students. Your name is Sparky. Keep your answers concise and helpful. Use simple language and emojis to make learning fun. Your goal is to help students practice their English conversation skills.",
-            temperature: 0.8
-        },
-    });
 };
 
 export const translateToVietnamese = async (text: string): Promise<string> => {
   const prompt = `Translate the following English text to Vietnamese for a K-12 student. Return only the translated text.\n\nEnglish: "${text}"`;
 
   try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
-      config: {
-        temperature: 0.1,
-      },
-    });
-    return response.text.trim();
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return response.text();
   } catch (error) {
     console.error("Error translating text:", error);
     throw new Error("Failed to translate text.");
