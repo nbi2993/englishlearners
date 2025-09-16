@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
-import type { User, Course, View } from '../types';
-import { MOCK_TEACHER_SCHEDULE } from '../constants';
+import type { User, Course, View, Classes, ClassScheduleItem } from '../types';
 import { curriculumData } from '../data/curriculum';
 import CourseCard from './CourseCard';
 
@@ -9,9 +8,10 @@ interface TeacherHomeProps {
   onSelectCourse: (course: Course) => void;
   language: 'en' | 'vi';
   setView: (view: View) => void;
+  classes: Classes;
 }
 
-const TeacherHome: React.FC<TeacherHomeProps> = ({ user, onSelectCourse, language, setView }) => {
+const TeacherHome: React.FC<TeacherHomeProps> = ({ user, onSelectCourse, language, setView, classes }) => {
 
   const allCourses = useMemo(() => {
     const colorPalette = ['#4A90E2', '#50E3C2', '#F5A623', '#BD10E0', '#9013FE', '#D0021B', '#F8E71C', '#7ED321'];
@@ -41,10 +41,22 @@ const TeacherHome: React.FC<TeacherHomeProps> = ({ user, onSelectCourse, languag
       return allCourses.filter(course => user.pinnedCourses?.includes(course.id));
   }, [allCourses, user.pinnedCourses]);
 
-  const dayOfWeek = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date());
   const todaysSchedule = useMemo(() => {
-      return MOCK_TEACHER_SCHEDULE.filter(item => item.day === dayOfWeek).sort((a, b) => a.startTime.localeCompare(b.startTime));
-  }, [dayOfWeek]);
+    const dayOfWeek = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date());
+    const scheduleItems: (ClassScheduleItem & { className: string })[] = [];
+    
+    Object.values(classes).forEach(classData => {
+        if (classData.schedule) {
+            classData.schedule.forEach(item => {
+                if (item.day === dayOfWeek) {
+                    scheduleItems.push({ ...item, className: classData.name });
+                }
+            });
+        }
+    });
+
+    return scheduleItems.sort((a, b) => a.startTime.localeCompare(b.startTime));
+  }, [classes]);
   
   const t = {
     en: {

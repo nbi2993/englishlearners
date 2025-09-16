@@ -63,12 +63,6 @@ const Sidebar: React.FC<SidebarProps> = ({ user, currentView, setView, language 
         </button>
       </div>
       
-      <div className={`p-4 flex flex-col items-center border-b border-slate-200/80 dark:border-slate-700/80 ${isExpanded ? '' : 'py-4'}`}>
-        <i className={`text-4xl text-blue-500 mb-2 ${user.avatar}`}></i>
-        {isExpanded && <h3 className="font-bold text-lg text-center">{user.name}</h3>}
-        {isExpanded && <p className="text-sm text-slate-500 dark:text-slate-400">{user.role === 'student' ? user.gradeLevel || t.student : user.title || t.teacher}</p>}
-      </div>
-      
       <ul className="flex-1 px-2 py-4 custom-scrollbar overflow-y-auto">
         {navGroups.map((group, groupIndex) => (
           <React.Fragment key={`group-${groupIndex}`}>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { Classes, Student } from '../types';
+import type { Classes, Student, ClassScheduleItem } from '../types';
 import StudentCard from './StudentCard';
 import StudentReportModal from './StudentReportModal';
 import CreateTestModal from './CreateTestModal';
@@ -63,11 +63,15 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses
     setIsReportModalOpen(true);
   };
   
-  const handleAddClass = (className: string) => {
+  const handleAddClass = (classData: { name: string, schedule: ClassScheduleItem[] }) => {
     const newClassId = `class-${Date.now()}`;
     const newClasses: Classes = {
       ...classes,
-      [newClassId]: { name: className, students: [] }
+      [newClassId]: { 
+        name: classData.name, 
+        students: [],
+        schedule: classData.schedule
+      }
     };
     setClasses(newClasses);
     setSelectedClassId(newClassId);

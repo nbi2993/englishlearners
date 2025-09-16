@@ -66,17 +66,29 @@ const App: React.FC = () => {
   }
 
   const handleSetRole = (role: 'student' | 'teacher') => {
-      const newUser: User = { ...MOCK_USER, role, id: `user-${Date.now()}` };
-      if (role === 'teacher') {
-          newUser.name = 'Ms. Evelyn';
-          newUser.avatar = 'fa-user-tie';
-          newUser.title = "English Teacher";
-          newUser.subject = "English, Literature";
-      } else {
-          newUser.name = 'Alex';
-          newUser.avatar = 'fa-user-astronaut';
-      }
-      handleSetUser(newUser);
+    const baseUser = { ...MOCK_USER, id: `user-${Date.now()}` };
+    let newUser: User;
+
+    if (role === 'teacher') {
+        const { gradeLevel, ...teacherDefaults } = baseUser;
+        newUser = {
+            ...teacherDefaults,
+            role: 'teacher',
+            name: 'Ms. Evelyn',
+            avatar: 'fa-user-tie',
+            title: "English Teacher",
+            subject: "English, Literature",
+        };
+    } else {
+        const { title, subject, ...studentDefaults } = baseUser;
+        newUser = {
+            ...studentDefaults,
+            role: 'student',
+            name: 'Alex',
+            avatar: 'fa-user-astronaut',
+        };
+    }
+    handleSetUser(newUser);
   };
   
   const handleUpdateUser = (updatedUser: User) => {
@@ -104,7 +116,7 @@ const App: React.FC = () => {
 
     switch (view) {
       case 'home':
-        return <Home user={user!} onSelectCourse={handleSelectCourse} language={language} setView={setView} />;
+        return <Home user={user!} onSelectCourse={handleSelectCourse} language={language} setView={setView} classes={classes} />;
       case 'curriculum':
         return <Dashboard onSelectCourse={handleSelectCourse} user={user!} onUpdateUser={handleUpdateUser} language={language}/>;
       case 'teacher-dashboard':
@@ -118,7 +130,7 @@ const App: React.FC = () => {
       case 'user-guide':
         return <UserGuide language={language} />;
       default:
-        return <Home user={user!} onSelectCourse={handleSelectCourse} language={language} setView={setView} />;
+        return <Home user={user!} onSelectCourse={handleSelectCourse} language={language} setView={setView} classes={classes} />;
     }
   };
 

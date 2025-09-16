@@ -83,20 +83,39 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
 
   const handleRoleChange = (newRole: 'student' | 'teacher') => {
     if (user.role === newRole) return;
+    const translatedRole = newRole === 'student' ? t.student : t.teacher;
 
-    if (window.confirm(t.roleConfirm(newRole))) {
-        const updatedUser = { ...user, role: newRole };
+    if (window.confirm(t.roleConfirm(translatedRole))) {
+      const baseUser: Partial<User> = {
+        id: user.id,
+        name: user.name,
+        avatar: user.avatar,
+        points: user.points,
+        badges: user.badges,
+        streak: user.streak,
+        pinnedCourses: user.pinnedCourses,
+        age: user.age,
+        gender: user.gender,
+        level: user.level,
+      };
 
-        if (newRole === 'teacher') {
-            updatedUser.gradeLevel = '';
-            if (!updatedUser.title) {
-                updatedUser.title = 'English Teacher';
-            }
-        } else {
-            updatedUser.title = '';
-            updatedUser.subject = '';
-        }
-        onUpdateUser(updatedUser);
+      let updatedUser: User;
+
+      if (newRole === 'teacher') {
+        updatedUser = {
+          ...baseUser,
+          role: 'teacher',
+          title: user.title || 'English Teacher',
+          subject: user.subject || 'English, Literature',
+        } as User;
+      } else { // newRole === 'student'
+        updatedUser = {
+          ...baseUser,
+          role: 'student',
+          gradeLevel: user.gradeLevel || '',
+        } as User;
+      }
+      onUpdateUser(updatedUser);
     }
   };
   

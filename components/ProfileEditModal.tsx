@@ -57,7 +57,14 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({ user, onSave, onClo
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(formData);
+    let finalData = { ...formData };
+    if (finalData.role === 'student') {
+        delete (finalData as Partial<User>).title;
+        delete (finalData as Partial<User>).subject;
+    } else if (finalData.role === 'teacher') {
+        delete (finalData as Partial<User>).gradeLevel;
+    }
+    onSave(finalData);
   };
 
   return (

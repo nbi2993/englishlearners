@@ -155,20 +155,18 @@ export interface Student {
     notes?: string;
 }
 
-export interface ClassData {
-    name: string;
-    students: Student[];
-}
-
-export type Classes = Record<string, ClassData>;
-
-export interface TeacherScheduleItem {
+export interface ClassScheduleItem {
   id: string;
-  className: string;
   day: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
   period: number;
   startTime: string; // "HH:MM"
   endTime: string;   // "HH:MM"
 }
 
-export type TeacherSchedule = TeacherScheduleItem[];
+export interface ClassData {
+    name: string;
+    students: Student[];
+    schedule?: ClassScheduleItem[];
+}
+
+export type Classes = Record<string, ClassData>;
