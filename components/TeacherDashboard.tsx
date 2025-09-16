@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import type { Classes, Student } from '../types';
 import StudentCard from './StudentCard';
 import StudentReportModal from './StudentReportModal';
@@ -8,172 +8,149 @@ import AddClassModal from './AddClassModal';
 import AddStudentModal from './AddStudentModal';
 
 interface TeacherDashboardProps {
-    classes: Classes;
-    setClasses: (classes: Classes) => void;
-    language: 'en' | 'vi';
-    translations: any;
+  classes: Classes;
+  setClasses: (classes: Classes) => void;
 }
 
-const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses, language, translations }) => {
-    const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
-    const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses }) => {
+  const classKeys = Object.keys(classes);
+  const [selectedClassId, setSelectedClassId] = useState<string>(classKeys[0] || '');
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [isTestModalOpen, setIsTestModalOpen] = useState(false);
+  const [isHomeworkModalOpen, setIsHomeworkModalOpen] = useState(false);
+  const [isAddClassModalOpen, setIsAddClassModalOpen] = useState(false);
+  const [isAddStudentModalOpen, setIsAddStudentModalOpen] = useState(false);
 
-    const [isReportModalOpen, setReportModalOpen] = useState(false);
-    const [isTestModalOpen, setTestModalOpen] = useState(false);
-    const [isHomeworkModalOpen, setHomeworkModalOpen] = useState(false);
-    const [isAddClassModalOpen, setAddClassModalOpen] = useState(false);
-    const [isAddStudentModalOpen, setAddStudentModalOpen] = useState(false);
-    
-    const selectedClass = selectedClassId ? classes[selectedClassId] : null;
+  const selectedClass = classes[selectedClassId];
 
-    useEffect(() => {
-        // If there's no selected class or the selected class was deleted,
-        // select the first available class.
-        if (!selectedClassId || !classes[selectedClassId]) {
-            const firstClassId = Object.keys(classes)[0];
-            setSelectedClassId(firstClassId || null);
-        }
-    }, [classes, selectedClassId]);
+  const handleOpenReport = (student: Student) => {
+    setSelectedStudent(student);
+    setIsReportModalOpen(true);
+  };
 
-    const handleOpenReport = (student: Student) => {
-        setSelectedStudent(student);
-        setReportModalOpen(true);
+  const handleCloseReport = () => {
+    setIsReportModalOpen(false);
+    setSelectedStudent(null);
+  };
+  
+  const handleAddClass = (className: string) => {
+    const newClassId = `class-${Date.now()}`;
+    const newClasses: Classes = {
+      ...classes,
+      [newClassId]: { name: className, students: [] }
     };
+    setClasses(newClasses);
+    setSelectedClassId(newClassId);
+    setIsAddClassModalOpen(false);
+  };
 
-    const handleAddClass = (className: string) => {
-        const newClassId = `${className.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`;
-        const newClass = { name: className, students: [] };
-        const newClasses = { ...classes, [newClassId]: newClass };
-        setClasses(newClasses);
-        setSelectedClassId(newClassId);
+  const handleAddStudent = (studentName: string) => {
+    if (!selectedClassId) return;
+    const newStudent: Student = {
+        id: `s-${Date.now()}`,
+        name: studentName,
+        avatar: `https://i.pravatar.cc/150?u=${Date.now()}`,
+        lastActivity: 'Never',
+        progress: 0,
+        averageScore: 0,
+        timeSpent: '0h 0m',
+        isStruggling: false,
+        scoreHistory: [],
+        assignments: [],
+        grades: [],
     };
+    const updatedClasses = { ...classes };
+    updatedClasses[selectedClassId].students.push(newStudent);
+    setClasses(updatedClasses);
+    setIsAddStudentModalOpen(false);
+  };
 
-    const handleAddStudent = (studentName: string) => {
-        if (!selectedClassId) return;
+  if (classKeys.length === 0) {
+      return (
+          <div className="flex flex-col items-center justify-center h-full text-center p-8">
+              <i className="fa-solid fa-school-circle-xmark text-6xl text-slate-400 mb-4"></i>
+              <h2 className="text-2xl font-bold">No Classes Found</h2>
+              <p className="text-slate-500 mb-6">Get started by creating your first class.</p>
+              <button className="btn btn-primary" onClick={() => setIsAddClassModalOpen(true)}>
+                  <i className="fa-solid fa-plus mr-2"></i> Create Class
+              </button>
+              {isAddClassModalOpen && <AddClassModal onClose={() => setIsAddClassModalOpen(false)} onAddClass={handleAddClass} />}
+          </div>
+      );
+  }
 
-        const newStudent: Student = {
-            id: `s${Date.now()}`, name: studentName, avatar: `https://i.pravatar.cc/150?u=${encodeURIComponent(studentName)}`,
-            lastActivity: 'Just now', progress: 0, averageScore: 0, timeSpent: '0m',
-            isStruggling: false, scoreHistory: [], assignments: [], grades: [], notes: ''
-        };
-        
-        const updatedClasses = { ...classes };
-        updatedClasses[selectedClassId].students.push(newStudent);
-        setClasses(updatedClasses);
-    };
-    
-    const handleUpdateStudent = (updatedStudent: Student) => {
-        if (!selectedClassId) return;
+  return (
+    <div className="p-4 sm:p-6 lg:p-8 animate-fade-in">
+      <header className="mb-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-4xl font-bold text-slate-900 dark:text-white">Teacher Dashboard</h1>
+            <p className="mt-1 text-lg text-slate-600 dark:text-slate-400">Manage your classes and track student progress.</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setIsHomeworkModalOpen(true)} className="btn btn-secondary"><i className="fa-solid fa-file-pen mr-2"></i> Assign</button>
+            <button onClick={() => setIsTestModalOpen(true)} className="btn btn-primary"><i className="fa-solid fa-vial-circle-check mr-2"></i> Create Test</button>
+          </div>
+        </div>
+      </header>
 
-        const updatedClasses = { ...classes };
-        const studentIndex = updatedClasses[selectedClassId].students.findIndex(s => s.id === updatedStudent.id);
-        
-        if (studentIndex > -1) {
-            updatedClasses[selectedClassId].students[studentIndex] = updatedStudent;
-            setClasses(updatedClasses);
-            // Also update the selectedStudent if it's the one being edited
-            if (selectedStudent?.id === updatedStudent.id) {
-                setSelectedStudent(updatedStudent);
-            }
-        }
-    };
-
-    const classIds = Object.keys(classes);
-
-    return (
-        <div className="animate-fade-in p-4 sm:p-6 lg:p-8">
-            <h1 className="text-3xl font-bold mb-6">Teacher Dashboard</h1>
-
-            <div className="flex flex-col md:flex-row gap-8">
-                <div className="md:w-1/4">
-                    <div className="card-glass p-4">
-                        <h2 className="text-xl font-bold mb-4">Classes</h2>
-                        <div className="space-y-2">
-                             {classIds.length > 0 ? (
-                                classIds.map((id) => (
-                                    <button
-                                        key={id} onClick={() => setSelectedClassId(id)}
-                                        className={`w-full text-left px-4 py-2 rounded-lg transition-all text-sm font-semibold ${
-                                            selectedClassId === id
-                                            ? 'bg-blue-600 text-white shadow-md'
-                                            : 'hover:bg-black/5 dark:hover:bg-white/5'
-                                        }`}
-                                    >
-                                        {classes[id].name}
-                                    </button>
-                                ))
-                            ) : (
-                                <p className="text-sm text-slate-700 dark:text-slate-400 p-2">No classes yet. Add one to start.</p>
-                            )}
-                        </div>
-                        <button onClick={() => setAddClassModalOpen(true)} className="w-full mt-4 btn btn-secondary text-sm">
-                            <i className="fa-solid fa-plus mr-2"></i> Add Class
-                        </button>
+      <div className="mb-6 flex flex-wrap items-center gap-4">
+        <select
+          value={selectedClassId}
+          onChange={(e) => setSelectedClassId(e.target.value)}
+          className="form-select w-full sm:w-auto"
+        >
+          {classKeys.map(key => (
+            <option key={key} value={key}>{classes[key].name}</option>
+          ))}
+        </select>
+        <button onClick={() => setIsAddClassModalOpen(true)} className="btn btn-secondary-outline text-sm"><i className="fa-solid fa-plus mr-2"></i> Add Class</button>
+        <button onClick={() => setIsAddStudentModalOpen(true)} className="btn btn-primary-outline text-sm"><i className="fa-solid fa-user-plus mr-2"></i> Add Student</button>
+      </div>
+      
+      {selectedClass ? (
+        <>
+            <div className="mb-6 p-4 bg-white/50 dark:bg-slate-800/50 rounded-lg flex flex-wrap justify-between items-center gap-4">
+                <h2 className="text-2xl font-bold">{selectedClass.name}</h2>
+                <div className="flex gap-x-6 gap-y-2 flex-wrap">
+                    <div className="text-center">
+                        <p className="text-2xl font-bold">{selectedClass.students.length}</p>
+                        <p className="text-sm text-slate-500">Students</p>
+                    </div>
+                    <div className="text-center">
+                        <p className="text-2xl font-bold text-green-500">
+                           {selectedClass.students.length > 0 ? (selectedClass.students.reduce((acc, s) => acc + s.averageScore, 0) / selectedClass.students.length).toFixed(1) : 'N/A'}
+                        </p>
+                        <p className="text-sm text-slate-500">Class Average</p>
+                    </div>
+                    <div className="text-center">
+                        <p className="text-2xl font-bold text-amber-500">
+                           {selectedClass.students.filter(s => s.isStruggling).length}
+                        </p>
+                        <p className="text-sm text-slate-500">Struggling</p>
                     </div>
                 </div>
-
-                <div className="flex-1">
-                    {classIds.length === 0 && (
-                        <div className="card-glass h-full flex flex-col items-center justify-center text-center p-8">
-                            <i className="fa-solid fa-chalkboard-user text-6xl text-slate-400 dark:text-slate-500 mb-4"></i>
-                            <h2 className="text-2xl font-bold">Welcome to your Dashboard!</h2>
-                            <p className="text-slate-700 dark:text-slate-400 mt-2 mb-6 max-w-sm">Create your first class to add students, assign homework, and track progress.</p>
-                            <button onClick={() => setAddClassModalOpen(true)} className="btn btn-primary">
-                                <i className="fa-solid fa-plus mr-2"></i> Create Your First Class
-                            </button>
-                        </div>
-                    )}
-
-                    {selectedClass && (
-                        <div>
-                            <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
-                                <h2 className="text-2xl font-bold">{selectedClass.name}</h2>
-                                <div className="flex items-center gap-2">
-                                    <button onClick={() => setHomeworkModalOpen(true)} className="btn btn-secondary text-sm">Assign Homework</button>
-                                    <button onClick={() => setTestModalOpen(true)} className="btn btn-secondary text-sm">Create Test</button>
-                                </div>
-                            </div>
-                            
-                            {selectedClass.students.length > 0 ? (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
-                                    {selectedClass.students.map(student => (
-                                        <StudentCard key={student.id} student={student} onReportClick={() => handleOpenReport(student)} />
-                                    ))}
-                                    <button onClick={() => setAddStudentModalOpen(true)} className="card-glass border-2 border-dashed border-slate-300 dark:border-slate-600 flex flex-col items-center justify-center text-slate-700 dark:text-slate-400 hover:bg-slate-100/50 dark:hover:bg-slate-700/50 transition-colors rounded-2xl min-h-[220px]">
-                                        <i className="fa-solid fa-plus text-2xl"></i>
-                                        <span className="mt-2 font-semibold">Add Student</span>
-                                    </button>
-                                </div>
-                            ) : (
-                                <div className="card-glass h-full flex flex-col items-center justify-center text-center p-8 border-2 border-dashed border-slate-300 dark:border-slate-600">
-                                    <i className="fa-solid fa-user-plus text-6xl text-slate-400 dark:text-slate-500 mb-4"></i>
-                                    <h2 className="text-2xl font-bold">This class is empty</h2>
-                                    <p className="text-slate-700 dark:text-slate-400 mt-2 mb-6">Add your first student to begin tracking their progress and assignments.</p>
-                                    <button onClick={() => setAddStudentModalOpen(true)} className="btn btn-primary">
-                                        <i className="fa-solid fa-plus mr-2"></i> Add Student
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </div>
             </div>
-            
-            {isReportModalOpen && selectedStudent && (
-                <StudentReportModal 
-                    student={selectedStudent} 
-                    onClose={() => setReportModalOpen(false)}
-                    onUpdateStudent={handleUpdateStudent}
-                />
-            )}
-            {isTestModalOpen && <CreateTestModal onClose={() => setTestModalOpen(false)} />}
-            {isHomeworkModalOpen && selectedClass && (
-                <AssignHomeworkModal students={selectedClass.students} onClose={() => setHomeworkModalOpen(false)} />
-            )}
-            {isAddClassModalOpen && <AddClassModal onClose={() => setAddClassModalOpen(false)} onAddClass={handleAddClass} />}
-            {isAddStudentModalOpen && <AddStudentModal onClose={() => setAddStudentModalOpen(false)} onAddStudent={handleAddStudent} />}
-        </div>
-    );
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {selectedClass.students.map(student => (
+                <StudentCard key={student.id} student={student} onReportClick={() => handleOpenReport(student)} />
+              ))}
+            </div>
+        </>
+      ) : (
+        <p>Select a class to view students.</p>
+      )}
+
+      {isReportModalOpen && selectedStudent && (
+        <StudentReportModal student={selectedStudent} onClose={handleCloseReport} classes={classes} setClasses={setClasses} classId={selectedClassId}/>
+      )}
+      {isTestModalOpen && <CreateTestModal onClose={() => setIsTestModalOpen(false)} />}
+      {isHomeworkModalOpen && selectedClass && <AssignHomeworkModal students={selectedClass.students} onClose={() => setIsHomeworkModalOpen(false)} />}
+      {isAddClassModalOpen && <AddClassModal onClose={() => setIsAddClassModalOpen(false)} onAddClass={handleAddClass} />}
+      {isAddStudentModalOpen && <AddStudentModal onClose={() => setIsAddStudentModalOpen(false)} onAddStudent={handleAddStudent} />}
+    </div>
+  );
 };
 
 export default TeacherDashboard;

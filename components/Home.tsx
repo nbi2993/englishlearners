@@ -1,23 +1,24 @@
 import React from 'react';
-import type { User, Course, OtherProgram, Classes } from '../types';
+import type { User, Course } from '../types';
 import StudentHome from './StudentHome';
 import TeacherHome from './TeacherHome';
 
 interface HomeProps {
   user: User;
-  setUser: (user: User) => void;
-  courses: Course[];
-  otherPrograms: OtherProgram[];
-  classes: Classes;
+  onSelectCourse: (course: Course) => void;
   language: 'en' | 'vi';
-  setSelectedCourse: (course: Course | null) => void;
 }
 
-const Home: React.FC<HomeProps> = (props) => {
-  if (props.user.role === 'teacher') {
-    return <TeacherHome {...props} />;
+const Home: React.FC<HomeProps> = ({ user, onSelectCourse, language }) => {
+  if (user.role === 'student') {
+    return <StudentHome user={user} onSelectCourse={onSelectCourse} language={language} />;
   }
-  return <StudentHome {...props} />;
+  
+  if (user.role === 'teacher') {
+    return <TeacherHome user={user} onSelectCourse={onSelectCourse} language={language} />;
+  }
+
+  return <div>Invalid user role.</div>;
 };
 
 export default Home;

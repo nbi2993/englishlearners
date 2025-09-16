@@ -3,188 +3,126 @@ import type { User } from '../types';
 
 interface ProfileEditModalProps {
   user: User;
-  setUser: (user: User) => void;
+  onSave: (user: User) => void;
   onClose: () => void;
 }
 
 const avatars = [
-  'fa-user-astronaut', 'fa-user-ninja', 'fa-user-secret', 'fa-user-doctor',
-  'fa-user-graduate', 'fa-user-tie', 'fa-user-pen', 'fa-music',
-  'fa-palette', 'fa-flask-vial', 'fa-laptop-code', 'fa-brain'
+  'fa-user-astronaut', 'fa-user-secret', 'fa-user-ninja', 'fa-user-doctor', 
+  'fa-user-graduate', 'fa-user-tie', 'fa-user-nurse', 'fa-user-md'
 ];
 
-const ProfileEditModal: React.FC<ProfileEditModalProps> = ({ user, setUser, onClose }) => {
-  const [name, setName] = useState(user.name);
-  const [avatar, setAvatar] = useState(user.avatar);
-  const [age, setAge] = useState(user.age || '');
-  const [gender, setGender] = useState(user.gender || '');
+const ProfileEditModal: React.FC<ProfileEditModalProps> = ({ user, onSave, onClose }) => {
+  const [formData, setFormData] = useState<User>(user);
 
-  // Student-specific state
-  const [gradeLevel, setGradeLevel] = useState(user.gradeLevel || '');
-
-  // Teacher-specific state
-  const [title, setTitle] = useState(user.title || '');
-  const [subject, setSubject] = useState(user.subject || '');
-
-
-  const getEducationLevel = (gradeStr: string): string => {
-      if (!gradeStr) return 'N/A';
-      const grade = parseInt(gradeStr.match(/\d+/)?.[0] || '0');
-      if (grade >= 10) return 'High School';
-      if (grade >= 6) return 'Secondary';
-      if (grade >= 1) return 'Primary';
-      return 'Preschool';
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSave = () => {
-    let updatedUser: Partial<User> = {};
-
-    if (user.role === 'student') {
-        const educationLevel = getEducationLevel(gradeLevel);
-        const newLevel = gradeLevel ? `${educationLevel} - ${gradeLevel}` : educationLevel;
-        updatedUser = {
-            name,
-            avatar,
-            gradeLevel,
-            age: age ? Number(age) : undefined,
-            gender,
-            level: newLevel,
-            title: undefined, // Clear teacher fields
-            subject: undefined
-        };
-    } else { // Teacher
-        updatedUser = {
-            name,
-            avatar,
-            title,
-            subject,
-            age: age ? Number(age) : undefined,
-            gender,
-            level: title || 'Teacher', // Use title for the level display
-            gradeLevel: undefined, // Clear student field
-        };
-    }
-
-    setUser({ ...user, ...updatedUser });
-    onClose();
+  const handleAvatarChange = (avatar: string) => {
+    setFormData({ ...formData, avatar });
   };
-  
-  const handleAvatarChange = () => {
-      const currentIndex = avatars.indexOf(avatar);
-      const nextIndex = currentIndex > -1 ? (currentIndex + 1) % avatars.length : 0;
-      setAvatar(avatars[nextIndex]);
-  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSave(formData);
+  };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 transition-opacity animate-fade-in">
-      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl p-6 w-full max-w-md m-4 transform transition-all animate-slide-in-up">
-        <div className="flex justify-between items-center mb-4 border-b dark:border-slate-700 pb-3">
-          <h4 className="text-xl font-bold text-slate-900 dark:text-white">Edit Profile</h4>
-          <button onClick={onClose} className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 text-2xl">&times;</button>
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 transition-opacity animate-fade-in p-4">
+      <form onSubmit={handleSubmit} className="modal-content p-6 w-full max-w-lg m-4 transform transition-all animate-slide-in-up">
+        <div className="flex justify-between items-center border-b pb-3 dark:border-slate-700">
+          <h3 className="text-xl font-bold text-slate-900 dark:text-white">Edit Profile</h3>
+          <button type="button" onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-2xl">&times;</button>
         </div>
         
-        <div className="space-y-6">
-            <div className="flex flex-col items-center">
-                <div className="w-24 h-24 rounded-full bg-blue-100 dark:bg-slate-700 flex items-center justify-center border-4 border-blue-500 mb-3">
-                    <i className={`fa-solid ${avatar} text-5xl text-blue-600 dark:text-blue-400`}></i>
-                </div>
-                <button onClick={handleAvatarChange} className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
-                    Change Avatar
+        <div className="mt-6 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-800 dark:text-slate-300 mb-2">Avatar</label>
+            <div className="flex flex-wrap gap-3">
+              {avatars.map(avatar => (
+                <button
+                  type="button"
+                  key={avatar}
+                  onClick={() => handleAvatarChange(avatar)}
+                  className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-all duration-200 ${
+                    formData.avatar === avatar ? 'bg-blue-500 text-white scale-110 ring-2 ring-blue-300' : 'bg-slate-200 dark:bg-slate-700'
+                  }`}
+                >
+                  <i className={`fa-solid ${avatar}`}></i>
                 </button>
+              ))}
             </div>
+          </div>
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-slate-800 dark:text-slate-300 mb-1">Name</label>
+            <input
+              id="name" name="name" type="text"
+              value={formData.name} onChange={handleChange}
+              className="form-input" required
+            />
+          </div>
 
-            <div className="space-y-4">
+          {user.role === 'student' ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="age" className="block text-sm font-medium text-slate-800 dark:text-slate-300 mb-1">Age</label>
+                <input
+                  id="age" name="age" type="number"
+                  value={formData.age || ''} onChange={handleChange}
+                  className="form-input"
+                />
+              </div>
+              <div>
+                <label htmlFor="gradeLevel" className="block text-sm font-medium text-slate-800 dark:text-slate-300 mb-1">Grade Level</label>
+                <input
+                  id="gradeLevel" name="gradeLevel" type="text"
+                  value={formData.gradeLevel || ''} onChange={handleChange}
+                  className="form-input" placeholder="e.g., Grade 5"
+                />
+              </div>
+            </div>
+          ) : ( // Teacher fields
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-slate-800 dark:text-slate-300 mb-1">Name</label>
+                  <label htmlFor="age" className="block text-sm font-medium text-slate-800 dark:text-slate-300 mb-1">Age</label>
                   <input
-                    id="name"
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    id="age" name="age" type="number"
+                    value={formData.age || ''} onChange={handleChange}
                     className="form-input"
                   />
                 </div>
-                
-                {user.role === 'student' ? (
-                    <div>
-                        <label htmlFor="gradeLevel" className="block text-sm font-medium text-slate-800 dark:text-slate-300 mb-1">Grade Level</label>
-                        <input
-                            id="gradeLevel"
-                            type="text"
-                            value={gradeLevel}
-                            onChange={(e) => setGradeLevel(e.target.value)}
-                            className="form-input"
-                            placeholder="e.g., Grade 5"
-                        />
-                    </div>
-                ) : (
-                   <>
-                        <div>
-                            <label htmlFor="title" className="block text-sm font-medium text-slate-800 dark:text-slate-300 mb-1">Title / Position</label>
-                            <input
-                                id="title"
-                                type="text"
-                                value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                                className="form-input"
-                                placeholder="e.g., English Teacher"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="subject" className="block text-sm font-medium text-slate-800 dark:text-slate-300 mb-1">Subject(s)</label>
-                            <input
-                                id="subject"
-                                type="text"
-                                value={subject}
-                                onChange={(e) => setSubject(e.target.value)}
-                                className="form-input"
-                                placeholder="e.g., English, Literature"
-                            />
-                        </div>
-                   </>
-                )}
-
-                <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <label htmlFor="age" className="block text-sm font-medium text-slate-800 dark:text-slate-300 mb-1">Age</label>
-                        <input
-                            id="age"
-                            type="number"
-                            value={age}
-                            onChange={(e) => setAge(e.target.value)}
-                            className="form-input"
-                            placeholder="e.g., 10"
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="gender" className="block text-sm font-medium text-slate-800 dark:text-slate-300 mb-1">Gender</label>
-                        <select id="gender" value={gender} onChange={(e) => setGender(e.target.value)} className="form-select">
-                            <option value="">Select...</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Other">Other</option>
-                            <option value="Prefer not to say">Prefer not to say</option>
-                        </select>
-                    </div>
+                <div>
+                  <label htmlFor="title" className="block text-sm font-medium text-slate-800 dark:text-slate-300 mb-1">Title</label>
+                  <input
+                    id="title" name="title" type="text"
+                    value={formData.title || ''} onChange={handleChange}
+                    className="form-input" placeholder="e.g., English Teacher"
+                  />
                 </div>
-            </div>
+              </div>
+              <div>
+                <label htmlFor="subject" className="block text-sm font-medium text-slate-800 dark:text-slate-300 mb-1">Subject(s)</label>
+                <input
+                  id="subject" name="subject" type="text"
+                  value={formData.subject || ''} onChange={handleChange}
+                  className="form-input" placeholder="e.g., English, Literature"
+                />
+              </div>
+            </>
+          )}
         </div>
 
         <div className="mt-8 flex justify-end space-x-3">
-            <button 
-                onClick={onClose}
-                className="px-4 py-2 bg-slate-200 dark:bg-slate-600 text-slate-900 dark:text-slate-200 font-semibold rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500 transition-colors"
-            >
-                Cancel
-            </button>
-            <button 
-                onClick={handleSave}
-                className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
-            >
-                Save Changes
-            </button>
+          <button type="button" onClick={onClose} className="btn btn-secondary">
+            Cancel
+          </button>
+          <button type="submit" className="btn btn-primary">
+            Save Changes
+          </button>
         </div>
-      </div>
+      </form>
     </div>
   );
 };

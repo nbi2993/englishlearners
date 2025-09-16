@@ -40,7 +40,7 @@ export const gradeWriting = async (topic: string, text: string): Promise<Writing
           coherence: { type: Type.STRING, description: 'Specific feedback on the structure and flow.' },
           score: { type: Type.INTEGER, description: 'A score from 0 to 100.' },
         },
-        required: ["overall", "grammar", "vocabulary", "coherence", "score"]
+        // FIX: Removed invalid 'required' property from responseSchema.
       },
       temperature: 0.2
     },

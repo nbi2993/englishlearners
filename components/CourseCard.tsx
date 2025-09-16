@@ -3,82 +3,49 @@ import type { Course } from '../types';
 
 interface CourseCardProps {
   course: Course;
-  onClick: () => void;
+  onSelect: () => void;
   isPinned: boolean;
-  onPinClick: (courseId: string) => void;
+  onPinToggle: () => void;
 }
 
-const CourseCard: React.FC<CourseCardProps> = ({ course, onClick, isPinned, onPinClick }) => {
-  // Use a placeholder image if imageUrl is not available
-  const imageUrl = course.imageUrl || 'https://placehold.co/600x400/E5E7EB/A1A1AA?text=No+Image';
-
+const CourseCard: React.FC<CourseCardProps> = ({ course, onSelect, isPinned, onPinToggle }) => {
   const handlePinClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent card's onClick from firing
-    onPinClick(course.id);
+    e.stopPropagation(); // Prevent card selection when pinning
+    onPinToggle();
   };
 
   return (
     <div 
-      className="card-glass overflow-hidden transform hover:-translate-y-1 transition-transform duration-300 cursor-pointer flex flex-col group relative" 
-      onClick={onClick}
+      className="card-glass flex flex-col cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-2"
+      onClick={onSelect}
     >
-      <button 
-        onClick={handlePinClick}
-        title={isPinned ? "Unpin from Home" : "Pin to Home"}
-        className={`absolute top-2 right-2 z-10 w-8 h-8 rounded-full flex-center transition-all duration-300
-                    ${isPinned 
-                        ? 'bg-blue-600 text-white opacity-100' 
-                        : 'bg-black/30 text-white/70 opacity-0 group-hover:opacity-100 hover:bg-blue-500'
-                    }`}
-      >
-          <i className="fa-solid fa-thumbtack text-sm"></i>
-      </button>
-
-      <div 
-        className="h-32 w-full relative bg-cover bg-center"
-        style={{ backgroundImage: `url(${imageUrl})` }}
-      >
-        <div 
-          className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"
-        ></div>
-        <div className="absolute bottom-0 left-0 p-3 w-full">
-          <p className="text-xs font-medium text-white/80 uppercase tracking-wider">{course.series}</p>
-          <h3 className="text-lg font-bold text-white leading-tight mt-1">{course.title}</h3>
+      <div className="relative">
+        <img className="w-full h-40 object-cover rounded-t-lg" src={course.imageUrl} alt={course.title} />
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black/60 to-transparent"></div>
+        <button 
+          onClick={handlePinClick}
+          className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-200 ${
+            isPinned ? 'bg-amber-400 text-white' : 'bg-white/30 text-white hover:bg-white/50'
+          }`}
+          title={isPinned ? "Unpin course" : "Pin course"}
+        >
+          <i className="fa-solid fa-thumbtack"></i>
+        </button>
+        <div className="absolute bottom-3 left-4">
+            <span className="text-xs bg-black/50 text-white px-2 py-1 rounded">{course.series}</span>
         </div>
-        <div 
-           className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-           style={{
-             background: `radial-gradient(circle at 50% 50%, ${course.color}33, transparent 70%)`
-           }}
-        ></div>
       </div>
-      <div className="p-4 flex flex-col flex-grow bg-white/50 dark:bg-slate-800/20">
-        <div>
-           <span 
-            className="text-xs font-bold px-2.5 py-1 rounded-full"
-            style={{ 
-              backgroundColor: `${course.color}20`, // Hex with 12.5% alpha
-              color: course.color 
-            }}
-          >
-            {course.level}
-          </span>
+
+      <div className="p-4 flex flex-col flex-grow">
+        <h3 className="font-bold text-lg mb-1 leading-tight">{course.title}</h3>
+        <p className="text-sm text-slate-600 dark:text-slate-400 mb-3 flex-grow">{course.description}</p>
+        
+        <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 mt-auto">
+          <div className="h-2 rounded-full" style={{ width: `${course.progress}%`, backgroundColor: course.color }}></div>
         </div>
-        <div className="mt-4 flex-grow flex flex-col justify-end">
-          <div className="flex justify-between items-center mb-1">
-            <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Progress</span>
-            <span className="text-xs font-bold" style={{color: course.color}}>{course.progress}%</span>
-          </div>
-          <div className="w-full bg-slate-200/70 dark:bg-slate-700/50 rounded-full h-1.5">
-            <div 
-                className="h-1.5 rounded-full transition-all duration-500 ease-out" 
-                style={{ 
-                    width: `${course.progress}%`, 
-                    backgroundColor: course.color,
-                    boxShadow: `0 0 8px ${course.color}80`
-                }}
-            ></div>
-          </div>
+        <div className="flex justify-between text-xs mt-1 text-slate-500 dark:text-slate-400">
+          <span>Progress</span>
+          <span>{course.progress}%</span>
         </div>
       </div>
     </div>

@@ -1,84 +1,111 @@
-import React from 'react';
-import type { Course, Lesson, User } from '../types';
+import React, { useState } from 'react';
+import type { Course, Unit as CurriculumUnit, Lesson } from '../types';
+import LessonView from './LessonView';
 
 interface CourseDetailProps {
-  user: User;
-  setUser: (user: User) => void;
   course: Course;
   onBack: () => void;
-  onSelectLesson: (lesson: Lesson) => void;
   language: 'en' | 'vi';
 }
 
-const LessonListItem: React.FC<{ lesson: Lesson; onClick: () => void; }> = ({ lesson, onClick }) => (
-    <button onClick={onClick} className="w-full text-left p-4 rounded-lg bg-slate-50/50 dark:bg-slate-800/20 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-all flex justify-between items-center border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
-        <div>
-            <p className="font-semibold text-slate-900 dark:text-white">{lesson.rawLesson.day ? `Day ${lesson.rawLesson.day}: ` : ''}{lesson.title}</p>
-            <p className="text-sm text-slate-700 dark:text-slate-400">{lesson.rawLesson.aims.en[0]}</p>
-        </div>
-        <i className="fa-solid fa-chevron-right text-slate-400"></i>
-    </button>
-);
+const CourseDetail: React.FC<CourseDetailProps> = ({ course, onBack, language }) => {
+  const [expandedUnit, setExpandedUnit] = useState<number | null>(course.rawLevel.units[0]?.id || null);
+  const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
 
-
-const CourseDetail: React.FC<CourseDetailProps> = ({
-    user,
-    setUser,
-    course,
-    onBack,
-    onSelectLesson,
-    language
-}) => {
-    
-    const handlePinClick = (courseId: string) => {
-        const currentPinned = user.pinnedCourses || [];
-        const isPinned = currentPinned.includes(courseId);
-        const newPinned = isPinned
-            ? currentPinned.filter(id => id !== courseId)
-            : [...currentPinned, courseId];
-        setUser({ ...user, pinnedCourses: newPinned });
-    };
-
+  const toggleUnit = (unitId: number) => {
+    setExpandedUnit(prev => (prev === unitId ? null : unitId));
+  };
+  
+  if (selectedLesson) {
     return (
-        <div className="animate-fade-in p-4 sm:p-6 lg:p-8">
-            <button onClick={onBack} className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-semibold mb-6 hover:underline">
-                <i className="fa-solid fa-arrow-left"></i>
-                {language === 'vi' ? 'Quay lại' : 'Back'}
+        <div>
+            <button onClick={() => setSelectedLesson(null)} className="m-4 btn btn-secondary-outline">
+                <i className="fa-solid fa-arrow-left mr-2"></i> Back to Course
             </button>
-            <div className="card-glass p-6 flex flex-col sm:flex-row items-start gap-6 mb-8 relative">
-                <div className="w-32 h-32 rounded-lg flex-shrink-0" style={{ backgroundColor: course.color }}>
-                    {/* Image could go here */}
-                </div>
-                <div>
-                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white">{course.title}</h1>
-                    <p className="text-slate-700 dark:text-slate-400 mt-1">{course.description}</p>
-                    <div className="flex items-center gap-4 mt-4">
-                        <a href={course.rawLevel.ebookPdfUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
-                            {language === 'vi' ? 'Xem eBook PDF' : 'View eBook PDF'} <i className="fa-solid fa-external-link-alt ml-2"></i>
-                        </a>
-                         <button 
-                            onClick={() => handlePinClick(course.id)}
-                            title={(user.pinnedCourses || []).includes(course.id) ? "Unpin from Home" : "Pin to Home"}
-                            className={`w-10 h-10 rounded-full flex-center transition-all duration-300
-                                ${ (user.pinnedCourses || []).includes(course.id)
-                                    ? 'bg-blue-600 text-white' 
-                                    : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-blue-500 hover:text-white'
-                                }`}
-                        >
-                            <i className="fa-solid fa-thumbtack text-sm"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <LessonView lesson={selectedLesson} language={language} />
+        </div>
+    );
+  }
 
-            <h2 className="text-2xl font-bold mb-4">{language === 'vi' ? 'Các bài học' : 'Lessons'}</h2>
-            <div className="space-y-3">
-                {course.lessons.map(lesson => (
-                    <LessonListItem key={lesson.id} lesson={lesson} onClick={() => onSelectLesson(lesson)} />
-                ))}
+  return (
+    <div className="p-4 sm:p-6 lg:p-8 animate-fade-in">
+      <div className="mb-6">
+        <button onClick={onBack} className="btn btn-secondary-outline mb-4">
+          <i className="fa-solid fa-arrow-left mr-2"></i> {language === 'vi' ? 'Tất cả khóa học' : 'All Courses'}
+        </button>
+        <div className="card-glass p-6 flex flex-col md:flex-row items-start gap-6">
+            <img src={course.imageUrl} alt={course.title} className="w-full md:w-64 h-auto object-cover rounded-lg shadow-md" />
+            <div className="flex-1">
+                <h1 className="text-3xl font-bold mb-1">{course.title}</h1>
+                <p className="text-lg text-slate-600 dark:text-slate-400 mb-3">{course.description}</p>
+                <div className="flex items-center gap-4 text-sm mb-4">
+                    <span className="font-semibold">{course.series}</span>
+                    <span className="text-slate-500">•</span>
+                    <span>{course.level}</span>
+                </div>
+                 <a href={course.rawLevel.ebookPdfUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
+                    <i className="fa-solid fa-book-reader mr-2"></i> {language === 'vi' ? 'Xem Ebook' : 'View Ebook'}
+                 </a>
             </div>
         </div>
-    )
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="md:col-span-1">
+            <div className="card-glass p-6 sticky top-6">
+                <h2 className="text-2xl font-bold mb-4">{language === 'vi' ? 'Các bài học' : 'Units'}</h2>
+                <div className="space-y-2">
+                    {course.rawLevel.units.map((unit: CurriculumUnit) => (
+                        <div key={unit.id}>
+                            <button
+                                onClick={() => toggleUnit(unit.id)}
+                                className="w-full text-left p-3 rounded-lg flex justify-between items-center bg-slate-100 dark:bg-slate-700/50 hover:bg-slate-200 dark:hover:bg-slate-700"
+                            >
+                                <span className="font-semibold">{language === 'vi' ? unit.title.vi : unit.title.en}</span>
+                                <i className={`fa-solid fa-chevron-down transition-transform ${expandedUnit === unit.id ? 'rotate-180' : ''}`}></i>
+                            </button>
+                            {expandedUnit === unit.id && (
+                                <ul className="mt-2 pl-4 space-y-1">
+                                    {unit.lessons.map(lesson => {
+                                        const mappedLesson: Lesson = {
+                                            id: lesson.id.toString(),
+                                            title: language === 'vi' ? lesson.title.vi : lesson.title.en,
+                                            type: 'ebook',
+                                            content: '',
+                                            rawLesson: lesson
+                                        };
+                                        return (
+                                            <li key={lesson.id}>
+                                                <button onClick={() => setSelectedLesson(mappedLesson)} className="w-full text-left p-2 rounded text-slate-600 dark:text-slate-300 hover:bg-blue-100 dark:hover:bg-blue-900/50">
+                                                    {language === 'vi' ? lesson.title.vi : lesson.title.en}
+                                                </button>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+        
+        <div className="md:col-span-2">
+             <div className="card-glass h-[80vh] flex flex-col">
+                <div className="p-4 border-b dark:border-slate-700">
+                    <h3 className="font-bold">{language === 'vi' ? 'Sách điện tử' : 'Ebook Viewer'}</h3>
+                </div>
+                 <iframe 
+                    src={`${course.rawLevel.ebookPdfUrl.replace('/view?usp=sharing', '/preview').replace('/view?usp=drive_link', '/preview')}`}
+                    className="w-full flex-grow border-0"
+                    title={`${course.title} Ebook`}
+                    allow="fullscreen"
+                ></iframe>
+            </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default CourseDetail;

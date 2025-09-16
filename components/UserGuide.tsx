@@ -1,4 +1,5 @@
 import React from 'react';
+import { curriculumData } from '../data/curriculum';
 
 interface UserGuideProps {
     language: 'en' | 'vi';
@@ -65,7 +66,34 @@ const UserGuide: React.FC<UserGuideProps> = ({ language }) => {
         student_p1: isVietnamese
             ? '**Trang chủ** của bạn hiển thị các chỉ số gamification để tạo động lực học tập: **Điểm (Points)**, **Chuỗi ngày học (Streak)**, và **Huy hiệu (Badges)**. Hãy hoàn thành các bài học để xem các chỉ số này tăng lên!'
             : 'Your **Home** page displays gamification stats to motivate you: **Points**, **Streak**, and **Badges**. Keep completing lessons to see them grow!',
+
+        duns: 'Mã D-U-N-S: 646434880',
+        copyright: isVietnamese ? '© 2025 IVS JSC. Mọi quyền được bảo lưu.' : '© 2025 IVS JSC. All rights reserved.',
+        developed_by: isVietnamese ? 'Được thiết kế và phát triển bởi IVS Celestech, IVS JSC.' : 'Designed and developed by IVS Celestech, IVS JSC.',
+        contact_phone_label: isVietnamese ? 'Số điện thoại Liên hệ' : 'Contact Phone',
+        contact_phone_value: '0795 555 789 (Zalo)',
+        website_value: 'ivsacademy.edu.vn',
+        email_value: 'info@ivsacademy.edu.vn'
     };
+    
+    const curriculumContent = {
+        title: isVietnamese ? 'Danh sách Toàn bộ Chương trình học IVS English (K-12)' : 'Complete IVS English Curriculum List (K-12)',
+        intro: isVietnamese ? 'Dưới đây là danh sách chi tiết các cấp học và chương trình học hiện có trong hệ thống của IVS English, được phân chia theo từng khối lớp từ Mầm non đến Trung học phổ thông.' : 'Below is a detailed list of the school levels and curricula available in the IVS English system, divided by grade from Kindergarten to High School.',
+        kindergarten_desc: isVietnamese ? 'Chương trình được thiết kế cho trẻ từ 3-5 tuổi, tập trung vào việc làm quen với tiếng Anh qua các hoạt động vui nhộn và trực quan.' : 'This program is designed for children aged 3-5, focusing on introducing English through fun and visual activities.',
+        primary_desc: isVietnamese ? 'Chương trình xây dựng nền tảng tiếng Anh vững chắc cho học sinh từ lớp 1 đến lớp 5.' : 'This program builds a solid English foundation for students from Grade 1 to Grade 5.',
+        secondary_desc: isVietnamese ? 'Chương trình bám sát sách giáo khoa của Bộ Giáo dục và Đào tạo, giúp học sinh phát triển toàn diện 4 kỹ năng.' : 'This program follows the Ministry of Education and Training textbooks, helping students develop all 4 skills comprehensively.',
+        highschool_desc: isVietnamese ? 'Chương trình nâng cao, bám sát bộ sách Global Success, chuẩn bị kiến thức cho các kỳ thi quan trọng và định hướng tương lai.' : 'An advanced program following the Global Success series, preparing students for important exams and future orientations.',
+        view_ebook: isVietnamese ? 'Giáo trình Ebook' : 'Ebook Curriculum'
+    };
+
+    const categoryDescriptions = [
+        curriculumContent.kindergarten_desc,
+        curriculumContent.primary_desc,
+        curriculumContent.secondary_desc,
+        curriculumContent.highschool_desc,
+    ];
+    
+    const romanNumerals = ['I', 'II', 'III', 'IV'];
 
     return (
         <div className="max-w-4xl mx-auto animate-fade-in p-4 sm:p-6 lg:p-8">
@@ -100,6 +128,40 @@ const UserGuide: React.FC<UserGuideProps> = ({ language }) => {
                     <li dangerouslySetInnerHTML={{ __html: content.features_settings_data }}></li>
                 </ul>
             </GuideSection>
+            
+            <GuideSection title={curriculumContent.title}>
+                <p>{curriculumContent.intro}</p>
+                {curriculumData.map((category, catIndex) => (
+                    <div key={catIndex} className="mt-6">
+                        <h3 className="!text-xl !font-bold !mb-2">
+                            {romanNumerals[catIndex]}. {isVietnamese ? category.category.vi : category.category.en}
+                        </h3>
+                        <p className="italic mb-2">{categoryDescriptions[catIndex]}</p>
+                        <ul className="list-disc list-inside ml-4 space-y-1">
+                            {category.levels.map(level => {
+                                const levelDesc = isVietnamese 
+                                    ? level.subtitle.vi.substring(level.subtitle.vi.indexOf('-') + 1).trim()
+                                    : level.subtitle.en.substring(level.subtitle.en.indexOf('-') + 1).trim();
+
+                                return (
+                                    <li key={level.level}>
+                                        <strong>{isVietnamese ? level.title.vi : level.title.en}:</strong> {levelDesc}
+                                        {' '}
+                                        <a
+                                            href={level.ebookPdfUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-blue-500 hover:underline text-sm font-medium"
+                                        >
+                                            [{curriculumContent.view_ebook}]
+                                        </a>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    </div>
+                ))}
+            </GuideSection>
 
             <GuideSection title={content.teacher_title}>
                 <p>{content.teacher_p1}</p>
@@ -108,6 +170,21 @@ const UserGuide: React.FC<UserGuideProps> = ({ language }) => {
             <GuideSection title={content.student_title}>
                 <p dangerouslySetInnerHTML={{ __html: content.student_p1 }}></p>
             </GuideSection>
+
+            <footer className="mt-12 pt-6 border-t border-slate-200 dark:border-slate-700 text-center text-xs text-slate-500 dark:text-slate-400 space-y-1">
+                <p className="font-semibold">{content.duns}</p>
+                <p>{content.copyright}</p>
+                <p>{content.developed_by}</p>
+                <div className="pt-2 flex items-center justify-center gap-x-6 gap-y-1 flex-wrap">
+                    <span><i className="fa-solid fa-phone mr-1"></i> {content.contact_phone_label}: {content.contact_phone_value}</span>
+                    <a href="https://ivsacademy.edu.vn" target="_blank" rel="noopener noreferrer" className="hover:underline hover:text-blue-500">
+                        <i className="fa-solid fa-globe mr-1"></i> Website: {content.website_value}
+                    </a>
+                    <a href={`mailto:${content.email_value}`} className="hover:underline hover:text-blue-500">
+                        <i className="fa-solid fa-envelope mr-1"></i> Email: {content.email_value}
+                    </a>
+                </div>
+            </footer>
         </div>
     );
 };

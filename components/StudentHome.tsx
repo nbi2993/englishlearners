@@ -1,114 +1,107 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import type { User, Course } from '../types';
-import ProfileEditModal from './ProfileEditModal';
 import CourseCard from './CourseCard';
+import { curriculumData } from '../data/curriculum';
 
 interface StudentHomeProps {
   user: User;
-  setUser: (user: User) => void;
-  courses: Course[];
+  onSelectCourse: (course: Course) => void;
   language: 'en' | 'vi';
-  setSelectedCourse: (course: Course | null) => void;
 }
 
-const StatCard: React.FC<{ icon: string; value: string | number; label: string; iconBg: string; valueColor: string; }> = ({ icon, value, label, iconBg, valueColor }) => (
-    <div className="flex items-center gap-4">
-        <div className={`w-12 h-12 rounded-full flex-center flex-shrink-0 ${iconBg}`}>
-            <i className={`fa-solid ${icon} text-white text-xl`}></i>
-        </div>
-        <div>
-            <div className={`text-2xl font-bold ${valueColor}`}>{value}</div>
-            <div className="text-sm text-slate-700 dark:text-slate-400">{label}</div>
-        </div>
-    </div>
-);
+const StudentHome: React.FC<StudentHomeProps> = ({ user, onSelectCourse, language }) => {
 
-const WelcomeHub: React.FC<{user: User, onEditProfile: () => void, language: 'en' | 'vi'}> = ({ user, onEditProfile, language }) => (
-    <div className="card-glass p-6 md:p-8 rounded-2xl md:rounded-3xl shadow-lg relative overflow-hidden">
-        <div className="relative z-10">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div>
-                    <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
-                        {language === 'vi' ? `Chào mừng, ${user.name}!` : `Welcome, ${user.name}!`}
-                    </h1>
-                    <p className="text-slate-700 dark:text-slate-300 mt-1">
-                        {language === 'vi' ? 'Sẵn sàng cho một ngày học tuyệt vời!' : 'Ready for a great day of learning!'}
-                    </p>
-                </div>
-                <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-slate-700 flex-center border-2 border-white/50">
-                        <i className={`fa-solid ${user.avatar} text-4xl text-blue-600 dark:text-blue-400`}></i>
-                    </div>
-                    <button onClick={onEditProfile} className="btn btn-secondary h-10 w-10 !rounded-full">
-                        <i className="fa-solid fa-pencil"></i>
-                    </button>
-                </div>
-            </div>
-            <div className="mt-8 grid grid-cols-2 md:grid-cols-3 gap-6">
-                <StatCard icon="fa-star" value={user.points} label={language === 'vi' ? 'Điểm' : 'Points'} iconBg="bg-amber-500" valueColor="text-amber-500" />
-                <StatCard icon="fa-fire" value={user.streak} label={language === 'vi' ? 'Chuỗi ngày' : 'Streak'} iconBg="bg-orange-500" valueColor="text-orange-500" />
-                <StatCard icon="fa-trophy" value={user.badges.length} label={language === 'vi' ? 'Huy hiệu' : 'Badges'} iconBg="bg-violet-500" valueColor="text-violet-500" />
-            </div>
-        </div>
-    </div>
-);
+  const allCourses = useMemo(() => {
+    const colorPalette = ['#4A90E2', '#50E3C2', '#F5A623', '#BD10E0', '#9013FE', '#D0021B', '#F8E71C', '#7ED321'];
+    let colorIndex = 0;
 
-
-const StudentHome: React.FC<StudentHomeProps> = ({ user, setUser, courses, language, setSelectedCourse }) => {
-    const [isProfileModalOpen, setProfileModalOpen] = useState(false);
-
-    const myCourses = useMemo(() => {
-        const pinnedIds = user.pinnedCourses || [];
-        const courseMap = new Map(courses.map(c => [c.id, c]));
-        return pinnedIds.map(id => courseMap.get(id)).filter(Boolean) as Course[];
-    }, [courses, user.pinnedCourses]);
-
-    const handlePinClick = (courseId: string) => {
-      const currentPinned = user.pinnedCourses || [];
-      const isPinned = currentPinned.includes(courseId);
-      const newPinned = isPinned
-        ? currentPinned.filter(id => id !== courseId)
-        : [...currentPinned, courseId];
-      setUser({ ...user, pinnedCourses: newPinned });
-    };
-
-    return (
-        <div className="animate-fade-in p-4 sm:p-6 lg:p-8 space-y-8">
-            {isProfileModalOpen && (
-                <ProfileEditModal user={user} setUser={setUser} onClose={() => setProfileModalOpen(false)} />
-            )}
-            
-            <WelcomeHub user={user} onEditProfile={() => setProfileModalOpen(true)} language={language} />
-
-            <section>
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-2xl font-bold">{language === 'vi' ? 'Các khóa học của tôi' : 'My Courses'}</h2>
-                </div>
-                {myCourses.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {myCourses.map(course => (
-                            <CourseCard 
-                                key={course.id} 
-                                course={course} 
-                                onClick={() => setSelectedCourse(course)}
-                                isPinned={(user.pinnedCourses || []).includes(course.id)}
-                                onPinClick={handlePinClick}
-                            />
-                        ))}
-                    </div>
-                ) : (
-                    <div className="card-glass p-8 text-center col-span-full">
-                        <i className="fa-solid fa-thumbtack text-4xl text-slate-400 mb-4"></i>
-                        <p className="text-slate-800 dark:text-slate-200 font-semibold">{language === 'vi' ? 'Chưa có khóa học nào được ghim' : 'No Pinned Courses Yet'}</p>
-                        <p className="text-slate-700 dark:text-slate-400 mt-2 mb-4 text-sm">{language === 'vi' ? 'Đi đến trang Chương trình để chọn và ghim các khóa học bạn muốn truy cập nhanh.' : 'Go to the Curriculum page to select and pin the courses you want to access quickly.'}</p>
-                        <button onClick={() => alert('Navigate to Curriculum')} className="btn btn-primary">
-                           {language === 'vi' ? 'Khám phá Chương trình' : 'Explore Curriculum'}
-                        </button>
-                    </div>
-                )}
-            </section>
-        </div>
+    return curriculumData.flatMap(category =>
+      category.levels.map(level => {
+        const courseId = `course-${level.level}`;
+        return {
+          id: courseId,
+          title: language === 'vi' ? level.title.vi : level.title.en,
+          series: language === 'vi' ? category.category.vi : category.category.en,
+          level: (level.subtitle.en.split(' - ')[0]) as Course['level'],
+          imageUrl: `https://picsum.photos/seed/${level.level}/400/225`,
+          description: language === 'vi' ? level.subtitle.vi : level.subtitle.en,
+          lessons: [], // Not needed for card view
+          color: colorPalette[colorIndex++ % colorPalette.length],
+          progress: Math.floor(Math.random() * 100), // Mock progress
+        } as Course;
+      })
     );
+  }, [language]);
+    
+  const pinnedCourses = useMemo(() => {
+      return allCourses.filter(course => user.pinnedCourses?.includes(course.id));
+  }, [allCourses, user.pinnedCourses]);
+
+  const welcomeMessage = language === 'vi' 
+    ? `Chào mừng trở lại, ${user.name}!`
+    : `Welcome back, ${user.name}!`;
+  
+  const welcomeSubMessage = language === 'vi'
+    ? 'Hãy tiếp tục hành trình học tập tuyệt vời của bạn.'
+    : "Let's continue your awesome learning journey.";
+
+  return (
+    <div className="p-4 sm:p-6 lg:p-8 animate-fade-in">
+      <header className="mb-8">
+        <h1 className="text-4xl font-bold text-slate-900 dark:text-white">{welcomeMessage}</h1>
+        <p className="mt-1 text-lg text-slate-600 dark:text-slate-400">{welcomeSubMessage}</p>
+      </header>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="card-glass p-6 flex items-center gap-4">
+            <i className="fa-solid fa-star text-4xl text-amber-400"></i>
+            <div>
+                <p className="text-2xl font-bold">{user.points}</p>
+                <p className="text-sm text-slate-500">{language === 'vi' ? 'Điểm' : 'Points'}</p>
+            </div>
+        </div>
+        <div className="card-glass p-6 flex items-center gap-4">
+            <i className="fa-solid fa-fire-flame-curved text-4xl text-red-500"></i>
+            <div>
+                <p className="text-2xl font-bold">{user.streak}</p>
+                <p className="text-sm text-slate-500">{language === 'vi' ? 'Chuỗi ngày học' : 'Day Streak'}</p>
+            </div>
+        </div>
+        <div className="card-glass p-6 flex items-center gap-4">
+            <i className="fa-solid fa-gem text-4xl text-sky-500"></i>
+            <div>
+                <p className="text-2xl font-bold">{user.badges.length}</p>
+                <p className="text-sm text-slate-500">{language === 'vi' ? 'Huy hiệu' : 'Badges'}</p>
+            </div>
+        </div>
+      </div>
+
+      <div>
+        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-4">
+            {language === 'vi' ? 'Các khóa học của tôi' : 'My Courses'}
+        </h2>
+        {pinnedCourses.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {pinnedCourses.map(course => (
+              <CourseCard
+                key={course.id}
+                course={course}
+                onSelect={() => onSelectCourse(course)}
+                isPinned={true}
+                onPinToggle={() => { /* This would be handled in curriculum view */ }}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12 card-glass">
+            <i className="fa-solid fa-thumbtack text-4xl text-slate-400 mb-4"></i>
+            <h3 className="text-xl font-semibold mb-2">{language === 'vi' ? 'Chưa có khóa học nào được ghim' : 'No Pinned Courses'}</h3>
+            <p className="text-slate-500">{language === 'vi' ? 'Vào mục Chương trình để ghim một khóa học và bắt đầu học!' : 'Go to the Curriculum to pin a course and get started!'}</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default StudentHome;
