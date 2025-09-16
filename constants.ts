@@ -1,4 +1,4 @@
-import type { User, Classes } from './types';
+import type { User, Classes, TeacherSchedule } from './types';
 
 export const MOCK_USER: User = {
   id: 'user-01',
@@ -34,3 +34,14 @@ export const MOCK_CLASSES: Classes = {
     ]
   }
 };
+
+export const MOCK_TEACHER_SCHEDULE: TeacherSchedule = [
+  { id: 'ts1', className: 'Grade 6', day: 'Monday', period: 1, startTime: '07:30', endTime: '08:15' },
+  { id: 'ts2', className: 'Grade 7', day: 'Monday', period: 3, startTime: '09:25', endTime: '10:10' },
+  { id: 'ts3', className: 'Grade 8', day: 'Tuesday', period: 2, startTime: '08:25', endTime: '09:10' },
+  { id: 'ts4', className: 'Grade 9', day: 'Tuesday', period: 4, startTime: '10:20', endTime: '11:05' },
+  { id: 'ts5', className: 'Grade 6', day: 'Wednesday', period: 2, startTime: '08:25', endTime: '09:10' },
+  { id: 'ts6', className: 'Grade 8', day: 'Wednesday', period: 5, startTime: '11:15', endTime: '12:00' },
+  { id: 'ts7', className: 'Grade 7', day: 'Thursday', period: 1, startTime: '07:30', endTime: '08:15' },
+  { id: 'ts8', className: 'Grade 9', day: 'Friday', period: 3, startTime: '09:25', endTime: '10:10' },
+];

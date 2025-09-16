@@ -14,10 +14,11 @@ const StudentHome: React.FC<StudentHomeProps> = ({ user, onSelectCourse, languag
   const allCourses = useMemo(() => {
     const colorPalette = ['#4A90E2', '#50E3C2', '#F5A623', '#BD10E0', '#9013FE', '#D0021B', '#F8E71C', '#7ED321'];
     let colorIndex = 0;
+    const slug = (str: string) => str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
     return curriculumData.flatMap(category =>
       category.levels.map(level => {
-        const courseId = `course-${level.level}`;
+        const courseId = `course-${slug(level.title.en)}`;
         return {
           id: courseId,
           title: language === 'vi' ? level.title.vi : level.title.en,
@@ -28,6 +29,7 @@ const StudentHome: React.FC<StudentHomeProps> = ({ user, onSelectCourse, languag
           lessons: [], // Not needed for card view
           color: colorPalette[colorIndex++ % colorPalette.length],
           progress: Math.floor(Math.random() * 100), // Mock progress
+          rawLevel: level,
         } as Course;
       })
     );

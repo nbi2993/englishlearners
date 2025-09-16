@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react';
-import type { User, Course, Classes } from '../types';
-import { MOCK_CLASSES } from '../constants'; // Using mock classes for the home summary
+import type { User, Course } from '../types';
+import { MOCK_TEACHER_SCHEDULE } from '../constants';
+import { curriculumData } from '../data/curriculum';
+import CourseCard from './CourseCard';
 
 interface TeacherHomeProps {
   user: User;
@@ -8,23 +10,48 @@ interface TeacherHomeProps {
   language: 'en' | 'vi';
 }
 
-const TeacherHome: React.FC<TeacherHomeProps> = ({ user, language }) => {
-  const classes: Classes = MOCK_CLASSES; // In a real app, this would come from props or a data store
+const TeacherHome: React.FC<TeacherHomeProps> = ({ user, onSelectCourse, language }) => {
 
-  const stats = useMemo(() => {
-    const classCount = Object.keys(classes).length;
-    const studentCount = Object.values(classes).reduce((sum, c) => sum + c.students.length, 0);
-    const strugglingCount = Object.values(classes).flatMap(c => c.students).filter(s => s.isStruggling).length;
-    return { classCount, studentCount, strugglingCount };
-  }, [classes]);
+  const allCourses = useMemo(() => {
+    const colorPalette = ['#4A90E2', '#50E3C2', '#F5A623', '#BD10E0', '#9013FE', '#D0021B', '#F8E71C', '#7ED321'];
+    let colorIndex = 0;
+    const slug = (str: string) => str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
+    return curriculumData.flatMap(category =>
+      category.levels.map(level => {
+        const courseId = `course-${slug(level.title.en)}`;
+        return {
+          id: courseId,
+          title: language === 'vi' ? level.title.vi : level.title.en,
+          series: language === 'vi' ? category.category.vi : category.category.en,
+          level: (level.subtitle.en.split(' - ')[0]) as Course['level'],
+          imageUrl: `https://picsum.photos/seed/${level.level}/400/225`,
+          description: language === 'vi' ? level.subtitle.vi : level.subtitle.en,
+          lessons: [], // Not needed for card view
+          color: colorPalette[colorIndex++ % colorPalette.length],
+          progress: Math.floor(Math.random() * 100), // Mock progress
+          rawLevel: level,
+        } as Course;
+      })
+    );
+  }, [language]);
+    
+  const pinnedCourses = useMemo(() => {
+      return allCourses.filter(course => user.pinnedCourses?.includes(course.id));
+  }, [allCourses, user.pinnedCourses]);
+
+  const dayOfWeek = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date());
+  const todaysSchedule = useMemo(() => {
+      return MOCK_TEACHER_SCHEDULE.filter(item => item.day === dayOfWeek).sort((a, b) => a.startTime.localeCompare(b.startTime));
+  }, [dayOfWeek]);
   
   const welcomeMessage = language === 'vi' 
     ? `Chào mừng, ${user.name}!`
     : `Welcome, ${user.name}!`;
 
   const welcomeSubMessage = language === 'vi'
-    ? 'Đây là tổng quan nhanh về các lớp học của bạn.'
-    : "Here's a quick overview of your classes.";
+    ? 'Đây là tổng quan nhanh về các lớp học và lịch trình của bạn.'
+    : "Here's a quick overview of your classes and schedule.";
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 animate-fade-in">
@@ -33,44 +60,66 @@ const TeacherHome: React.FC<TeacherHomeProps> = ({ user, language }) => {
             <p className="mt-1 text-lg text-slate-600 dark:text-slate-400">{welcomeSubMessage}</p>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="card-glass p-6 flex items-center gap-4">
-                <i className="fa-solid fa-school text-4xl text-blue-500"></i>
-                <div>
-                    <p className="text-2xl font-bold">{stats.classCount}</p>
-                    <p className="text-sm text-slate-500">{language === 'vi' ? 'Lớp học' : 'Classes'}</p>
-                </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            {/* Today's Schedule */}
+            <div className="card-glass p-6">
+                <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-4">
+                    <i className="fa-solid fa-calendar-day mr-2 text-blue-500"></i>
+                    {language === 'vi' ? 'Lịch dạy hôm nay' : "Today's Schedule"}
+                </h2>
+                {todaysSchedule.length > 0 ? (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-slate-100 dark:bg-slate-700/50">
+                                <tr>
+                                    <th className="p-3 font-semibold">{language === 'vi' ? 'Thời gian' : 'Time'}</th>
+                                    <th className="p-3 font-semibold">{language === 'vi' ? 'Lớp' : 'Class'}</th>
+                                    <th className="p-3 font-semibold text-center">{language === 'vi' ? 'Tiết' : 'Period'}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {todaysSchedule.map(item => (
+                                    <tr key={item.id} className="border-b dark:border-slate-700">
+                                        <td className="p-3 whitespace-nowrap">{item.startTime} - {item.endTime}</td>
+                                        <td className="p-3 font-medium">{item.className}</td>
+                                        <td className="p-3 text-center">{item.period}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                ) : (
+                    <div className="text-center py-10">
+                        <i className="fa-solid fa-mug-hot text-4xl text-slate-400 mb-4"></i>
+                        <p className="text-slate-500">{language === 'vi' ? 'Không có lớp nào được lên lịch hôm nay. Chúc bạn một ngày tốt lành!' : 'No classes scheduled for today. Enjoy your day!'}</p>
+                    </div>
+                )}
             </div>
-            <div className="card-glass p-6 flex items-center gap-4">
-                <i className="fa-solid fa-users text-4xl text-green-500"></i>
-                <div>
-                    <p className="text-2xl font-bold">{stats.studentCount}</p>
-                    <p className="text-sm text-slate-500">{language === 'vi' ? 'Học sinh' : 'Students'}</p>
-                </div>
-            </div>
-            <div className="card-glass p-6 flex items-center gap-4">
-                <i className="fa-solid fa-triangle-exclamation text-4xl text-amber-500"></i>
-                <div>
-                    <p className="text-2xl font-bold">{stats.strugglingCount}</p>
-                    <p className="text-sm text-slate-500">{language === 'vi' ? 'Học sinh cần chú ý' : 'Struggling'}</p>
-                </div>
-            </div>
-        </div>
 
-        <div className="card-glass p-6">
-            <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-4">
-                {language === 'vi' ? 'Hành động nhanh' : 'Quick Actions'}
-            </h2>
-            <div className="flex flex-wrap gap-4">
-                <button className="btn btn-primary">
-                    <i className="fa-solid fa-plus mr-2"></i> {language === 'vi' ? 'Tạo Lớp học mới' : 'Create New Class'}
-                </button>
-                 <button className="btn btn-secondary">
-                    <i className="fa-solid fa-file-pen mr-2"></i> {language === 'vi' ? 'Giao bài tập' : 'Assign Homework'}
-                </button>
-                 <button className="btn btn-secondary-outline">
-                    <i className="fa-solid fa-bullhorn mr-2"></i> {language === 'vi' ? 'Gửi thông báo' : 'Send Announcement'}
-                </button>
+            {/* Pinned Courses Placeholder */}
+            <div className="card-glass p-6">
+                <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-4">
+                  <i className="fa-solid fa-book-bookmark mr-2 text-green-500"></i>
+                  {language === 'vi' ? 'Chương trình của tôi' : 'My Curriculum'}
+                </h2>
+                {pinnedCourses.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {pinnedCourses.slice(0, 2).map(course => (
+                      <CourseCard
+                        key={course.id}
+                        course={course}
+                        onSelect={() => onSelectCourse(course)}
+                        isPinned={true}
+                        onPinToggle={() => {}}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-10">
+                    <i className="fa-solid fa-thumbtack text-4xl text-slate-400 mb-4"></i>
+                    <p className="text-slate-500">{language === 'vi' ? 'Ghim các chương trình bạn dạy ở đây để truy cập nhanh chóng.' : 'Pin the curriculum you teach here for quick access.'}</p>
+                  </div>
+                )}
             </div>
         </div>
     </div>

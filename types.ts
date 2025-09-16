@@ -161,3 +161,14 @@ export interface ClassData {
 }
 
 export type Classes = Record<string, ClassData>;
+
+export interface TeacherScheduleItem {
+  id: string;
+  className: string;
+  day: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
+  period: number;
+  startTime: string; // "HH:MM"
+  endTime: string;   // "HH:MM"
+}
+
+export type TeacherSchedule = TeacherScheduleItem[];
