@@ -6,13 +6,28 @@ interface CourseCardProps {
   onSelect: () => void;
   isPinned: boolean;
   onPinToggle: () => void;
+  language: 'en' | 'vi';
 }
 
-const CourseCard: React.FC<CourseCardProps> = ({ course, onSelect, isPinned, onPinToggle }) => {
+const CourseCard: React.FC<CourseCardProps> = ({ course, onSelect, isPinned, onPinToggle, language }) => {
   const handlePinClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent card selection when pinning
     onPinToggle();
   };
+  
+  const translations = {
+    en: {
+      pin: "Pin course",
+      unpin: "Unpin course",
+      progress: "Progress"
+    },
+    vi: {
+      pin: "Ghim khóa học",
+      unpin: "Bỏ ghim khóa học",
+      progress: "Tiến độ"
+    }
+  };
+  const t = translations[language];
 
   return (
     <div 
@@ -27,7 +42,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onSelect, isPinned, onP
           className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-200 ${
             isPinned ? 'bg-amber-400 text-white' : 'bg-white/30 text-white hover:bg-white/50'
           }`}
-          title={isPinned ? "Unpin course" : "Pin course"}
+          title={isPinned ? t.unpin : t.pin}
         >
           <i className="fa-solid fa-thumbtack"></i>
         </button>
@@ -44,7 +59,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onSelect, isPinned, onP
           <div className="h-2 rounded-full" style={{ width: `${course.progress}%`, backgroundColor: course.color }}></div>
         </div>
         <div className="flex justify-between text-xs mt-1 text-slate-500 dark:text-slate-400">
-          <span>Progress</span>
+          <span>{t.progress}</span>
           <span>{course.progress}%</span>
         </div>
       </div>

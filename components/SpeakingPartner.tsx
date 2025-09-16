@@ -3,7 +3,11 @@ import { createChat } from '../services/geminiService';
 import type { ChatMessage } from '../types';
 import type { Chat, GenerateContentResponse } from '@google/genai';
 
-const SpeakingPartner: React.FC = () => {
+interface SpeakingPartnerProps {
+  language: 'en' | 'vi';
+}
+
+const SpeakingPartner: React.FC<SpeakingPartnerProps> = ({ language }) => {
   const [chat, setChat] = useState<Chat | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
@@ -12,18 +16,36 @@ const SpeakingPartner: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const isMounted = useRef(true);
 
+  const t = {
+    en: {
+      initialMessage: "Hello! I'm Sparky, your friendly English tutor. What would you like to talk about today? 😊",
+      initError: "Could not initialize AI chat partner.",
+      sendError: "Sorry, I encountered an error: ",
+      title: "Speaking Partner",
+      subtitle: "Practice your English with Sparky the AI tutor!",
+      placeholder: "Type your message...",
+    },
+    vi: {
+      initialMessage: "Xin chào! Tôi là Sparky, gia sư tiếng Anh thân thiện của bạn. Hôm nay bạn muốn nói về chủ đề gì? 😊",
+      initError: "Không thể khởi tạo đối tác trò chuyện AI.",
+      sendError: "Xin lỗi, tôi đã gặp lỗi: ",
+      title: "Luyện nói",
+      subtitle: "Luyện tập tiếng Anh của bạn với gia sư AI Sparky!",
+      placeholder: "Nhập tin nhắn của bạn...",
+    }
+  }[language];
 
   useEffect(() => {
     isMounted.current = true;
     try {
       const newChat = createChat();
       setChat(newChat);
-      setMessages([{ role: 'model', text: "Hello! I'm Sparky, your friendly English tutor. What would you like to talk about today? 😊" }]);
+      setMessages([{ role: 'model', text: t.initialMessage }]);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not initialize AI chat partner.');
+      setError(err instanceof Error ? err.message : t.initError);
     }
     return () => { isMounted.current = false; };
-  }, []);
+  }, [t.initialMessage, t.initError]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -72,7 +94,7 @@ const SpeakingPartner: React.FC = () => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
       setError(errorMessage);
-      setMessages(prev => [...prev, { role: 'model', text: `Sorry, I encountered an error: ${errorMessage}` }]);
+      setMessages(prev => [...prev, { role: 'model', text: `${t.sendError}${errorMessage}` }]);
     } finally {
         if (isMounted.current) {
             setIsLoading(false);
@@ -84,11 +106,11 @@ const SpeakingPartner: React.FC = () => {
     <div className="h-full flex flex-col max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 animate-fade-in">
         <div className="text-center mb-6">
             <i className="fa-solid fa-comments text-5xl text-blue-500 mb-4"></i>
-            <h1 className="text-4xl font-bold">Speaking Partner</h1>
-            <p className="mt-2 text-lg text-slate-600 dark:text-slate-400">Practice your English with Sparky the AI tutor!</p>
+            <h1 className="text-4xl font-bold">{t.title}</h1>
+            <p className="mt-2 text-lg text-slate-600 dark:text-slate-400">{t.subtitle}</p>
         </div>
         <div className="card-glass flex-grow flex flex-col p-0">
-            <div className="flex-grow p-6 overflow-y-auto space-y-4">
+            <div className="flex-grow p-6 overflow-y-auto space-y-4 custom-scrollbar">
                 {messages.map((msg, index) => (
                     <div key={index} className={`flex items-end gap-3 ${msg.role === 'user' ? 'justify-end' : ''}`}>
                         {msg.role === 'model' && <i className="fa-solid fa-robot text-2xl text-blue-500 mb-2"></i>}
@@ -115,7 +137,7 @@ const SpeakingPartner: React.FC = () => {
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         className="form-input flex-grow"
-                        placeholder="Type your message..."
+                        placeholder={t.placeholder}
                         disabled={isLoading || !chat}
                     />
                     <button type="submit" className="btn btn-primary btn-icon" disabled={isLoading || !input.trim() || !chat}>

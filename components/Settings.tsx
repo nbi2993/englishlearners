@@ -15,6 +15,61 @@ interface SettingsProps {
 
 const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpdateClasses, theme, setTheme, language, setLanguage }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  
+  const t = {
+    en: {
+        title: "Settings",
+        subtitle: "Manage your profile and application preferences.",
+        profileTitle: "Profile",
+        role: "Role",
+        student: "Student",
+        teacher: "Teacher",
+        grade: "Grade",
+        subject: "Subject",
+        editProfile: "Edit Profile",
+        roleTitle: "Role",
+        roleDesc: "Switching your role will change the app's layout and available features to better suit your needs.",
+        roleConfirm: (role: string) => `Are you sure you want to switch to the ${role} role? This will change your dashboard and available features.`,
+        appearanceTitle: "Appearance & Language",
+        themeTitle: "Theme",
+        light: "Light",
+        dark: "Dark",
+        languageTitle: "Language",
+        dataTitle: "Data Management",
+        backup: "Backup Data",
+        restore: "Restore Data",
+        dataDesc: "Save your profile, classes, and settings to a file, or restore from a backup.",
+        restoreSuccess: "Data restored successfully!",
+        restoreInvalid: "Invalid backup file format.",
+        restoreFail: "Failed to read or parse the backup file.",
+    },
+    vi: {
+        title: "Cài đặt",
+        subtitle: "Quản lý hồ sơ và tùy chọn ứng dụng của bạn.",
+        profileTitle: "Hồ sơ",
+        role: "Vai trò",
+        student: "Học sinh",
+        teacher: "Giáo viên",
+        grade: "Cấp lớp",
+        subject: "Môn học",
+        editProfile: "Chỉnh sửa Hồ sơ",
+        roleTitle: "Vai trò",
+        roleDesc: "Chuyển đổi vai trò sẽ thay đổi giao diện và các tính năng có sẵn của ứng dụng để phù hợp hơn với nhu cầu của bạn.",
+        roleConfirm: (role: string) => `Bạn có chắc chắn muốn chuyển sang vai trò ${role} không? Điều này sẽ thay đổi bảng điều khiển và các tính năng có sẵn của bạn.`,
+        appearanceTitle: "Giao diện & Ngôn ngữ",
+        themeTitle: "Giao diện",
+        light: "Sáng",
+        dark: "Tối",
+        languageTitle: "Ngôn ngữ",
+        dataTitle: "Quản lý Dữ liệu",
+        backup: "Sao lưu Dữ liệu",
+        restore: "Phục hồi Dữ liệu",
+        dataDesc: "Lưu hồ sơ, lớp học và cài đặt của bạn vào một tệp, hoặc khôi phục từ một bản sao lưu.",
+        restoreSuccess: "Dữ liệu đã được khôi phục thành công!",
+        restoreInvalid: "Định dạng tệp sao lưu không hợp lệ.",
+        restoreFail: "Không thể đọc hoặc phân tích tệp sao lưu.",
+    }
+  }[language];
 
   const handleThemeChange = (newTheme: 'light' | 'dark') => {
     setTheme(newTheme);
@@ -29,16 +84,16 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
   const handleRoleChange = (newRole: 'student' | 'teacher') => {
     if (user.role === newRole) return;
 
-    if (window.confirm(`Are you sure you want to switch to the ${newRole} role? This will change your dashboard and available features.`)) {
+    if (window.confirm(t.roleConfirm(newRole))) {
         const updatedUser = { ...user, role: newRole };
 
         if (newRole === 'teacher') {
-            updatedUser.gradeLevel = ''; // clear student-specific field
+            updatedUser.gradeLevel = '';
             if (!updatedUser.title) {
-                updatedUser.title = 'English Teacher'; // set teacher default
+                updatedUser.title = 'English Teacher';
             }
-        } else { // newRole is student
-            updatedUser.title = ''; // clear teacher-specific fields
+        } else {
+            updatedUser.title = '';
             updatedUser.subject = '';
         }
         onUpdateUser(updatedUser);
@@ -81,14 +136,14 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
                     onUpdateClasses(data.classes);
                     handleThemeChange(data.settings.theme || 'light');
                     setLanguage(data.settings.language || 'en');
-                    alert('Data restored successfully!');
+                    alert(t.restoreSuccess);
                 } else {
-                    alert('Invalid backup file format.');
+                    alert(t.restoreInvalid);
                 }
             }
         } catch (error) {
             console.error("Failed to restore data:", error);
-            alert('Failed to read or parse the backup file.');
+            alert(t.restoreFail);
         }
     };
     reader.readAsText(file);
@@ -98,60 +153,57 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
     <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 animate-fade-in">
         <div className="text-center mb-8">
             <i className="fa-solid fa-cog text-5xl text-blue-500 mb-4"></i>
-            <h1 className="text-4xl font-bold">Settings</h1>
-            <p className="mt-2 text-lg text-slate-600 dark:text-slate-400">Manage your profile and application preferences.</p>
+            <h1 className="text-4xl font-bold">{t.title}</h1>
+            <p className="mt-2 text-lg text-slate-600 dark:text-slate-400">{t.subtitle}</p>
         </div>
 
         <div className="space-y-8">
-            {/* Profile Section */}
             <section className="card-glass p-6">
-                <h2 className="text-2xl font-bold mb-4">Profile</h2>
+                <h2 className="text-2xl font-bold mb-4">{t.profileTitle}</h2>
                 <div className="flex items-center gap-6">
                     <i className={`${user.avatar} text-6xl text-blue-500`}></i>
                     <div className="flex-grow">
                         <p className="text-xl font-bold">{user.name}</p>
-                        <p className="text-slate-500 dark:text-slate-400 capitalize">{user.role}</p>
+                        <p className="text-slate-500 dark:text-slate-400 capitalize">{user.role === 'student' ? t.student : t.teacher}</p>
                         <p className="text-sm text-slate-500 dark:text-slate-400">
-                          {user.role === 'student' ? `Grade: ${user.gradeLevel || 'N/A'}` : `Subject: ${user.subject || 'N/A'}`}
+                          {user.role === 'student' ? `${t.grade}: ${user.gradeLevel || 'N/A'}` : `${t.subject}: ${user.subject || 'N/A'}`}
                         </p>
                     </div>
                     <button onClick={() => setIsEditModalOpen(true)} className="btn btn-secondary">
-                        <i className="fa-solid fa-pen-to-square mr-2"></i> Edit Profile
+                        <i className="fa-solid fa-pen-to-square mr-2"></i> {t.editProfile}
                     </button>
                 </div>
             </section>
             
-            {/* Role Section */}
             <section className="card-glass p-6">
-                <h2 className="text-2xl font-bold mb-4">Role</h2>
-                <p className="text-slate-600 dark:text-slate-400 mb-4 text-sm">Switching your role will change the app's layout and available features to better suit your needs.</p>
+                <h2 className="text-2xl font-bold mb-4">{t.roleTitle}</h2>
+                <p className="text-slate-600 dark:text-slate-400 mb-4 text-sm">{t.roleDesc}</p>
                 <div className="flex gap-2">
                     <button onClick={() => handleRoleChange('student')} className={`btn flex-1 ${user.role === 'student' ? 'btn-primary' : 'btn-secondary-outline'}`}>
-                        <i className="fa-solid fa-user-graduate mr-2"></i> Student
+                        <i className="fa-solid fa-user-graduate mr-2"></i> {t.student}
                     </button>
                     <button onClick={() => handleRoleChange('teacher')} className={`btn flex-1 ${user.role === 'teacher' ? 'btn-primary' : 'btn-secondary-outline'}`}>
-                        <i className="fa-solid fa-chalkboard-user mr-2"></i> Teacher
+                        <i className="fa-solid fa-chalkboard-user mr-2"></i> {t.teacher}
                     </button>
                 </div>
             </section>
 
-            {/* Appearance Section */}
             <section className="card-glass p-6">
-                <h2 className="text-2xl font-bold mb-4">Appearance & Language</h2>
+                <h2 className="text-2xl font-bold mb-4">{t.appearanceTitle}</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <h3 className="text-lg font-semibold mb-2">Theme</h3>
+                        <h3 className="text-lg font-semibold mb-2">{t.themeTitle}</h3>
                         <div className="flex gap-2">
                             <button onClick={() => handleThemeChange('light')} className={`btn flex-1 ${theme === 'light' ? 'btn-primary' : 'btn-secondary-outline'}`}>
-                                <i className="fa-solid fa-sun mr-2"></i> Light
+                                <i className="fa-solid fa-sun mr-2"></i> {t.light}
                             </button>
                             <button onClick={() => handleThemeChange('dark')} className={`btn flex-1 ${theme === 'dark' ? 'btn-primary' : 'btn-secondary-outline'}`}>
-                                <i className="fa-solid fa-moon mr-2"></i> Dark
+                                <i className="fa-solid fa-moon mr-2"></i> {t.dark}
                             </button>
                         </div>
                     </div>
                      <div>
-                        <h3 className="text-lg font-semibold mb-2">Language</h3>
+                        <h3 className="text-lg font-semibold mb-2">{t.languageTitle}</h3>
                         <div className="flex gap-2">
                              <button onClick={() => setLanguage('en')} className={`btn flex-1 ${language === 'en' ? 'btn-primary' : 'btn-secondary-outline'}`}>
                                 English
@@ -164,19 +216,18 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
                 </div>
             </section>
 
-            {/* Data Management Section */}
             <section className="card-glass p-6">
-                <h2 className="text-2xl font-bold mb-4">Data Management</h2>
+                <h2 className="text-2xl font-bold mb-4">{t.dataTitle}</h2>
                 <div className="flex flex-col sm:flex-row gap-4 items-center">
                     <button onClick={handleBackup} className="btn btn-primary w-full sm:w-auto">
-                        <i className="fa-solid fa-download mr-2"></i> Backup Data
+                        <i className="fa-solid fa-download mr-2"></i> {t.backup}
                     </button>
                     <label className="btn btn-secondary w-full sm:w-auto cursor-pointer">
-                        <i className="fa-solid fa-upload mr-2"></i> Restore Data
+                        <i className="fa-solid fa-upload mr-2"></i> {t.restore}
                         <input type="file" accept=".json" onChange={handleRestore} className="hidden" />
                     </label>
                     <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 sm:mt-0 sm:ml-4">
-                        Save your profile, classes, and settings to a file, or restore from a backup.
+                        {t.dataDesc}
                     </p>
                 </div>
             </section>
@@ -190,6 +241,7 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
                     onUpdateUser(updatedUser);
                     setIsEditModalOpen(false);
                 }} 
+                language={language}
             />
         )}
     </div>

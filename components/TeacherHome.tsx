@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import type { User, Course } from '../types';
+import type { User, Course, View } from '../types';
 import { MOCK_TEACHER_SCHEDULE } from '../constants';
 import { curriculumData } from '../data/curriculum';
 import CourseCard from './CourseCard';
@@ -8,9 +8,10 @@ interface TeacherHomeProps {
   user: User;
   onSelectCourse: (course: Course) => void;
   language: 'en' | 'vi';
+  setView: (view: View) => void;
 }
 
-const TeacherHome: React.FC<TeacherHomeProps> = ({ user, onSelectCourse, language }) => {
+const TeacherHome: React.FC<TeacherHomeProps> = ({ user, onSelectCourse, language, setView }) => {
 
   const allCourses = useMemo(() => {
     const colorPalette = ['#4A90E2', '#50E3C2', '#F5A623', '#BD10E0', '#9013FE', '#D0021B', '#F8E71C', '#7ED321'];
@@ -45,36 +46,54 @@ const TeacherHome: React.FC<TeacherHomeProps> = ({ user, onSelectCourse, languag
       return MOCK_TEACHER_SCHEDULE.filter(item => item.day === dayOfWeek).sort((a, b) => a.startTime.localeCompare(b.startTime));
   }, [dayOfWeek]);
   
-  const welcomeMessage = language === 'vi' 
-    ? `Chào mừng, ${user.name}!`
-    : `Welcome, ${user.name}!`;
-
-  const welcomeSubMessage = language === 'vi'
-    ? 'Đây là tổng quan nhanh về các lớp học và lịch trình của bạn.'
-    : "Here's a quick overview of your classes and schedule.";
+  const t = {
+    en: {
+        welcome: `Welcome, ${user.name}!`,
+        subtitle: "Here's a quick overview of your classes and schedule.",
+        scheduleTitle: "Today's Schedule",
+        timeHeader: "Time",
+        classHeader: "Class",
+        periodHeader: "Period",
+        noClasses: "No classes scheduled for today. Enjoy your day!",
+        curriculumTitle: "My Curriculum",
+        pinPrompt: "Pin the curriculum you teach here for quick access.",
+        goToCurriculum: "Go to Curriculum",
+    },
+    vi: {
+        welcome: `Chào mừng, ${user.name}!`,
+        subtitle: "Đây là tổng quan nhanh về các lớp học và lịch trình của bạn.",
+        scheduleTitle: "Lịch dạy hôm nay",
+        timeHeader: "Thời gian",
+        classHeader: "Lớp",
+        periodHeader: "Tiết",
+        noClasses: "Không có lớp nào được lên lịch hôm nay. Chúc bạn một ngày tốt lành!",
+        curriculumTitle: "Chương trình của tôi",
+        pinPrompt: "Ghim các chương trình bạn dạy ở đây để truy cập nhanh chóng.",
+        goToCurriculum: "Tới trang Chương trình",
+    }
+  }[language];
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 animate-fade-in">
         <header className="mb-8">
-            <h1 className="text-4xl font-bold text-slate-900 dark:text-white">{welcomeMessage}</h1>
-            <p className="mt-1 text-lg text-slate-600 dark:text-slate-400">{welcomeSubMessage}</p>
+            <h1 className="text-4xl font-bold text-slate-900 dark:text-white">{t.welcome}</h1>
+            <p className="mt-1 text-lg text-slate-600 dark:text-slate-400">{t.subtitle}</p>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            {/* Today's Schedule */}
             <div className="card-glass p-6">
                 <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-4">
                     <i className="fa-solid fa-calendar-day mr-2 text-blue-500"></i>
-                    {language === 'vi' ? 'Lịch dạy hôm nay' : "Today's Schedule"}
+                    {t.scheduleTitle}
                 </h2>
                 {todaysSchedule.length > 0 ? (
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm text-left">
                             <thead className="bg-slate-100 dark:bg-slate-700/50">
                                 <tr>
-                                    <th className="p-3 font-semibold">{language === 'vi' ? 'Thời gian' : 'Time'}</th>
-                                    <th className="p-3 font-semibold">{language === 'vi' ? 'Lớp' : 'Class'}</th>
-                                    <th className="p-3 font-semibold text-center">{language === 'vi' ? 'Tiết' : 'Period'}</th>
+                                    <th className="p-3 font-semibold">{t.timeHeader}</th>
+                                    <th className="p-3 font-semibold">{t.classHeader}</th>
+                                    <th className="p-3 font-semibold text-center">{t.periodHeader}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -91,16 +110,15 @@ const TeacherHome: React.FC<TeacherHomeProps> = ({ user, onSelectCourse, languag
                 ) : (
                     <div className="text-center py-10">
                         <i className="fa-solid fa-mug-hot text-4xl text-slate-400 mb-4"></i>
-                        <p className="text-slate-500">{language === 'vi' ? 'Không có lớp nào được lên lịch hôm nay. Chúc bạn một ngày tốt lành!' : 'No classes scheduled for today. Enjoy your day!'}</p>
+                        <p className="text-slate-500">{t.noClasses}</p>
                     </div>
                 )}
             </div>
 
-            {/* Pinned Courses Placeholder */}
             <div className="card-glass p-6">
                 <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-4">
                   <i className="fa-solid fa-book-bookmark mr-2 text-green-500"></i>
-                  {language === 'vi' ? 'Chương trình của tôi' : 'My Curriculum'}
+                  {t.curriculumTitle}
                 </h2>
                 {pinnedCourses.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -111,13 +129,17 @@ const TeacherHome: React.FC<TeacherHomeProps> = ({ user, onSelectCourse, languag
                         onSelect={() => onSelectCourse(course)}
                         isPinned={true}
                         onPinToggle={() => {}}
+                        language={language}
                       />
                     ))}
                   </div>
                 ) : (
                   <div className="text-center py-10">
                     <i className="fa-solid fa-thumbtack text-4xl text-slate-400 mb-4"></i>
-                    <p className="text-slate-500">{language === 'vi' ? 'Ghim các chương trình bạn dạy ở đây để truy cập nhanh chóng.' : 'Pin the curriculum you teach here for quick access.'}</p>
+                    <p className="text-slate-500 mb-6">{t.pinPrompt}</p>
+                     <button onClick={() => setView('curriculum')} className="btn btn-primary">
+                        {t.goToCurriculum}
+                    </button>
                   </div>
                 )}
             </div>

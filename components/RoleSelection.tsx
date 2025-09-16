@@ -2,13 +2,29 @@ import React from 'react';
 
 interface RoleSelectionProps {
   onSelectRole: (role: 'student' | 'teacher') => void;
+  language: 'en' | 'vi';
 }
 
-const RoleSelection: React.FC<RoleSelectionProps> = ({ onSelectRole }) => {
+const RoleSelection: React.FC<RoleSelectionProps> = ({ onSelectRole, language }) => {
+  const t = {
+    en: {
+      welcome: "Welcome to IVS English!",
+      prompt: "Please select your role to get started.",
+      student: "I am a Student",
+      teacher: "I am a Teacher",
+    },
+    vi: {
+      welcome: "Chào mừng đến với IVS English!",
+      prompt: "Vui lòng chọn vai trò của bạn để bắt đầu.",
+      student: "Tôi là Học sinh",
+      teacher: "Tôi là Giáo viên",
+    }
+  }[language];
+
   return (
     <div className="flex flex-col items-center justify-center h-full text-center p-8 animate-fade-in">
-      <h1 className="text-4xl font-bold mb-2 text-slate-900 dark:text-white">Welcome to IVS English!</h1>
-      <p className="text-lg text-slate-600 dark:text-slate-400 mb-10">Please select your role to get started.</p>
+      <h1 className="text-4xl font-bold mb-2 text-slate-900 dark:text-white">{t.welcome}</h1>
+      <p className="text-lg text-slate-600 dark:text-slate-400 mb-10">{t.prompt}</p>
       
       <div className="flex flex-col sm:flex-row gap-8">
         <div 
@@ -16,7 +32,7 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ onSelectRole }) => {
           onClick={() => onSelectRole('student')}
         >
           <i className="fa-solid fa-user-graduate text-6xl text-blue-500 mb-4"></i>
-          <h2 className="text-2xl font-bold">I am a Student</h2>
+          <h2 className="text-2xl font-bold">{t.student}</h2>
         </div>
         
         <div 
@@ -24,7 +40,7 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ onSelectRole }) => {
           onClick={() => onSelectRole('teacher')}
         >
           <i className="fa-solid fa-chalkboard-user text-6xl text-green-500 mb-4"></i>
-          <h2 className="text-2xl font-bold">I am a Teacher</h2>
+          <h2 className="text-2xl font-bold">{t.teacher}</h2>
         </div>
       </div>
     </div>

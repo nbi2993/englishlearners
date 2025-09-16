@@ -5,13 +5,45 @@ interface AddEditGradeModalProps {
   grade: Grade | null;
   onSave: (grade: Grade) => void;
   onClose: () => void;
+  language: 'en' | 'vi';
 }
 
-const AddEditGradeModal: React.FC<AddEditGradeModalProps> = ({ grade, onSave, onClose }) => {
+const AddEditGradeModal: React.FC<AddEditGradeModalProps> = ({ grade, onSave, onClose, language }) => {
   const [name, setName] = useState('');
   const [score, setScore] = useState<number | ''>('');
   const [coefficient, setCoefficient] = useState<1 | 2 | 3>(1);
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]); // YYYY-MM-DD
+
+  const t = {
+    en: {
+      editTitle: "Edit Grade",
+      addTitle: "Add New Grade",
+      nameLabel: "Name / Type",
+      namePlaceholder: "e.g., Mid-term HK1, 15-min Test",
+      scoreLabel: "Score (0-10)",
+      scorePlaceholder: "e.g., 8.5",
+      coeffLabel: "Coefficient",
+      dateLabel: "Date",
+      cancel: "Cancel",
+      save: "Save Changes",
+      add: "Add Grade",
+      alert: "Please fill in all fields correctly. Score must be between 0 and 10."
+    },
+    vi: {
+      editTitle: "Chỉnh sửa Điểm",
+      addTitle: "Thêm Điểm Mới",
+      nameLabel: "Tên / Loại Điểm",
+      namePlaceholder: "VD: Giữa HK1, Kiểm tra 15 phút",
+      scoreLabel: "Điểm (0-10)",
+      scorePlaceholder: "VD: 8.5",
+      coeffLabel: "Hệ số",
+      dateLabel: "Ngày",
+      cancel: "Hủy",
+      save: "Lưu thay đổi",
+      add: "Thêm Điểm",
+      alert: "Vui lòng điền đúng tất cả các trường. Điểm phải từ 0 đến 10."
+    }
+  }[language];
 
   useEffect(() => {
     if (grade) {
@@ -26,7 +58,7 @@ const AddEditGradeModal: React.FC<AddEditGradeModalProps> = ({ grade, onSave, on
     e.preventDefault();
     if (name.trim() && score !== '' && score >= 0 && score <= 10) {
       const savedGrade: Grade = {
-        id: grade ? grade.id : '', // ID will be set in parent for new grades
+        id: grade ? grade.id : '',
         name: name.trim(),
         score: score,
         coefficient,
@@ -34,7 +66,7 @@ const AddEditGradeModal: React.FC<AddEditGradeModalProps> = ({ grade, onSave, on
       };
       onSave(savedGrade);
     } else {
-        alert("Please fill in all fields correctly. Score must be between 0 and 10.");
+        alert(t.alert);
     }
   };
 
@@ -43,31 +75,31 @@ const AddEditGradeModal: React.FC<AddEditGradeModalProps> = ({ grade, onSave, on
       <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl p-6 w-full max-w-md m-4 transform transition-all animate-slide-in-up">
         <div className="flex justify-between items-center mb-6 border-b dark:border-slate-700 pb-3">
           <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-            {grade ? 'Edit Grade' : 'Add New Grade'}
+            {grade ? t.editTitle : t.addTitle}
           </h3>
           <button type="button" onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-2xl">&times;</button>
         </div>
         
         <div className="space-y-4">
           <div>
-            <label htmlFor="gradeName" className="block text-sm font-medium text-slate-800 dark:text-slate-300 mb-1">Name / Type</label>
+            <label htmlFor="gradeName" className="block text-sm font-medium text-slate-800 dark:text-slate-300 mb-1">{t.nameLabel}</label>
             <input
               id="gradeName" type="text" value={name}
               onChange={(e) => setName(e.target.value)}
-              className="form-input" placeholder="e.g., Mid-term HK1, 15-min Test" required
+              className="form-input" placeholder={t.namePlaceholder} required
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
              <div>
-                <label htmlFor="score" className="block text-sm font-medium text-slate-800 dark:text-slate-300 mb-1">Score (0-10)</label>
+                <label htmlFor="score" className="block text-sm font-medium text-slate-800 dark:text-slate-300 mb-1">{t.scoreLabel}</label>
                 <input
                     id="score" type="number" step="0.1" min="0" max="10" value={score}
                     onChange={(e) => setScore(e.target.value === '' ? '' : parseFloat(e.target.value))}
-                    className="form-input" placeholder="e.g., 8.5" required
+                    className="form-input" placeholder={t.scorePlaceholder} required
                 />
             </div>
             <div>
-                <label htmlFor="coefficient" className="block text-sm font-medium text-slate-800 dark:text-slate-300 mb-1">Coefficient</label>
+                <label htmlFor="coefficient" className="block text-sm font-medium text-slate-800 dark:text-slate-300 mb-1">{t.coeffLabel}</label>
                 <select 
                     id="coefficient" value={coefficient}
                     onChange={(e) => setCoefficient(Number(e.target.value) as 1 | 2 | 3)}
@@ -80,7 +112,7 @@ const AddEditGradeModal: React.FC<AddEditGradeModalProps> = ({ grade, onSave, on
             </div>
           </div>
           <div>
-            <label htmlFor="date" className="block text-sm font-medium text-slate-800 dark:text-slate-300 mb-1">Date</label>
+            <label htmlFor="date" className="block text-sm font-medium text-slate-800 dark:text-slate-300 mb-1">{t.dateLabel}</label>
             <input
               id="date" type="date" value={date}
               onChange={(e) => setDate(e.target.value)}
@@ -91,10 +123,10 @@ const AddEditGradeModal: React.FC<AddEditGradeModalProps> = ({ grade, onSave, on
 
         <div className="mt-8 flex justify-end space-x-3">
           <button type="button" onClick={onClose} className="btn btn-secondary">
-            Cancel
+            {t.cancel}
           </button>
           <button type="submit" className="btn btn-primary">
-            {grade ? 'Save Changes' : 'Add Grade'}
+            {grade ? t.save : t.add}
           </button>
         </div>
       </form>

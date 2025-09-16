@@ -85,6 +85,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onSelectCourse, user, onUpdateUse
                 onSelect={() => onSelectCourse(course)}
                 isPinned={user.pinnedCourses?.includes(course.id) || false}
                 onPinToggle={() => handlePinToggle(course.id)}
+                // FIX: Pass the 'language' prop to CourseCard as it is required.
+                language={language}
               />
             ))}
           </div>

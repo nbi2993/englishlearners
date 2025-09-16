@@ -17,19 +17,28 @@ const App: React.FC = () => {
   const [classes, setClasses] = useState<Classes>(MOCK_CLASSES);
   const [view, setView] = useState<View>('home');
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
-  const [language, setLanguage] = useState<'en' | 'vi'>('en');
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [language, setLanguage] = useState<'en' | 'vi'>('vi');
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
   useEffect(() => {
     // Load saved data from localStorage
     try {
       const savedUser = localStorage.getItem('ivs-user');
       const savedClasses = localStorage.getItem('ivs-classes');
+      const savedLanguage = localStorage.getItem('ivs-language');
+      
       if (savedUser) {
         setUser(JSON.parse(savedUser));
       }
       if (savedClasses) {
         setClasses(JSON.parse(savedClasses));
+      }
+       if (savedLanguage === 'vi' || savedLanguage === 'en') {
+        setLanguage(savedLanguage);
+      } else {
+        // Default to Vietnamese if no language is set
+        setLanguage('vi');
+        localStorage.setItem('ivs-language', 'vi');
       }
     } catch (error) {
       console.error("Failed to parse data from localStorage", error);
@@ -37,7 +46,7 @@ const App: React.FC = () => {
     }
 
     const savedTheme = localStorage.getItem('ivs-theme');
-    if (savedTheme === 'dark' || (savedTheme !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         setTheme('dark');
         document.documentElement.classList.add('dark');
     } else {
@@ -46,6 +55,11 @@ const App: React.FC = () => {
     }
   }, []);
   
+  const handleSetLanguage = (lang: 'en' | 'vi') => {
+    setLanguage(lang);
+    localStorage.setItem('ivs-language', lang);
+  }
+
   const handleSetUser = (newUser: User) => {
     setUser(newUser);
     localStorage.setItem('ivs-user', JSON.stringify(newUser));
@@ -79,33 +93,32 @@ const App: React.FC = () => {
     setSelectedCourse(course);
   };
 
-  const handleBackToCurriculum = () => {
+  const handleBackToView = () => {
     setSelectedCourse(null);
-    setView('curriculum');
   }
   
-  const renderView = () => {
+  const renderContent = () => {
     if (selectedCourse) {
-        return <CourseDetail course={selectedCourse} onBack={handleBackToCurriculum} language={language} />;
+        return <CourseDetail course={selectedCourse} onBack={handleBackToView} language={language} />;
     }
 
     switch (view) {
       case 'home':
-        return <Home user={user!} onSelectCourse={handleSelectCourse} language={language} />;
+        return <Home user={user!} onSelectCourse={handleSelectCourse} language={language} setView={setView} />;
       case 'curriculum':
         return <Dashboard onSelectCourse={handleSelectCourse} user={user!} onUpdateUser={handleUpdateUser} language={language}/>;
       case 'teacher-dashboard':
-        return <TeacherDashboard classes={classes} setClasses={handleUpdateClasses} />;
+        return <TeacherDashboard classes={classes} setClasses={handleUpdateClasses} language={language} />;
       case 'writing-grader':
-        return <WritingGrader />;
+        return <WritingGrader language={language} />;
       case 'speaking-partner':
-        return <SpeakingPartner />;
+        return <SpeakingPartner language={language} />;
       case 'settings':
-        return <Settings user={user!} onUpdateUser={handleUpdateUser} classes={classes} onUpdateClasses={handleUpdateClasses} theme={theme} setTheme={setTheme} language={language} setLanguage={setLanguage}/>;
+        return <Settings user={user!} onUpdateUser={handleUpdateUser} classes={classes} onUpdateClasses={handleUpdateClasses} theme={theme} setTheme={setTheme} language={language} setLanguage={handleSetLanguage}/>;
       case 'user-guide':
         return <UserGuide language={language} />;
       default:
-        return <Home user={user!} onSelectCourse={handleSelectCourse} language={language} />;
+        return <Home user={user!} onSelectCourse={handleSelectCourse} language={language} setView={setView} />;
     }
   };
 
@@ -116,7 +129,7 @@ const App: React.FC = () => {
         <div className={`app-container ${currentTheme}`}>
             <div className="flex h-screen bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200">
                 <main className="flex-1 overflow-y-auto">
-                    <RoleSelection onSelectRole={handleSetRole} />
+                    <RoleSelection onSelectRole={handleSetRole} language={language} />
                 </main>
             </div>
         </div>
@@ -126,9 +139,9 @@ const App: React.FC = () => {
   return (
     <div className={`app-container ${currentTheme}`}>
       <div className="flex h-screen bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200">
-        <Sidebar user={user} currentView={view} setView={setView} />
-        <main className="flex-1 overflow-y-auto">
-            {renderView()}
+        <Sidebar user={user} currentView={view} setView={setView} language={language} />
+        <main className="flex-1 overflow-y-auto custom-scrollbar">
+            {renderContent()}
         </main>
       </div>
     </div>
