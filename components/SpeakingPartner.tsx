@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChatSession } from '../services/geminiService';
+import type { Chat } from '@google/genai';
+import { createChat } from '../services/geminiService';
 import type { ChatMessage } from '../types';
 
 const SpeakingPartner: React.FC<{ language: 'en' | 'vi'; translations: any; }> = ({ language, translations }) => {
-    const [chat, setChat] = useState<ChatSession | null>(null);
+    const [chat, setChat] = useState<Chat | null>(null);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [userInput, setUserInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -11,11 +12,11 @@ const SpeakingPartner: React.FC<{ language: 'en' | 'vi'; translations: any; }> =
 
     useEffect(() => {
         const initChat = async () => {
-            const newChat = new ChatSession();
+            const newChat = createChat();
             setChat(newChat);
             setIsLoading(true);
             try {
-                const response = await newChat.sendMessage("Hello! What would you like to talk about today?");
+                const response = await newChat.sendMessage({ message: "Hello! What would you like to talk about today?" });
                 setMessages([{ role: 'model', text: response.text }]);
             } catch (error) {
                 console.error("Failed to start chat:", error);
@@ -41,9 +42,23 @@ const SpeakingPartner: React.FC<{ language: 'en' | 'vi'; translations: any; }> =
         setIsLoading(true);
 
         try {
-            const stream = await chat.sendMessageStream(userInput);
-            let modelResponse = stream[0].text;
-            setMessages(prev => [...prev, { role: 'model', text: modelResponse }]);
+            const stream = await chat.sendMessageStream({ message: userInput });
+            let modelResponse = '';
+            setMessages(prev => [...prev, { role: 'model', text: '' }]); // Add empty model message
+
+            for await (const chunk of stream) {
+                modelResponse += chunk.text;
+                setMessages(prev => {
+                    const newMessages = [...prev];
+                    newMessages[newMessages.length - 1] = { role: 'model', text: modelResponse + '...' };
+                    return newMessages;
+                });
+            }
+             setMessages(prev => {
+                    const newMessages = [...prev];
+                    newMessages[newMessages.length - 1] = { role: 'model', text: modelResponse };
+                    return newMessages;
+                });
         } catch (error) {
             console.error("Error sending message:", error);
             setMessages(prev => [...prev, { role: 'model', text: "I'm sorry, I encountered an error. Could you please repeat that?" }]);
