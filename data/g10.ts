@@ -81,6 +81,22 @@ export const g10Data: CurriculumLevel = {
                 { en: 'New Ways to Learn', vi: 'Phương pháp học tập mới' },
                 Array.from({ length: 6 }, (_, i) => ({ en: `Session ${i + 1}`, vi: `Buổi ${i + 1}` }))
             )
+        },
+        {
+            id: 1009,
+            title: { en: 'Protecting the Environment', vi: 'Bảo vệ môi trường' },
+            lessons: createLessonsForUnit(1009,
+                { en: 'Protecting the Environment', vi: 'Bảo vệ môi trường' },
+                Array.from({ length: 6 }, (_, i) => ({ en: `Session ${i + 1}`, vi: `Buổi ${i + 1}` }))
+            )
+        },
+        {
+            id: 1010,
+            title: { en: 'Ecotourism', vi: 'Du lịch sinh thái' },
+            lessons: createLessonsForUnit(1010,
+                { en: 'Ecotourism', vi: 'Du lịch sinh thái' },
+                Array.from({ length: 6 }, (_, i) => ({ en: `Session ${i + 1}`, vi: `Buổi ${i + 1}` }))
+            )
         }
     ]
 };

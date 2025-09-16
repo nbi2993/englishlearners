@@ -73,6 +73,12 @@ const App: React.FC = () => {
         localStorage.setItem('theme', theme);
     }, [theme]);
 
+    useEffect(() => {
+        if (user.role === 'student' && currentView === 'teacher-dashboard') {
+            setCurrentView('dashboard');
+        }
+    }, [user.role, currentView]);
+
     const handleSetView = (view: View) => {
         setCurrentView(view);
         setIsSidebarOpen(false);
@@ -106,7 +112,7 @@ const App: React.FC = () => {
 
         switch (currentView) {
             case 'teacher-dashboard':
-                return <TeacherDashboard language={language} translations={translations} />;
+                return user.role === 'teacher' ? <TeacherDashboard language={language} translations={translations} /> : <Dashboard user={user} setUser={setUser} courses={courses} otherPrograms={otherProgramsData} setView={handleSetView} selectedCourse={selectedCourse} setSelectedCourse={setSelectedCourse} onSelectLesson={handleSelectLesson} onBackToCourses={handleBackToCourses} language={language} translations={translations}/>;
             case 'writing-grader':
                 return <WritingGrader language={language} translations={translations} />;
             case 'speaking-partner':
@@ -144,6 +150,7 @@ const App: React.FC = () => {
         <div className="flex h-screen font-sans">
              <div className="aurora-background"></div>
             <Sidebar
+                user={user}
                 currentView={currentView}
                 setView={handleSetView}
                 isSidebarOpen={isSidebarOpen}

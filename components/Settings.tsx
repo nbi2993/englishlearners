@@ -59,6 +59,20 @@ const Settings: React.FC<SettingsProps> = ({ user, setUser, language, setLanguag
                         Edit Profile
                     </button>
                 </div>
+
+                <SettingCard 
+                    title={language === 'vi' ? 'Vai trò' : 'Role'}
+                    description={language === 'vi' ? 'Chuyển đổi giữa giao diện học sinh và giáo viên.' : 'Switch between student and teacher views.'}
+                >
+                    <SegmentedControl>
+                        <SegmentedButton isActive={user.role === 'student'} onClick={() => setUser({ ...user, role: 'student' })}>
+                           <i className="fa-solid fa-user-graduate mr-2"></i> {language === 'vi' ? 'Học sinh' : 'Student'}
+                        </SegmentedButton>
+                         <SegmentedButton isActive={user.role === 'teacher'} onClick={() => setUser({ ...user, role: 'teacher' })}>
+                           <i className="fa-solid fa-chalkboard-user mr-2"></i> {language === 'vi' ? 'Giáo viên' : 'Teacher'}
+                        </SegmentedButton>
+                    </SegmentedControl>
+                </SettingCard>
                 
                 <SettingCard 
                     title="Language"

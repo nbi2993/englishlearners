@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { MOCK_CLASSES } from '../constants';
+import React, { useState, useEffect } from 'react';
 import type { Classes, Student } from '../types';
 import StudentCard from './StudentCard';
 import StudentReportModal from './StudentReportModal';
@@ -9,8 +8,8 @@ import AddClassModal from './AddClassModal';
 import AddStudentModal from './AddStudentModal';
 
 const TeacherDashboard: React.FC<{ language: 'en' | 'vi'; translations: any; }> = ({ language, translations }) => {
-    const [classes, setClasses] = useState<Classes>(MOCK_CLASSES);
-    const [selectedClassId, setSelectedClassId] = useState<string>(Object.keys(MOCK_CLASSES)[0]);
+    const [classes, setClasses] = useState<Classes>({});
+    const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
     const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
 
     const [isReportModalOpen, setReportModalOpen] = useState(false);
@@ -19,7 +18,13 @@ const TeacherDashboard: React.FC<{ language: 'en' | 'vi'; translations: any; }> 
     const [isAddClassModalOpen, setAddClassModalOpen] = useState(false);
     const [isAddStudentModalOpen, setAddStudentModalOpen] = useState(false);
     
-    const selectedClass = classes[selectedClassId];
+    const selectedClass = selectedClassId ? classes[selectedClassId] : null;
+
+    useEffect(() => {
+        if (selectedClassId && !classes[selectedClassId]) {
+            setSelectedClassId(Object.keys(classes)[0] || null);
+        }
+    }, [classes, selectedClassId]);
 
     const handleOpenReport = (student: Student) => {
         setSelectedStudent(student);
@@ -27,21 +32,28 @@ const TeacherDashboard: React.FC<{ language: 'en' | 'vi'; translations: any; }> 
     };
 
     const handleAddClass = (className: string) => {
-        const newClassId = className.toLowerCase().replace(/\s+/g, '-');
+        const newClassId = `${className.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`;
         const newClass = { name: className, students: [] };
-        setClasses(prev => ({ ...prev, [newClassId]: newClass }));
+        const newClasses = { ...classes, [newClassId]: newClass };
+        setClasses(newClasses);
         setSelectedClassId(newClassId);
     };
 
     const handleAddStudent = (studentName: string) => {
+        if (!selectedClassId) return;
+
         const newStudent: Student = {
-            id: `s${Date.now()}`, name: studentName, avatar: `https://i.pravatar.cc/150?u=${studentName}`,
+            id: `s${Date.now()}`, name: studentName, avatar: `https://i.pravatar.cc/150?u=${encodeURIComponent(studentName)}`,
             lastActivity: 'Just now', progress: 0, averageScore: 0, timeSpent: '0m',
             isStruggling: false, scoreHistory: [], assignments: [],
         };
-        const updatedClass = { ...selectedClass, students: [...selectedClass.students, newStudent] };
-        setClasses(prev => ({ ...prev, [selectedClassId]: updatedClass }));
+        
+        const updatedClasses = { ...classes };
+        updatedClasses[selectedClassId].students.push(newStudent);
+        setClasses(updatedClasses);
     };
+
+    const classIds = Object.keys(classes);
 
     return (
         <div className="animate-fade-in p-4 sm:p-6 lg:p-8">
@@ -52,18 +64,22 @@ const TeacherDashboard: React.FC<{ language: 'en' | 'vi'; translations: any; }> 
                     <div className="card-glass p-4">
                         <h2 className="text-xl font-bold mb-4">Classes</h2>
                         <div className="space-y-2">
-                            {Object.entries(classes).map(([id, classData]) => (
-                                <button
-                                    key={id} onClick={() => setSelectedClassId(id)}
-                                    className={`w-full text-left px-4 py-2 rounded-lg transition-colors text-sm font-semibold ${
-                                        selectedClassId === id
-                                        ? 'bg-blue-600 text-white shadow-md'
-                                        : 'hover:bg-black/5 dark:hover:bg-white/5'
-                                    }`}
-                                >
-                                    {classData.name}
-                                </button>
-                            ))}
+                             {classIds.length > 0 ? (
+                                classIds.map((id) => (
+                                    <button
+                                        key={id} onClick={() => setSelectedClassId(id)}
+                                        className={`w-full text-left px-4 py-2 rounded-lg transition-all text-sm font-semibold ${
+                                            selectedClassId === id
+                                            ? 'bg-blue-600 text-white shadow-md'
+                                            : 'hover:bg-black/5 dark:hover:bg-white/5'
+                                        }`}
+                                    >
+                                        {classes[id].name}
+                                    </button>
+                                ))
+                            ) : (
+                                <p className="text-sm text-slate-500 dark:text-slate-400 p-2">No classes yet. Add one to start.</p>
+                            )}
                         </div>
                         <button onClick={() => setAddClassModalOpen(true)} className="w-full mt-4 btn btn-secondary text-sm">
                             <i className="fa-solid fa-plus mr-2"></i> Add Class
@@ -72,7 +88,18 @@ const TeacherDashboard: React.FC<{ language: 'en' | 'vi'; translations: any; }> 
                 </div>
 
                 <div className="flex-1">
-                    {selectedClass ? (
+                    {classIds.length === 0 && (
+                        <div className="card-glass h-full flex flex-col items-center justify-center text-center p-8">
+                            <i className="fa-solid fa-chalkboard-user text-6xl text-slate-400 dark:text-slate-500 mb-4"></i>
+                            <h2 className="text-2xl font-bold">Welcome to your Dashboard!</h2>
+                            <p className="text-slate-500 dark:text-slate-400 mt-2 mb-6 max-w-sm">Create your first class to add students, assign homework, and track progress.</p>
+                            <button onClick={() => setAddClassModalOpen(true)} className="btn btn-primary">
+                                <i className="fa-solid fa-plus mr-2"></i> Create Your First Class
+                            </button>
+                        </div>
+                    )}
+
+                    {selectedClass && (
                         <div>
                             <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
                                 <h2 className="text-2xl font-bold">{selectedClass.name}</h2>
@@ -82,18 +109,27 @@ const TeacherDashboard: React.FC<{ language: 'en' | 'vi'; translations: any; }> 
                                 </div>
                             </div>
                             
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
-                                {selectedClass.students.map(student => (
-                                    <StudentCard key={student.id} student={student} onReportClick={() => handleOpenReport(student)} />
-                                ))}
-                                <button onClick={() => setAddStudentModalOpen(true)} className="card-glass border-2 border-dashed border-slate-300 dark:border-slate-600 flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100/50 dark:hover:bg-slate-700/50 transition-colors">
-                                    <i className="fa-solid fa-plus text-2xl"></i>
-                                    <span className="mt-2 font-semibold">Add Student</span>
-                                </button>
-                            </div>
+                            {selectedClass.students.length > 0 ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
+                                    {selectedClass.students.map(student => (
+                                        <StudentCard key={student.id} student={student} onReportClick={() => handleOpenReport(student)} />
+                                    ))}
+                                    <button onClick={() => setAddStudentModalOpen(true)} className="card-glass border-2 border-dashed border-slate-300 dark:border-slate-600 flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100/50 dark:hover:bg-slate-700/50 transition-colors rounded-2xl min-h-[220px]">
+                                        <i className="fa-solid fa-plus text-2xl"></i>
+                                        <span className="mt-2 font-semibold">Add Student</span>
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="card-glass h-full flex flex-col items-center justify-center text-center p-8 border-2 border-dashed border-slate-300 dark:border-slate-600">
+                                    <i className="fa-solid fa-user-plus text-6xl text-slate-400 dark:text-slate-500 mb-4"></i>
+                                    <h2 className="text-2xl font-bold">This class is empty</h2>
+                                    <p className="text-slate-500 dark:text-slate-400 mt-2 mb-6">Add your first student to begin tracking their progress and assignments.</p>
+                                    <button onClick={() => setAddStudentModalOpen(true)} className="btn btn-primary">
+                                        <i className="fa-solid fa-plus mr-2"></i> Add Student
+                                    </button>
+                                </div>
+                            )}
                         </div>
-                    ) : (
-                        <div className="card-glass p-8 text-center text-slate-500">Select a class to view details.</div>
                     )}
                 </div>
             </div>

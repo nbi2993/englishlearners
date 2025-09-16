@@ -36,17 +36,17 @@ export const g11Data: CurriculumLevel = {
         },
         {
             id: 1103,
-            title: { en: 'The World of Work', vi: 'Thế giới công việc' },
+            title: { en: 'Cities of the Future', vi: 'Thành phố của tương lai' },
             lessons: createLessonsForUnit(1103,
-                { en: 'The World of Work', vi: 'Thế giới công việc' },
+                { en: 'Cities of the Future', vi: 'Thành phố của tương lai' },
                 Array.from({ length: 6 }, (_, i) => ({ en: `Session ${i + 1}`, vi: `Buổi ${i + 1}` }))
             )
         },
         {
             id: 1104,
-            title: { en: 'Sustainable Development', vi: 'Phát triển bền vững' },
+            title: { en: 'ASEAN and Viet Nam', vi: 'ASEAN và Việt Nam' },
             lessons: createLessonsForUnit(1104,
-                { en: 'Sustainable Development', vi: 'Phát triển bền vững' },
+                { en: 'ASEAN and Viet Nam', vi: 'ASEAN và Việt Nam' },
                 Array.from({ length: 6 }, (_, i) => ({ en: `Session ${i + 1}`, vi: `Buổi ${i + 1}` }))
             )
         },
@@ -60,25 +60,41 @@ export const g11Data: CurriculumLevel = {
         },
         {
             id: 1106,
-            title: { en: 'Our Heritage', vi: 'Di sản của chúng ta' },
+            title: { en: 'Preserving Our Heritage', vi: 'Bảo tồn di sản của chúng ta' },
             lessons: createLessonsForUnit(1106,
-                { en: 'Our Heritage', vi: 'Di sản của chúng ta' },
+                { en: 'Preserving Our Heritage', vi: 'Bảo tồn di sản của chúng ta' },
                 Array.from({ length: 6 }, (_, i) => ({ en: `Session ${i + 1}`, vi: `Buổi ${i + 1}` }))
             )
         },
         {
             id: 1107,
-            title: { en: 'The Asian Games', vi: 'Đại hội thể thao châu Á' },
+            title: { en: 'Education Options for School-Leavers', vi: 'Lựa chọn giáo dục cho học sinh tốt nghiệp' },
             lessons: createLessonsForUnit(1107,
-                { en: 'The Asian Games', vi: 'Đại hội thể thao châu Á' },
+                { en: 'Education Options for School-Leavers', vi: 'Lựa chọn giáo dục cho học sinh tốt nghiệp' },
                 Array.from({ length: 6 }, (_, i) => ({ en: `Session ${i + 1}`, vi: `Buổi ${i + 1}` }))
             )
         },
         {
             id: 1108,
-            title: { en: 'Ecotourism', vi: 'Du lịch sinh thái' },
+            title: { en: 'Becoming Independent', vi: 'Trở nên độc lập' },
             lessons: createLessonsForUnit(1108,
-                { en: 'Ecotourism', vi: 'Du lịch sinh thái' },
+                { en: 'Becoming Independent', vi: 'Trở nên độc lập' },
+                Array.from({ length: 6 }, (_, i) => ({ en: `Session ${i + 1}`, vi: `Buổi ${i + 1}` }))
+            )
+        },
+        {
+            id: 1109,
+            title: { en: 'Social Issues', vi: 'Các vấn đề xã hội' },
+            lessons: createLessonsForUnit(1109,
+                { en: 'Social Issues', vi: 'Các vấn đề xã hội' },
+                Array.from({ length: 6 }, (_, i) => ({ en: `Session ${i + 1}`, vi: `Buổi ${i + 1}` }))
+            )
+        },
+        {
+            id: 1110,
+            title: { en: 'The Ecosystem', vi: 'Hệ sinh thái' },
+            lessons: createLessonsForUnit(1110,
+                { en: 'The Ecosystem', vi: 'Hệ sinh thái' },
                 Array.from({ length: 6 }, (_, i) => ({ en: `Session ${i + 1}`, vi: `Buổi ${i + 1}` }))
             )
         }

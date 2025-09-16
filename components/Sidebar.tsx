@@ -1,7 +1,8 @@
 import React from 'react';
-import type { View } from '../types';
+import type { View, User } from '../types';
 
 interface SidebarProps {
+  user: User;
   currentView: View;
   setView: (view: View) => void;
   isSidebarOpen: boolean;
@@ -30,7 +31,7 @@ const NavItem: React.FC<{
   </button>
 );
 
-const Sidebar: React.FC<SidebarProps> = ({ currentView, setView, isSidebarOpen, setIsSidebarOpen, language, translations }) => {
+const Sidebar: React.FC<SidebarProps> = ({ user, currentView, setView, isSidebarOpen, setIsSidebarOpen, language, translations }) => {
   const t = translations[language];
 
   return (
@@ -59,12 +60,14 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, setView, isSidebarOpen, 
             isActive={currentView === 'dashboard' || currentView === 'lesson'}
             onClick={() => setView('dashboard')}
           />
-          <NavItem
-            icon="fa-user-tie"
-            label={t['teacher-dashboard']}
-            isActive={currentView === 'teacher-dashboard'}
-            onClick={() => setView('teacher-dashboard')}
-          />
+          {user.role === 'teacher' && (
+            <NavItem
+                icon="fa-user-tie"
+                label={t['teacher-dashboard']}
+                isActive={currentView === 'teacher-dashboard'}
+                onClick={() => setView('teacher-dashboard')}
+            />
+          )}
           <h3 className="px-3 pt-6 pb-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">AI Tools</h3>
           <NavItem
             icon="fa-comments"
