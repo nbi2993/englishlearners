@@ -14,6 +14,7 @@ const LessonView: React.FC<LessonViewProps> = ({ course, setView }) => {
   const [expandedUnitId, setExpandedUnitId] = useState<number | null>(course.rawLevel.units[0]?.id || null);
   const [activeTab, setActiveTab] = useState<ActiveTab>('aims');
   const [showContent, setShowContent] = useState(false);
+  const [contentLang, setContentLang] = useState<'vi' | 'en'>('vi');
 
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
@@ -59,9 +60,9 @@ const LessonView: React.FC<LessonViewProps> = ({ course, setView }) => {
       case 'aims':
         return (
           <div className="bg-white dark:bg-slate-700 p-6 rounded-lg shadow-sm animate-fade-in">
-            <h2 className="text-2xl font-bold text-cyan-700 dark:text-cyan-400 mb-4">Mục tiêu học tập</h2>
+            <h2 className="text-2xl font-bold text-cyan-700 dark:text-cyan-400 mb-4">{contentLang === 'vi' ? 'Mục tiêu học tập' : 'Learning Aims'}</h2>
             <ul className="list-disc list-inside space-y-3 text-slate-700 dark:text-slate-300 text-lg">
-              {(selectedLesson.aims.vi || selectedLesson.aims.en).map((aim, index) => <li key={index}>{aim}</li>)}
+              {selectedLesson.aims[contentLang].map((aim, index) => <li key={index}>{aim}</li>)}
             </ul>
           </div>
         );
@@ -91,9 +92,9 @@ const LessonView: React.FC<LessonViewProps> = ({ course, setView }) => {
             <div className="space-y-6 animate-fade-in">
                 {selectedLesson.grammar.map((point, index) => (
                     <div key={index} className="bg-white dark:bg-slate-700 p-6 rounded-lg shadow-sm">
-                        <h2 className="text-2xl font-bold text-cyan-700 dark:text-cyan-400 mb-4">{point.title.vi || point.title.en}</h2>
+                        <h2 className="text-2xl font-bold text-cyan-700 dark:text-cyan-400 mb-4">{point.title[contentLang]}</h2>
                         <div className="prose dark:prose-invert max-w-none text-slate-700 dark:text-slate-300">
-                            {(point.explanation.vi || point.explanation.en).map((exp, i) => <p key={i}>{exp}</p>)}
+                            {point.explanation[contentLang].map((exp, i) => <p key={i}>{exp}</p>)}
                         </div>
                     </div>
                 ))}
@@ -109,7 +110,7 @@ const LessonView: React.FC<LessonViewProps> = ({ course, setView }) => {
                      <div key={index} className="bg-white dark:bg-slate-700 p-6 rounded-lg shadow-sm">
                         <h2 className="text-2xl font-bold text-cyan-700 dark:text-cyan-400 mb-4">{activity.type}</h2>
                          <ul className="list-disc list-inside space-y-2 text-slate-700 dark:text-slate-300">
-                           {(activity.description.vi || activity.description.en).map((desc, i) => <li key={i}>{desc}</li>)}
+                           {activity.description[contentLang].map((desc, i) => <li key={i}>{desc}</li>)}
                         </ul>
                     </div>
                 ))}
@@ -136,24 +137,25 @@ const LessonView: React.FC<LessonViewProps> = ({ course, setView }) => {
   ];
 
   return (
-    <div className="flex h-full md:rounded-lg md:shadow-inner overflow-hidden">
-      <aside className={`w-full md:w-80 md:bg-white md:dark:bg-slate-900 md:border-r md:border-slate-200 md:dark:border-slate-700 overflow-y-auto shrink-0 flex-col ${isMobile && showContent ? 'hidden' : 'flex'}`}>
-        <div className="p-4 flex-1 flex flex-col bg-slate-100 dark:bg-slate-900">
-            <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-md flex-1 flex flex-col">
-              <h2 className="text-xl font-bold mb-4 text-slate-800 dark:text-white shrink-0">{course.title}</h2>
-              <nav className="flex-1 space-y-1 overflow-y-auto pr-2 -mr-2">
+    <div className="flex h-full md:rounded-lg md:shadow-inner overflow-hidden bg-slate-100 dark:bg-slate-900 md:bg-transparent md:dark:bg-transparent">
+      { /* Lesson List Sidebar */ }
+      <aside className={`w-full md:w-80 lg:w-96 md:bg-white md:dark:bg-slate-900 md:border-r md:border-slate-200 md:dark:border-slate-700 overflow-y-auto shrink-0 flex-col ${isMobile && showContent ? 'hidden' : 'flex'} bg-slate-800 text-white md:text-inherit`}>
+        <div className="p-4 flex-1 flex flex-col">
+            <div className="bg-slate-900 md:bg-white md:dark:bg-slate-800 p-4 rounded-lg shadow-md flex-1 flex flex-col">
+              <h2 className="text-xl font-bold mb-4 text-white md:text-slate-800 md:dark:text-white shrink-0">{course.title}</h2>
+              <nav className="flex-1 space-y-1 overflow-y-auto pr-2 -mr-2 custom-scrollbar">
                   {course.rawLevel.units.map((unit) => (
                     <div key={unit.id}>
                       <button 
                         onClick={() => handleUnitToggle(unit.id)}
-                        className={`w-full text-left p-3 rounded-md flex justify-between items-center transition-colors ${expandedUnitId === unit.id ? 'bg-slate-100 dark:bg-slate-700' : 'hover:bg-slate-100 dark:hover:bg-slate-600'}`}
+                        className={`w-full text-left p-3 rounded-md flex justify-between items-center transition-colors ${expandedUnitId === unit.id ? 'bg-slate-700 md:bg-slate-100 md:dark:bg-slate-700' : 'hover:bg-slate-700/50 md:hover:bg-slate-100 md:dark:hover:bg-slate-600'}`}
                         aria-expanded={expandedUnitId === unit.id}
                       >
-                        <span className="font-semibold text-slate-700 dark:text-slate-200">{unit.title.vi || unit.title.en}</span>
-                        <i className={`fa-solid ${expandedUnitId === unit.id ? 'fa-chevron-up' : 'fa-chevron-down'} text-slate-500`}></i>
+                        <span className="font-semibold text-slate-100 md:text-slate-700 md:dark:text-slate-200">{unit.title[contentLang]}</span>
+                        <i className={`fa-solid ${expandedUnitId === unit.id ? 'fa-chevron-up' : 'fa-chevron-down'} text-slate-400 md:text-slate-500`}></i>
                       </button>
                       {expandedUnitId === unit.id && (
-                        <div className="pl-4 mt-2 ml-2 relative border-l-2 border-slate-200 dark:border-slate-600">
+                        <div className="pl-4 mt-2 ml-2 relative border-l-2 border-slate-600 md:border-slate-200 md:dark:border-slate-600">
                           <ul className="space-y-1">
                               {unit.lessons.map(lesson => (
                                 <li key={lesson.id}>
@@ -162,10 +164,10 @@ const LessonView: React.FC<LessonViewProps> = ({ course, setView }) => {
                                     className={`w-full text-left p-3 my-1 rounded-md text-sm transition-colors ${
                                       selectedLesson.id === lesson.id 
                                         ? 'bg-cyan-500 text-white font-semibold' 
-                                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
+                                        : 'text-slate-300 md:text-slate-600 md:dark:text-slate-300 hover:bg-slate-700/50 md:hover:bg-slate-100 md:dark:hover:bg-slate-700'
                                     }`}
                                   >
-                                    {lesson.title.vi || lesson.title.en}
+                                    {lesson.title[contentLang]}
                                   </button>
                                 </li>
                               ))}
@@ -179,7 +181,8 @@ const LessonView: React.FC<LessonViewProps> = ({ course, setView }) => {
         </div>
       </aside>
 
-      <main className={`flex-1 bg-cyan-50 dark:bg-slate-800/60 p-6 overflow-y-auto flex flex-col relative ${isMobile && !showContent ? 'hidden' : 'flex'}`}>
+      { /* Main Content */ }
+      <main className={`flex-1 bg-cyan-50 dark:bg-slate-800/60 p-4 sm:p-6 overflow-y-auto flex flex-col relative ${isMobile && !showContent ? 'hidden' : 'flex'}`}>
           {isMobile && (
              <button onClick={() => setShowContent(false)} className="md:hidden absolute top-4 left-4 z-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-full w-10 h-10 flex items-center justify-center text-slate-600 dark:text-slate-300 shadow-md">
                 <i className="fa-solid fa-arrow-left"></i>
@@ -188,11 +191,28 @@ const LessonView: React.FC<LessonViewProps> = ({ course, setView }) => {
           <div className="flex-shrink-0 pt-10 md:pt-0">
             <div className="text-sm text-slate-500 dark:text-slate-400 mb-2 hidden md:block">
               <button onClick={() => setView('dashboard')} className="hover:underline transition-colors">
-                <i className="fa-solid fa-arrow-left mr-2"></i> Bảng điều khiển
+                <i className="fa-solid fa-arrow-left mr-2"></i> {contentLang === 'vi' ? 'Bảng điều khiển' : 'Dashboard'}
               </button>
-              <span> | {course.series} &gt; {currentUnit?.title.vi || currentUnit?.title.en}</span>
+              <span> | {course.series} &gt; {currentUnit?.title[contentLang]}</span>
             </div>
-            <h1 className="text-4xl font-extrabold text-slate-800 dark:text-white mb-6">{selectedLesson.title.vi || selectedLesson.title.en}</h1>
+            
+            <div className="md:flex items-start justify-between mb-4">
+                 <h1 className="text-3xl lg:text-4xl font-extrabold text-slate-800 dark:text-white mb-4 md:mb-0">{selectedLesson.title[contentLang]}</h1>
+                 <div className="flex rounded-md bg-slate-200 dark:bg-slate-700 p-1 shrink-0">
+                    <button 
+                        onClick={() => setContentLang('vi')}
+                        className={`px-3 py-1 rounded text-sm font-semibold transition-colors ${contentLang === 'vi' ? 'bg-white dark:bg-blue-600 text-blue-700 dark:text-white shadow' : 'text-gray-600 dark:text-gray-300'}`}
+                    >
+                        Tiếng Việt
+                    </button>
+                    <button 
+                        onClick={() => setContentLang('en')}
+                        className={`px-3 py-1 rounded text-sm font-semibold transition-colors ${contentLang === 'en' ? 'bg-white dark:bg-blue-600 text-blue-700 dark:text-white shadow' : 'text-gray-600 dark:text-gray-300'}`}
+                    >
+                        English
+                    </button>
+                </div>
+            </div>
 
             <div className="border-b border-slate-300 dark:border-slate-600">
                 <nav className="-mb-px flex space-x-6 overflow-x-auto" aria-label="Tabs">
@@ -217,7 +237,7 @@ const LessonView: React.FC<LessonViewProps> = ({ course, setView }) => {
             {renderTabContent()}
           </div>
           
-          <div className="mt-auto flex justify-center gap-4 py-4 flex-shrink-0 bg-cyan-50 dark:bg-slate-800/60 sticky bottom-0">
+          <div className="mt-auto flex justify-center gap-4 py-4 flex-shrink-0 bg-cyan-50 dark:bg-slate-800/60 sticky bottom-0 -mx-6 px-6">
              <button className="px-6 py-3 bg-amber-500 text-white font-semibold rounded-lg shadow-md hover:bg-amber-600 transition-transform hover:scale-105 flex items-center gap-2">
                 <i className="fa-solid fa-bolt"></i>
                 Kiểm tra kiến thức
@@ -228,7 +248,7 @@ const LessonView: React.FC<LessonViewProps> = ({ course, setView }) => {
              </button>
           </div>
 
-          <div className="fixed bottom-10 right-10">
+          <div className="fixed bottom-6 right-6 md:bottom-10 md:right-10 z-20">
             <button className="w-14 h-14 bg-teal-500 rounded-full text-white shadow-lg flex items-center justify-center text-2xl hover:bg-teal-600 transition-transform hover:scale-110 hover:rotate-12" aria-label="AI Helper">
               <i className="fa-solid fa-wand-magic-sparkles"></i>
             </button>
