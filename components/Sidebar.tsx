@@ -40,15 +40,9 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, setView, isSidebarOpen, 
         onClick={() => setIsSidebarOpen(false)}
       ></div>
       <aside className={`fixed inset-y-0 left-0 w-64 border-r border-slate-200/50 dark:border-slate-700/50 flex flex-col p-4 z-40
-                       transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0
+                       transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 sidebar-glass
                        ${isSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'}`}
-                       style={{
-                         backgroundColor: 'var(--sidebar-bg-light)',
-                         backdropFilter: 'blur(16px)',
-                         WebkitBackdropFilter: 'blur(16px)'
-                       }}
       >
-        <div className="dark" style={{ backgroundColor: 'var(--sidebar-bg-dark)'}}></div>
         <div className="flex items-center justify-between mb-8 h-12">
           <div className="flex items-center">
               <i className="fa-solid fa-graduation-cap text-3xl text-blue-600 dark:text-blue-400"></i>

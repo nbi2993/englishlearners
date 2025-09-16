@@ -105,21 +105,6 @@ const App: React.FC = () => {
         }
 
         switch (currentView) {
-            case 'dashboard':
-            case 'lesson':
-                return <Dashboard
-                    user={user}
-                    setUser={setUser}
-                    courses={courses}
-                    otherPrograms={otherProgramsData}
-                    setView={handleSetView}
-                    selectedCourse={selectedCourse}
-                    setSelectedCourse={setSelectedCourse}
-                    onSelectLesson={handleSelectLesson}
-                    onBackToCourses={handleBackToCourses}
-                    language={language}
-                    translations={translations}
-                />;
             case 'teacher-dashboard':
                 return <TeacherDashboard language={language} translations={translations} />;
             case 'writing-grader':
@@ -136,6 +121,8 @@ const App: React.FC = () => {
                     setTheme={setTheme}
                     translations={translations}
                 />;
+            case 'dashboard':
+            case 'lesson': // This case handles when a course is selected but no lesson yet
             default:
                 return <Dashboard
                     user={user}

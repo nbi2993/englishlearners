@@ -60,7 +60,7 @@ const WelcomeHub: React.FC<{user: User, onEditProfile: () => void, language: 'en
 );
 
 const LessonListItem: React.FC<{ lesson: Lesson; onClick: () => void; }> = ({ lesson, onClick }) => (
-    <button onClick={onClick} className="w-full text-left p-4 card-glass hover:bg-white/50 dark:hover:bg-slate-700/50 transition-all flex justify-between items-center">
+    <button onClick={onClick} className="w-full text-left p-4 rounded-lg bg-slate-50/50 dark:bg-slate-800/20 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-all flex justify-between items-center border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
         <div>
             <p className="font-semibold text-slate-800 dark:text-white">{lesson.rawLesson.day ? `Day ${lesson.rawLesson.day}: ` : ''}{lesson.title}</p>
             <p className="text-sm text-slate-500 dark:text-slate-400">{lesson.rawLesson.aims.en[0]}</p>
@@ -123,7 +123,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             <section>
                 <h2 className="text-2xl font-bold mb-4">{language === 'vi' ? 'Khóa học của bạn' : 'Your Courses'}</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {courses.map(course => (
+                    {courses.filter(course => course).map(course => (
                         <CourseCard key={course.id} course={course} onClick={() => setSelectedCourse(course)} />
                     ))}
                 </div>

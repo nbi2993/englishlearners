@@ -7,6 +7,9 @@ interface CourseCardProps {
 }
 
 const CourseCard: React.FC<CourseCardProps> = ({ course, onClick }) => {
+  // Use a placeholder image if imageUrl is not available
+  const imageUrl = course.imageUrl || 'https://placehold.co/600x400/E5E7EB/A1A1AA?text=No+Image';
+
   return (
     <div 
       className="card-glass overflow-hidden transform hover:-translate-y-1 transition-transform duration-300 cursor-pointer flex flex-col group" 
@@ -14,7 +17,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onClick }) => {
     >
       <div 
         className="h-40 w-full relative bg-cover bg-center"
-        style={{ backgroundImage: `url(${course.imageUrl})` }}
+        style={{ backgroundImage: `url(${imageUrl})` }}
       >
         <div 
           className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"

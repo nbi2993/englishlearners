@@ -1,4 +1,3 @@
-
 // types.ts
 
 export type View = 'dashboard' | 'lesson' | 'teacher-dashboard' | 'writing-grader' | 'speaking-partner' | 'settings';
@@ -14,6 +13,7 @@ export interface User {
   age?: string | number;
   gradeLevel?: string;
   gender?: string;
+  streak: number;
 }
 
 export interface Lesson {
