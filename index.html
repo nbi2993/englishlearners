@@ -1,28 +1,34 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="vi" class="h-full">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <title>IVS English K-12 Learning App</title>
 
-  <!-- Preload fonts/icons -->
+  <!-- Preconnect to CDNs for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://aistudiocdn.com" crossorigin>
+
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <!-- Font Awesome for icons -->
   <link 
     rel="stylesheet" 
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" 
-    integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" 
+    xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" 
     crossorigin="anonymous" 
     referrerpolicy="no-referrer" 
   />
 
-  <!-- Main stylesheet -->
-  <link rel="stylesheet" href="/index.css">
+  <!-- Tailwind CSS for modern UI -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
+  <!-- Custom Styles & Base Resets -->
   <style>
-    /* Reset + optimize */
+    /* Basic reset and font setup */
     *, *::before, *::after {
       box-sizing: border-box;
     }
@@ -31,66 +37,30 @@
       padding: 0;
       height: 100%;
       overflow-x: hidden;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
     }
-
-    /* Loader */
-    .initial-loader {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      width: 100%;
-      background-color: var(--bg-color, #f1f5f9);
-      color: var(--text-color, #1e293b);
-      transition: opacity 0.3s ease-in-out;
-      text-align: center;
-      padding: 1rem;
-    }
-
-    .initial-loader .spinner {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      border: 4px solid var(--spinner-base, #e2e8f0);
-      border-top-color: var(--spinner-active, #2563eb);
-      animation: spin 1s linear infinite;
-    }
-
-    .initial-loader p {
-      margin-top: 1rem;
-      font-weight: 500;
-      letter-spacing: 0.5px;
-      font-size: 1rem;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* Dark theme variables */
+    /* Custom configuration for Tailwind dark mode */
     .dark {
-      --bg-color: #1e293b;
-      --text-color: #f1f5f9;
-      --spinner-base: #334155;
-      --spinner-active: #3b82f6;
+      color-scheme: dark;
     }
   </style>
 </head>
-<body class="h-full">
+<body class="h-full bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 antialiased">
   
   <!-- Root app container -->
-  <div id="root">
-    <div class="initial-loader" role="status" aria-live="polite">
-      <div class="spinner" aria-hidden="true"></div>
-      <p>Loading IVS English...</p>
+  <div id="root" class="h-full">
+    <!-- Optimized Initial Loader with Tailwind CSS -->
+    <div class="initial-loader flex flex-col items-center justify-center h-full w-full bg-slate-50 dark:bg-slate-900 transition-opacity duration-300" role="status" aria-live="polite">
+      <div class="spinner h-12 w-12 animate-spin rounded-full border-4 border-slate-200 dark:border-slate-700 border-t-blue-600 dark:border-t-blue-500" aria-hidden="true"></div>
+      <p class="mt-4 text-lg font-medium text-slate-600 dark:text-slate-300 tracking-wide">
+        Đang tải IVS English...
+      </p>
     </div>
   </div>
 
-  <!-- Import map for React -->
+  <!-- Import map for React (ESM) -->
   <script type="importmap">
     {
       "imports": {
@@ -102,20 +72,22 @@
     }
   </script>
 
-  <!-- Dark mode apply instantly -->
+  <!-- Instantly apply dark mode to prevent flash of light theme -->
   <script>
     (() => {
       try {
         const theme = localStorage.getItem('theme');
-        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (theme === 'dark' || (theme === 'system' && systemDark)) {
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (theme === 'dark' || (!theme && systemPrefersDark)) {
           document.documentElement.classList.add('dark');
         }
-      } catch {}
+      } catch (e) {
+        console.error("Failed to apply theme:", e);
+      }
     })();
   </script>
 
-  <!-- Main React app -->
+  <!-- Main React app entry point -->
   <script type="module" src="/index.tsx"></script>
 </body>
 </html>
