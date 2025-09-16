@@ -4,17 +4,36 @@ import type { Course } from '../types';
 interface CourseCardProps {
   course: Course;
   onClick: () => void;
+  isPinned: boolean;
+  onPinClick: (courseId: string) => void;
 }
 
-const CourseCard: React.FC<CourseCardProps> = ({ course, onClick }) => {
+const CourseCard: React.FC<CourseCardProps> = ({ course, onClick, isPinned, onPinClick }) => {
   // Use a placeholder image if imageUrl is not available
   const imageUrl = course.imageUrl || 'https://placehold.co/600x400/E5E7EB/A1A1AA?text=No+Image';
 
+  const handlePinClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card's onClick from firing
+    onPinClick(course.id);
+  };
+
   return (
     <div 
-      className="card-glass overflow-hidden transform hover:-translate-y-1 transition-transform duration-300 cursor-pointer flex flex-col group" 
+      className="card-glass overflow-hidden transform hover:-translate-y-1 transition-transform duration-300 cursor-pointer flex flex-col group relative" 
       onClick={onClick}
     >
+      <button 
+        onClick={handlePinClick}
+        title={isPinned ? "Unpin from Home" : "Pin to Home"}
+        className={`absolute top-2 right-2 z-10 w-8 h-8 rounded-full flex-center transition-all duration-300
+                    ${isPinned 
+                        ? 'bg-blue-600 text-white opacity-100' 
+                        : 'bg-black/30 text-white/70 opacity-0 group-hover:opacity-100 hover:bg-blue-500'
+                    }`}
+      >
+          <i className="fa-solid fa-thumbtack text-sm"></i>
+      </button>
+
       <div 
         className="h-32 w-full relative bg-cover bg-center"
         style={{ backgroundImage: `url(${imageUrl})` }}

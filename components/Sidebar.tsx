@@ -55,10 +55,16 @@ const Sidebar: React.FC<SidebarProps> = ({ user, currentView, setView, isSidebar
         </div>
         <nav className="flex-1 space-y-2">
           <NavItem
+            icon="fa-house"
+            label={t.home}
+            isActive={currentView === 'home'}
+            onClick={() => setView('home')}
+          />
+          <NavItem
             icon="fa-table-columns"
-            label={t.dashboard}
-            isActive={currentView === 'dashboard' || currentView === 'lesson'}
-            onClick={() => setView('dashboard')}
+            label={t.curriculum}
+            isActive={currentView === 'curriculum' || currentView === 'lesson'}
+            onClick={() => setView('curriculum')}
           />
           {user.role === 'teacher' && (
             <NavItem

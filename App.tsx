@@ -1,26 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
-import Dashboard from './components/Dashboard';
+import Home from './components/Home';
+import Curriculum from './components/Dashboard';
 import LessonView from './components/LessonView';
 import TeacherDashboard from './components/TeacherDashboard';
 import WritingGrader from './components/WritingGrader';
 import SpeakingPartner from './components/SpeakingPartner';
 import Settings from './components/Settings';
-import type { View, User, Course, Lesson } from './types';
-import { MOCK_USER } from './constants';
+import RoleSelection from './components/RoleSelection';
+import type { View, User, Course, Lesson, Classes } from './types';
+import { MOCK_USER, MOCK_CLASSES } from './constants';
 import { curriculumData } from './data/curriculum';
 import { otherProgramsData } from './data/otherPrograms';
 
 const translations = {
   en: {
-    dashboard: 'Dashboard',
+    home: 'Home',
+    curriculum: 'Curriculum',
     'teacher-dashboard': 'Teacher Dashboard',
     'speaking-partner': 'Speaking Partner',
     'writing-grader': 'Writing Grader',
     settings: 'Settings',
   },
   vi: {
-    dashboard: 'Bảng điều khiển',
+    home: 'Trang chủ',
+    curriculum: 'Chương trình',
     'teacher-dashboard': 'Bảng điều khiển giáo viên',
     'speaking-partner': 'Luyện nói',
     'writing-grader': 'Chấm bài viết',
@@ -29,19 +33,83 @@ const translations = {
 };
 
 const App: React.FC = () => {
-    const [user, setUser] = useState<User>(MOCK_USER);
+    const [user, setUser] = useState<User | null>(null);
     const [courses, setCourses] = useState<Course[]>([]);
-    const [currentView, setCurrentView] = useState<View>('dashboard');
+    const [classes, setClasses] = useState<Classes>({});
+    const [currentView, setCurrentView] = useState<View>('home');
     const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
     const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [language, setLanguage] = useState<'en' | 'vi'>('en');
+    const [language, setLanguage] = useState<'en' | 'vi'>('vi');
     const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+    const [isInitialized, setIsInitialized] = useState(false);
+
+    // Effect for initializing app state from localStorage
+    useEffect(() => {
+        try {
+            const savedUser = localStorage.getItem('ivs-english-user');
+            const savedClasses = localStorage.getItem('ivs-english-classes');
+            const savedLang = localStorage.getItem('ivs-english-language');
+            const savedTheme = localStorage.getItem('ivs-english-theme');
+
+            if (savedUser) {
+                // Ensure pinnedCourses exists
+                const parsedUser = JSON.parse(savedUser);
+                if (!parsedUser.pinnedCourses) {
+                    parsedUser.pinnedCourses = [];
+                }
+                setUser(parsedUser);
+            }
+            if (savedClasses) {
+                setClasses(JSON.parse(savedClasses));
+            }
+            if (savedLang) {
+                setLanguage(savedLang as 'en' | 'vi');
+            }
+            if (savedTheme) {
+                setTheme(savedTheme as 'light' | 'dark');
+            }
+        } catch (error) {
+            console.error("Failed to load data from localStorage", error);
+            // If loading fails, clear potentially corrupted storage
+            localStorage.clear();
+        } finally {
+            setIsInitialized(true);
+        }
+    }, []);
+
+    // Effects for saving state changes to localStorage
+    useEffect(() => {
+        if (user) {
+            localStorage.setItem('ivs-english-user', JSON.stringify(user));
+        }
+    }, [user]);
+
+    useEffect(() => {
+        // Do not save empty initial state
+        if (Object.keys(classes).length > 0) {
+          localStorage.setItem('ivs-english-classes', JSON.stringify(classes));
+        }
+    }, [classes]);
+    
+    useEffect(() => {
+        localStorage.setItem('ivs-english-language', language);
+    }, [language]);
+
+    useEffect(() => {
+        if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        localStorage.setItem('ivs-english-theme', theme);
+    }, [theme]);
+
 
     useEffect(() => {
         const processedCourses: Course[] = curriculumData.flatMap(category =>
             category.levels.map(level => ({
-                id: level.level.toString(),
+                id: `${category.category.en.replace(/\s+/g, '-')}-${level.level}`,
                 title: level.title[language],
                 series: category.category[language],
                 level: level.subtitle.en.split(' - ')[0] as any,
@@ -64,26 +132,23 @@ const App: React.FC = () => {
         setCourses(processedCourses);
     }, [language]);
 
-    useEffect(() => {
-        if (theme === 'dark') {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-        localStorage.setItem('theme', theme);
-    }, [theme]);
 
     useEffect(() => {
-        if (user.role === 'student' && currentView === 'teacher-dashboard') {
-            setCurrentView('dashboard');
+        if (user && user.role === 'student' && currentView === 'teacher-dashboard') {
+            setCurrentView('home');
         }
-    }, [user.role, currentView]);
+    }, [user, user?.role, currentView]);
 
     const handleSetView = (view: View) => {
         setCurrentView(view);
         setIsSidebarOpen(false);
-        if (view === 'dashboard') {
-            setSelectedCourse(null);
+        if (view === 'curriculum' || view === 'home') {
+            // Only clear selectedCourse if navigating back to curriculum main page
+            if(view === 'curriculum' && selectedCourse) {
+                // do nothing, we are likely navigating TO a lesson view
+            } else {
+                 setSelectedCourse(null);
+            }
             setSelectedLesson(null);
         }
     };
@@ -96,14 +161,33 @@ const App: React.FC = () => {
 
     const handleBackToDashboard = () => {
         setSelectedLesson(null);
-        setCurrentView('dashboard');
+        setCurrentView('curriculum');
     }
 
     const handleBackToCourses = () => {
         setSelectedCourse(null);
         setSelectedLesson(null);
-        setCurrentView('dashboard');
+        setCurrentView('curriculum');
     }
+    
+    const handleSelectRole = (role: 'student' | 'teacher') => {
+        const newUser: User = { ...MOCK_USER, role };
+        setUser(newUser);
+        if (role === 'teacher') {
+            // Give teachers some mock data to start with
+            setClasses(MOCK_CLASSES);
+        }
+    };
+    
+    if (!isInitialized) {
+        // You can return a loading spinner here if initialization takes time
+        return null;
+    }
+    
+    if (!user) {
+        return <RoleSelection onSelectRole={handleSelectRole} />;
+    }
+
 
     const renderContent = () => {
         if (currentView === 'lesson' && selectedLesson && selectedCourse) {
@@ -112,7 +196,7 @@ const App: React.FC = () => {
 
         switch (currentView) {
             case 'teacher-dashboard':
-                return user.role === 'teacher' ? <TeacherDashboard language={language} translations={translations} /> : <Dashboard user={user} setUser={setUser} courses={courses} otherPrograms={otherProgramsData} setView={handleSetView} selectedCourse={selectedCourse} setSelectedCourse={setSelectedCourse} onSelectLesson={handleSelectLesson} onBackToCourses={handleBackToCourses} language={language} translations={translations}/>;
+                return user.role === 'teacher' ? <TeacherDashboard classes={classes} setClasses={setClasses} language={language} translations={translations} /> : <Home user={user} setUser={setUser} courses={courses} otherPrograms={otherProgramsData} classes={classes} language={language} setView={handleSetView} setSelectedCourse={setSelectedCourse} />;
             case 'writing-grader':
                 return <WritingGrader language={language} translations={translations} />;
             case 'speaking-partner':
@@ -127,21 +211,29 @@ const App: React.FC = () => {
                     setTheme={setTheme}
                     translations={translations}
                 />;
-            case 'dashboard':
-            case 'lesson': // This case handles when a course is selected but no lesson yet
-            default:
-                return <Dashboard
+            case 'curriculum':
+                return <Curriculum
                     user={user}
                     setUser={setUser}
                     courses={courses}
                     otherPrograms={otherProgramsData}
-                    setView={handleSetView}
                     selectedCourse={selectedCourse}
                     setSelectedCourse={setSelectedCourse}
                     onSelectLesson={handleSelectLesson}
                     onBackToCourses={handleBackToCourses}
                     language={language}
-                    translations={translations}
+                />;
+            case 'home':
+            default:
+                return <Home
+                    user={user}
+                    setUser={setUser}
+                    courses={courses}
+                    otherPrograms={otherProgramsData}
+                    classes={classes}
+                    language={language}
+                    setView={handleSetView}
+                    setSelectedCourse={setSelectedCourse}
                 />;
         }
     };

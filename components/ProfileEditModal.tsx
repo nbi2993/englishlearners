@@ -7,26 +7,49 @@ interface ProfileEditModalProps {
   onClose: () => void;
 }
 
-// Copied from Settings.tsx for consistency
+// Added more diverse avatar options including the default one
 const avatars = [
-  'fa-graduation-cap', 'fa-book-open-reader', 'fa-flask-vial', 'fa-laptop-code',
-  'fa-palette', 'fa-music', 'fa-chart-line', 'fa-earth-americas',
-  'fa-building-columns', 'fa-lightbulb', 'fa-scale-balanced', 'fa-brain'
+  'fa-user-astronaut', 'fa-user-ninja', 'fa-user-secret', 'fa-user-doctor',
+  'fa-user-graduate', 'fa-user-tie', 'fa-user-pen', 'fa-music',
+  'fa-palette', 'fa-flask-vial', 'fa-laptop-code', 'fa-brain'
 ];
 
 const ProfileEditModal: React.FC<ProfileEditModalProps> = ({ user, setUser, onClose }) => {
   const [name, setName] = useState(user.name);
   const [avatar, setAvatar] = useState(user.avatar);
+  const [gradeLevel, setGradeLevel] = useState(user.gradeLevel || '');
+  const [age, setAge] = useState(user.age || '');
+  const [gender, setGender] = useState(user.gender || '');
+
+  const getEducationLevel = (gradeStr: string): string => {
+      if (!gradeStr) return 'N/A';
+      const grade = parseInt(gradeStr.match(/\d+/)?.[0] || '0');
+      if (grade >= 10) return 'High School';
+      if (grade >= 6) return 'Secondary';
+      if (grade >= 1) return 'Primary';
+      return 'Preschool';
+  };
 
   const handleSave = () => {
-    setUser({ ...user, name, avatar: avatar });
+    const educationLevel = getEducationLevel(gradeLevel);
+    const newLevel = gradeLevel ? `${educationLevel} - ${gradeLevel}` : educationLevel;
+
+    setUser({ 
+        ...user, 
+        name, 
+        avatar,
+        gradeLevel,
+        age: age ? Number(age) : undefined,
+        gender,
+        level: newLevel,
+    });
     onClose();
   };
   
-  // Simulate avatar change by cycling through available icons
   const handleAvatarChange = () => {
       const currentIndex = avatars.indexOf(avatar);
-      const nextIndex = (currentIndex + 1) % avatars.length;
+      // If current avatar is not in the list, start from the beginning
+      const nextIndex = currentIndex > -1 ? (currentIndex + 1) % avatars.length : 0;
       setAvatar(avatars[nextIndex]);
   }
 
@@ -47,15 +70,54 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({ user, setUser, onCl
                     Change Avatar
                 </button>
             </div>
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-slate-800 dark:text-slate-300 mb-1">Name</label>
-              <input
-                id="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-              />
+
+            <div className="space-y-4">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium text-slate-800 dark:text-slate-300 mb-1">Name</label>
+                  <input
+                    id="name"
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="form-input"
+                  />
+                </div>
+                
+                <div>
+                    <label htmlFor="gradeLevel" className="block text-sm font-medium text-slate-800 dark:text-slate-300 mb-1">Grade Level</label>
+                    <input
+                        id="gradeLevel"
+                        type="text"
+                        value={gradeLevel}
+                        onChange={(e) => setGradeLevel(e.target.value)}
+                        className="form-input"
+                        placeholder="e.g., Grade 5"
+                    />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <label htmlFor="age" className="block text-sm font-medium text-slate-800 dark:text-slate-300 mb-1">Age</label>
+                        <input
+                            id="age"
+                            type="number"
+                            value={age}
+                            onChange={(e) => setAge(e.target.value)}
+                            className="form-input"
+                            placeholder="e.g., 10"
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="gender" className="block text-sm font-medium text-slate-800 dark:text-slate-300 mb-1">Gender</label>
+                        <select id="gender" value={gender} onChange={(e) => setGender(e.target.value)} className="form-select">
+                            <option value="">Select...</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                            <option value="Prefer not to say">Prefer not to say</option>
+                        </select>
+                    </div>
+                </div>
             </div>
         </div>
 

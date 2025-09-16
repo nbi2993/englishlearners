@@ -1,6 +1,6 @@
 // types.ts
 
-export type View = 'dashboard' | 'lesson' | 'teacher-dashboard' | 'writing-grader' | 'speaking-partner' | 'settings';
+export type View = 'home' | 'curriculum' | 'lesson' | 'teacher-dashboard' | 'writing-grader' | 'speaking-partner' | 'settings';
 
 export interface User {
   id: string;
@@ -14,6 +14,7 @@ export interface User {
   gradeLevel?: string;
   gender?: string;
   streak: number;
+  pinnedCourses?: string[];
 }
 
 export interface Lesson {

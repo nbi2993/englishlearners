@@ -7,8 +7,14 @@ import AssignHomeworkModal from './AssignHomeworkModal';
 import AddClassModal from './AddClassModal';
 import AddStudentModal from './AddStudentModal';
 
-const TeacherDashboard: React.FC<{ language: 'en' | 'vi'; translations: any; }> = ({ language, translations }) => {
-    const [classes, setClasses] = useState<Classes>({});
+interface TeacherDashboardProps {
+    classes: Classes;
+    setClasses: (classes: Classes) => void;
+    language: 'en' | 'vi';
+    translations: any;
+}
+
+const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses, language, translations }) => {
     const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
     const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
 
@@ -21,8 +27,11 @@ const TeacherDashboard: React.FC<{ language: 'en' | 'vi'; translations: any; }> 
     const selectedClass = selectedClassId ? classes[selectedClassId] : null;
 
     useEffect(() => {
-        if (selectedClassId && !classes[selectedClassId]) {
-            setSelectedClassId(Object.keys(classes)[0] || null);
+        // If there's no selected class or the selected class was deleted,
+        // select the first available class.
+        if (!selectedClassId || !classes[selectedClassId]) {
+            const firstClassId = Object.keys(classes)[0];
+            setSelectedClassId(firstClassId || null);
         }
     }, [classes, selectedClassId]);
 
