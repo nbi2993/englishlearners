@@ -1,219 +1,95 @@
-
 import React, { useState } from 'react';
 import type { User } from '../types';
-
-type Language = 'en' | 'vi';
-type Theme = 'light' | 'dark' | 'system';
-type Role = 'student' | 'teacher';
+import ProfileEditModal from './ProfileEditModal';
 
 interface SettingsProps {
   user: User;
   setUser: (user: User) => void;
-  language: Language;
-  setLanguage: (language: Language) => void;
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
+  language: 'en' | 'vi';
+  setLanguage: (lang: 'en' | 'vi') => void;
+  theme: 'light' | 'dark';
+  setTheme: (theme: 'light' | 'dark') => void;
+  translations: any;
 }
 
-const avatars = [
-  'fa-graduation-cap', 'fa-book-open-reader', 'fa-flask-vial', 'fa-laptop-code',
-  'fa-palette', 'fa-music', 'fa-chart-line', 'fa-earth-americas',
-  'fa-building-columns', 'fa-lightbulb', 'fa-scale-balanced', 'fa-brain'
-];
-
-const gradeLevels = [
-    "Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5",
-    "Grade 6", "Grade 7", "Grade 8", "Grade 9",
-    "Grade 10", "Grade 11", "Grade 12"
-];
-
-const SettingsCard: React.FC<{ title: string; children: React.ReactNode; className?: string }> = ({ title, children, className = '' }) => (
-  <div className={`bg-white dark:bg-slate-800 rounded-lg shadow-md ${className}`}>
-    <div className="p-6">
-      <h3 className="text-lg font-bold text-gray-900 dark:text-white">{title}</h3>
-      <div className="mt-4">
-        {children}
-      </div>
-    </div>
-  </div>
-);
-
 const Settings: React.FC<SettingsProps> = ({ user, setUser, language, setLanguage, theme, setTheme }) => {
-  const [name, setName] = useState(user.name);
-  // FIX: Ensure 'age' state is always a string to match TextInput's `value` prop type.
-  const [age, setAge] = useState(String(user.age ?? ''));
-  const [gradeLevel, setGradeLevel] = useState(user.gradeLevel || '');
-  const [gender, setGender] = useState(user.gender || '');
-  const [selectedAvatar, setSelectedAvatar] = useState(user.avatar);
-  const [role, setRole] = useState<Role>(user.role);
-
-  const handleSaveChanges = () => {
-    setUser({ ...user, name, age, gradeLevel, gender, avatar: selectedAvatar, role });
-    alert('Changes saved!');
-  };
-  
-  const FormRow: React.FC<{children: React.ReactNode}> = ({children}) => (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">{children}</div>
-  );
-
-  const FormField: React.FC<{label: string, children: React.ReactNode}> = ({label, children}) => (
-      <div>
-        <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{label}</label>
-        {children}
-      </div>
-  );
-
-  const TextInput: React.FC<{value: string, onChange: (e: React.ChangeEvent<HTMLInputElement>) => void, placeholder?: string}> = ({ value, onChange, placeholder }) => (
-    <input
-        type="text"
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md focus:ring-blue-500 focus:border-blue-500 transition"
-    />
-  );
-  
-  const SelectInput: React.FC<{value: string, onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void, children: React.ReactNode}> = ({ value, onChange, children }) => (
-     <select value={value} onChange={onChange} className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md focus:ring-blue-500 focus:border-blue-500 transition">
-        {children}
-    </select>
-  );
-
-  return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      <div>
-        <h2 className="text-3xl font-bold text-gray-800 dark:text-white">Profile Settings</h2>
-      </div>
-
-      <SettingsCard title="Personal Information">
-        <div className="space-y-6">
-            <FormRow>
-                <FormField label="Name">
-                    <TextInput value={name} onChange={(e) => setName(e.target.value)} />
-                </FormField>
-                <FormField label="Age">
-                    <TextInput value={age} onChange={(e) => setAge(e.target.value)} placeholder="e.g., 18" />
-                </FormField>
-                 <FormField label="Grade Level">
-                    <SelectInput value={gradeLevel} onChange={(e) => setGradeLevel(e.target.value)}>
-                        <option value="">-- Select Grade Level --</option>
-                        {gradeLevels.map(gl => <option key={gl} value={gl}>{gl}</option>)}
-                    </SelectInput>
-                </FormField>
-                <FormField label="Gender">
-                    <SelectInput value={gender} onChange={(e) => setGender(e.target.value)}>
-                        <option value="">-- Select Gender --</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Other">Other</option>
-                    </SelectInput>
-                </FormField>
-            </FormRow>
-
-            <FormField label="Avatar">
-                 <div className="flex flex-wrap gap-3">
-                    {avatars.map(avatarIcon => (
-                        <button
-                            key={avatarIcon}
-                            onClick={() => setSelectedAvatar(avatarIcon)}
-                            className={`w-12 h-12 rounded-lg flex items-center justify-center transition-all duration-200
-                                        ${selectedAvatar === avatarIcon 
-                                            ? 'bg-blue-600 text-white ring-2 ring-offset-2 ring-blue-500 dark:ring-offset-slate-800' 
-                                            : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
-                                        }`}
-                            aria-label={`Select ${avatarIcon.replace('fa-', '')} avatar`}
-                        >
-                            <i className={`fa-solid ${avatarIcon} text-2xl`}></i>
-                        </button>
-                    ))}
-                </div>
-            </FormField>
+    const [isProfileModalOpen, setProfileModalOpen] = useState(false);
+    
+    const SettingCard: React.FC<{ title: string; description: string; children: React.ReactNode; }> = ({ title, description, children }) => (
+        <div className="card-glass p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h3 className="text-lg font-bold">{title}</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{description}</p>
+            </div>
+            <div className="flex-shrink-0 w-full md:w-auto">
+                {children}
+            </div>
         </div>
-      </SettingsCard>
+    );
+    
+    const SegmentedControl: React.FC<{children: React.ReactNode}> = ({children}) => (
+        <div className="flex items-center bg-slate-100 dark:bg-slate-900/70 rounded-lg p-1 w-full md:w-auto">
+            {children}
+        </div>
+    );
+    
+    const SegmentedButton: React.FC<{isActive: boolean, onClick: () => void, children: React.ReactNode}> = ({isActive, onClick, children}) => (
+        <button 
+            onClick={onClick}
+            className={`flex-1 flex items-center justify-center gap-2 px-3 py-1.5 text-sm font-semibold rounded-md transition-all ${isActive ? 'bg-white dark:bg-slate-700 shadow' : 'text-slate-600 dark:text-slate-300'}`}
+        >
+            {children}
+        </button>
+    );
 
-      <SettingsCard title="Preferences">
-          <FormRow>
-            <FormField label="Language">
-                 <div className="flex rounded-md bg-slate-100 dark:bg-slate-700 p-1">
-                        <button 
-                            onClick={() => setLanguage('en')}
-                            className={`w-full py-1.5 rounded text-sm font-semibold transition-colors ${language === 'en' ? 'bg-white dark:bg-blue-600 text-blue-700 dark:text-white shadow' : 'text-gray-600 dark:text-gray-300'}`}
-                        >
-                            English
-                        </button>
-                        <button 
-                            onClick={() => setLanguage('vi')}
-                            className={`w-full py-1.5 rounded text-sm font-semibold transition-colors ${language === 'vi' ? 'bg-white dark:bg-blue-600 text-blue-700 dark:text-white shadow' : 'text-gray-600 dark:text-gray-300'}`}
-                        >
-                            Tiếng Việt
-                        </button>
-                    </div>
-            </FormField>
-            <FormField label="Theme">
-                 <div className="flex rounded-md bg-slate-100 dark:bg-slate-700 p-1">
-                        <button 
-                            onClick={() => setTheme('light')}
-                            className={`w-full py-1.5 rounded text-sm font-semibold transition-colors ${theme === 'light' ? 'bg-white dark:bg-slate-500 text-slate-700 dark:text-white shadow' : 'text-gray-600 dark:text-gray-300'}`}
-                        >
-                            Light
-                        </button>
-                         <button 
-                            onClick={() => setTheme('dark')}
-                            className={`w-full py-1.5 rounded text-sm font-semibold transition-colors ${theme === 'dark' ? 'bg-white dark:bg-slate-500 text-slate-700 dark:text-white shadow' : 'text-gray-600 dark:text-gray-300'}`}
-                        >
-                            Dark
-                        </button>
-                        <button 
-                            onClick={() => setTheme('system')}
-                            className={`w-full py-1.5 rounded text-sm font-semibold transition-colors ${theme === 'system' ? 'bg-white dark:bg-slate-500 text-slate-700 dark:text-white shadow' : 'text-gray-600 dark:text-gray-300'}`}
-                        >
-                            System
-                        </button>
-                    </div>
-            </FormField>
-          </FormRow>
-          <div className="mt-6">
-              <FormRow>
-                  <FormField label="Account Type">
-                      <div className="flex rounded-md bg-slate-100 dark:bg-slate-700 p-1">
-                          <button
-                              onClick={() => setRole('student')}
-                              className={`w-full py-1.5 rounded text-sm font-semibold transition-colors flex items-center justify-center gap-2 ${role === 'student' ? 'bg-white dark:bg-blue-600 text-blue-700 dark:text-white shadow' : 'text-gray-600 dark:text-gray-300'}`}
-                          >
-                              <i className="fa-solid fa-user-graduate"></i>
-                              Student
-                          </button>
-                          <button
-                              onClick={() => setRole('teacher')}
-                              className={`w-full py-1.5 rounded text-sm font-semibold transition-colors flex items-center justify-center gap-2 ${role === 'teacher' ? 'bg-white dark:bg-blue-600 text-blue-700 dark:text-white shadow' : 'text-gray-600 dark:text-gray-300'}`}
-                          >
-                              <i className="fa-solid fa-chalkboard-user"></i>
-                              Teacher
-                          </button>
-                      </div>
-                  </FormField>
-              </FormRow>
-          </div>
-      </SettingsCard>
-      
-      <div className="flex justify-end">
-          <button
-            onClick={handleSaveChanges}
-            className="px-5 py-2.5 bg-white dark:bg-slate-200 text-slate-800 font-semibold rounded-lg hover:bg-slate-200 dark:hover:bg-slate-300 transition-colors shadow flex items-center gap-2"
-          >
-            <i className="fa-solid fa-check"></i>
-            Save Changes
-          </button>
-      </div>
+    return (
+        <div className="max-w-4xl mx-auto animate-fade-in p-4 sm:p-0 py-6">
+            <h1 className="text-3xl font-bold mb-8">Settings</h1>
 
-      <div className="text-center text-xs text-slate-500 dark:text-slate-400 space-y-1">
-        <p>ivsacademy.edu.vn</p>
-        <p>D-U-N-S Number: 646434880</p>
-        <p>Designed and developed by IVS Celestech, IVS JSC.</p>
-        <p>&copy; 2025 IVS JSC. All Rights Reserved.</p>
-      </div>
-    </div>
-  );
+            <div className="space-y-6">
+                <div className="card-glass p-6 flex items-center gap-6">
+                    <div className="w-20 h-20 rounded-full bg-blue-100 dark:bg-slate-700 flex-center">
+                         <i className={`fa-solid ${user.avatar} text-4xl text-blue-600 dark:text-blue-400`}></i>
+                    </div>
+                    <div>
+                        <h2 className="text-2xl font-bold">{user.name}</h2>
+                        <p className="text-slate-500 dark:text-slate-400">{user.level}</p>
+                    </div>
+                    <button onClick={() => setProfileModalOpen(true)} className="ml-auto btn btn-secondary">
+                        Edit Profile
+                    </button>
+                </div>
+                
+                <SettingCard 
+                    title="Language"
+                    description="Choose your preferred language for the application."
+                >
+                    <SegmentedControl>
+                        <SegmentedButton isActive={language === 'en'} onClick={() => setLanguage('en')}>English</SegmentedButton>
+                        <SegmentedButton isActive={language === 'vi'} onClick={() => setLanguage('vi')}>Tiếng Việt</SegmentedButton>
+                    </SegmentedControl>
+                </SettingCard>
+
+                <SettingCard 
+                    title="Appearance"
+                    description="Customize the look and feel of the app."
+                >
+                     <SegmentedControl>
+                        <SegmentedButton isActive={theme === 'light'} onClick={() => setTheme('light')}>
+                           <i className="fa-solid fa-sun"></i> Light
+                        </SegmentedButton>
+                         <SegmentedButton isActive={theme === 'dark'} onClick={() => setTheme('dark')}>
+                           <i className="fa-solid fa-moon"></i> Dark
+                        </SegmentedButton>
+                    </SegmentedControl>
+                </SettingCard>
+            </div>
+            
+            {isProfileModalOpen && (
+                <ProfileEditModal user={user} setUser={setUser} onClose={() => setProfileModalOpen(false)} />
+            )}
+        </div>
+    );
 };
 
 export default Settings;

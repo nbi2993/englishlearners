@@ -1,118 +1,116 @@
-
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { gradeWriting } from '../services/geminiService';
 import type { WritingFeedback } from '../types';
 
-const WritingGrader: React.FC = () => {
-  const [topic, setTopic] = useState<string>("My Summer Vacation");
-  const [text, setText] = useState<string>("");
-  const [feedback, setFeedback] = useState<WritingFeedback | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+const WritingGrader: React.FC<{ language: 'en' | 'vi'; translations: any; }> = ({ language, translations }) => {
+    const [topic, setTopic] = useState('');
+    const [text, setText] = useState('');
+    const [feedback, setFeedback] = useState<WritingFeedback | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = useCallback(async () => {
-    if (!text.trim() || !topic.trim()) {
-      setError("Please provide both a topic and your essay.");
-      return;
-    }
-    setIsLoading(true);
-    setError(null);
-    setFeedback(null);
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!topic.trim() || !text.trim()) {
+            setError('Please provide both a topic and your writing.');
+            return;
+        }
 
-    try {
-      const result = await gradeWriting(topic, text);
-      setFeedback(result);
-    } catch (err: any) {
-      setError(err.message || "An unexpected error occurred.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [topic, text]);
+        setIsLoading(true);
+        setError(null);
+        setFeedback(null);
 
-  const FeedbackDisplay: React.FC<{ feedback: WritingFeedback }> = ({ feedback }) => (
-    <div className="mt-8 bg-white p-6 rounded-xl shadow-md border border-gray-200 animate-fade-in">
-        <div className="flex justify-between items-start">
-            <h3 className="text-2xl font-bold text-gray-800">Your Feedback</h3>
-            <div className="text-right">
-                <p className="font-bold text-3xl text-blue-600">{feedback.score}<span className="text-lg text-gray-500">/100</span></p>
-                <p className="text-sm text-gray-500">Overall Score</p>
+        try {
+            const result = await gradeWriting(topic, text);
+            setFeedback(result);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'An unknown error occurred.');
+            console.error(err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const FeedbackCard: React.FC<{ title: string; content: string; }> = ({ title, content }) => (
+        <div className="card-glass p-4">
+            <h4 className="font-semibold text-blue-600 dark:text-blue-400 mb-2">{title}</h4>
+            <p className="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-wrap">{content}</p>
+        </div>
+    );
+
+    return (
+        <div className="max-w-4xl mx-auto animate-fade-in p-4 sm:p-0 py-6">
+            <div className="text-center mb-8">
+                <i className="fa-solid fa-pen-ruler text-4xl text-blue-500 mb-3"></i>
+                <h1 className="text-3xl font-bold">AI Writing Grader</h1>
+                <p className="text-slate-500 dark:text-slate-400 mt-2">Get instant feedback on your writing. Enter a topic and your text below.</p>
             </div>
-        </div>
 
-        <div className="mt-6 space-y-4">
-            <FeedbackSection icon="fa-star" title="Overall" content={feedback.overall} color="text-yellow-500" />
-            <FeedbackSection icon="fa-spell-check" title="Grammar" content={feedback.grammar} color="text-green-500" />
-            <FeedbackSection icon="fa-book-open" title="Vocabulary" content={feedback.vocabulary} color="text-purple-500" />
-            <FeedbackSection icon="fa-link" title="Coherence" content={feedback.coherence} color="text-red-500" />
-        </div>
-    </div>
-);
+            <div className="card-glass p-6 md:p-8">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <div>
+                        <label htmlFor="topic" className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
+                            Topic
+                        </label>
+                        <input
+                            id="topic"
+                            type="text"
+                            value={topic}
+                            onChange={(e) => setTopic(e.target.value)}
+                            placeholder="e.g., My Summer Vacation"
+                            className="form-input"
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="writing-text" className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
+                            Your Writing
+                        </label>
+                        <textarea
+                            id="writing-text"
+                            rows={10}
+                            value={text}
+                            onChange={(e) => setText(e.target.value)}
+                            placeholder="Write your essay or paragraph here..."
+                            className="form-textarea"
+                        />
+                    </div>
+                    <button type="submit" disabled={isLoading} className="w-full btn btn-primary py-3">
+                        {isLoading ? (
+                            <>
+                                <i className="fa-solid fa-spinner fa-spin mr-2"></i> Grading...
+                            </>
+                        ) : (
+                            <>
+                                <i className="fa-solid fa-magic-sparkles mr-2"></i> Grade my Writing
+                            </>
+                        )}
+                    </button>
+                </form>
+            </div>
 
-  const FeedbackSection: React.FC<{icon: string, title: string, content: string, color: string}> = ({ icon, title, content, color }) => (
-    <div>
-        <h4 className={`text-lg font-semibold flex items-center ${color}`}>
-            <i className={`fa-solid ${icon} mr-3 w-5 text-center`}></i>
-            {title}
-        </h4>
-        <p className="text-gray-600 mt-1 pl-8">{content}</p>
-    </div>
-  );
-
-  return (
-    <div className="max-w-4xl mx-auto">
-      <div className="text-center mb-8">
-        <h2 className="text-4xl font-extrabold text-gray-800">AI Writing Grader</h2>
-        <p className="text-gray-500 mt-2">Get instant feedback on your writing to improve your skills.</p>
-      </div>
-      
-      <div className="bg-white p-8 rounded-xl shadow-lg">
-        <div className="mb-4">
-          <label htmlFor="topic" className="block text-sm font-medium text-gray-700 mb-1">Topic</label>
-          <input
-            id="topic"
-            type="text"
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-            placeholder="e.g., My Favorite Animal"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="essay" className="block text-sm font-medium text-gray-700 mb-1">Your Essay</label>
-          <textarea
-            id="essay"
-            rows={10}
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Write your essay here..."
-          />
-        </div>
-        
-        <div className="mt-6">
-          <button
-            onClick={handleSubmit}
-            disabled={isLoading}
-            className="w-full flex justify-center items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300"
-          >
-            {isLoading ? (
-              <>
-                <i className="fa-solid fa-spinner fa-spin mr-2"></i>
-                Grading...
-              </>
-            ) : (
-              'Get Feedback'
+            {error && (
+                <div className="mt-8 p-4 bg-red-50 dark:bg-red-900/50 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-500/30 rounded-lg">
+                    <p><span className="font-bold">Error:</span> {error}</p>
+                </div>
             )}
-          </button>
+
+            {feedback && (
+                <div className="mt-8 animate-fade-in-slow">
+                    <h2 className="text-2xl font-bold mb-4 text-center">Feedback Results</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="md:col-span-2 flex flex-col items-center justify-center card-glass p-6">
+                            <h3 className="text-lg font-semibold text-slate-500 dark:text-slate-400">Overall Score</h3>
+                            <p className="text-6xl font-bold text-blue-600 dark:text-blue-400 my-2">{feedback.score}<span className="text-3xl">/100</span></p>
+                        </div>
+                        <FeedbackCard title="Overall" content={feedback.overall} />
+                        <FeedbackCard title="Grammar" content={feedback.grammar} />
+                        <FeedbackCard title="Vocabulary" content={feedback.vocabulary} />
+                        <FeedbackCard title="Coherence" content={feedback.coherence} />
+                    </div>
+                </div>
+            )}
         </div>
-      </div>
-      
-      {error && <div className="mt-4 text-center p-3 bg-red-100 text-red-700 rounded-lg">{error}</div>}
-      
-      {feedback && <FeedbackDisplay feedback={feedback} />}
-    </div>
-  );
+    );
 };
 
 export default WritingGrader;

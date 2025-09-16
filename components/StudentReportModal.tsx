@@ -10,15 +10,15 @@ const StudentReportModal: React.FC<StudentReportModalProps> = ({ student, onClos
     
     const getStatusColor = (status: 'Completed' | 'Pending' | 'Overdue') => {
         switch(status) {
-            case 'Completed': return 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200';
-            case 'Pending': return 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200';
-            case 'Overdue': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+            case 'Completed': return 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-400';
+            case 'Pending': return 'bg-amber-100 text-amber-800 dark:bg-amber-500/10 dark:text-amber-400';
+            case 'Overdue': return 'bg-red-100 text-red-800 dark:bg-red-500/10 dark:text-red-400';
         }
     }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 transition-opacity animate-fade-in">
-      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl p-6 w-full max-w-2xl m-4 transform transition-all animate-slide-in-up flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 transition-opacity animate-fade-in p-4">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 w-full max-w-2xl transform transition-all animate-slide-in-up flex flex-col max-h-[90vh]">
         <div className="flex justify-between items-center border-b pb-3 dark:border-slate-700 flex-shrink-0">
           <div>
             <h3 className="text-xl font-bold text-slate-800 dark:text-white">Student Report</h3>
@@ -30,19 +30,19 @@ const StudentReportModal: React.FC<StudentReportModalProps> = ({ student, onClos
           <button onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-2xl">&times;</button>
         </div>
         
-        <div className="mt-4 flex-grow overflow-y-auto pr-2">
+        <div className="mt-4 flex-grow overflow-y-auto pr-2 custom-scrollbar">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
                 <div className="bg-slate-50 dark:bg-slate-700/50 p-4 rounded-lg">
                     <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{student.progress}%</div>
-                    <div className="text-sm text-slate-500 dark:text-slate-400">Progress</div>
+                    <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">Progress</div>
                 </div>
                  <div className="bg-slate-50 dark:bg-slate-700/50 p-4 rounded-lg">
                     <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">{student.averageScore}</div>
-                    <div className="text-sm text-slate-500 dark:text-slate-400">Avg. Score</div>
+                    <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">Avg. Score</div>
                 </div>
                  <div className="bg-slate-50 dark:bg-slate-700/50 p-4 rounded-lg">
                     <div className="text-3xl font-bold text-violet-600 dark:text-violet-400">{student.timeSpent}</div>
-                    <div className="text-sm text-slate-500 dark:text-slate-400">Time Spent</div>
+                    <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">Time Spent</div>
                 </div>
             </div>
 
@@ -50,8 +50,8 @@ const StudentReportModal: React.FC<StudentReportModalProps> = ({ student, onClos
                 <h4 className="font-semibold text-slate-700 dark:text-slate-200 mb-3">Score History</h4>
                 <div className="bg-slate-50 dark:bg-slate-700/50 p-4 rounded-lg h-48 flex items-end justify-around gap-2">
                     {student.scoreHistory.length > 0 ? student.scoreHistory.map((entry, index) => (
-                        <div key={index} className="flex flex-col items-center justify-end h-full w-full">
-                            <div className="text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">{entry.score}</div>
+                        <div key={index} className="flex flex-col items-center justify-end h-full w-full group">
+                            <div className="text-xs font-bold text-slate-600 dark:text-slate-300 mb-1 opacity-0 group-hover:opacity-100 transition-opacity">{entry.score}</div>
                             <div 
                                 className="w-3/4 bg-blue-400 dark:bg-blue-500 rounded-t-md hover:bg-blue-500 dark:hover:bg-blue-400 transition-all"
                                 style={{ height: `${entry.score}%` }}

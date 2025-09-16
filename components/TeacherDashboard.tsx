@@ -1,181 +1,110 @@
-import React, { useState, useMemo } from 'react';
-import { Student, Classes } from '../types';
+import React, { useState } from 'react';
 import { MOCK_CLASSES } from '../constants';
+import type { Classes, Student } from '../types';
+import StudentCard from './StudentCard';
 import StudentReportModal from './StudentReportModal';
 import CreateTestModal from './CreateTestModal';
 import AssignHomeworkModal from './AssignHomeworkModal';
 import AddClassModal from './AddClassModal';
 import AddStudentModal from './AddStudentModal';
 
-type SortKey = keyof Student;
-type SortOrder = 'asc' | 'desc';
-
-const TeacherDashboard: React.FC = () => {
+const TeacherDashboard: React.FC<{ language: 'en' | 'vi'; translations: any; }> = ({ language, translations }) => {
     const [classes, setClasses] = useState<Classes>(MOCK_CLASSES);
-    const [selectedClassId, setSelectedClassId] = useState<string>(Object.keys(MOCK_CLASSES)[0] || '');
-    
+    const [selectedClassId, setSelectedClassId] = useState<string>(Object.keys(MOCK_CLASSES)[0]);
     const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
-    const [isCreateTestOpen, setCreateTestOpen] = useState(false);
-    const [isAssignHomeworkOpen, setAssignHomeworkOpen] = useState(false);
+
+    const [isReportModalOpen, setReportModalOpen] = useState(false);
+    const [isTestModalOpen, setTestModalOpen] = useState(false);
+    const [isHomeworkModalOpen, setHomeworkModalOpen] = useState(false);
     const [isAddClassModalOpen, setAddClassModalOpen] = useState(false);
     const [isAddStudentModalOpen, setAddStudentModalOpen] = useState(false);
     
-    const [sortConfig, setSortConfig] = useState<{ key: SortKey; order: SortOrder }>({ key: 'name', order: 'asc' });
+    const selectedClass = classes[selectedClassId];
 
-    const currentClass = classes[selectedClassId];
-    const students = currentClass?.students || [];
-
-    const sortedStudents = useMemo(() => {
-        if (students.length === 0) return [];
-        
-        return [...students].sort((a, b) => {
-            if (a[sortConfig.key] < b[sortConfig.key]) {
-                return sortConfig.order === 'asc' ? -1 : 1;
-            }
-            if (a[sortConfig.key] > b[sortConfig.key]) {
-                return sortConfig.order === 'asc' ? 1 : -1;
-            }
-            return 0;
-        });
-    }, [students, sortConfig]);
-
-    const requestSort = (key: SortKey) => {
-        let order: SortOrder = 'asc';
-        if (sortConfig.key === key && sortConfig.order === 'asc') {
-            order = 'desc';
-        }
-        setSortConfig({ key, order });
-    };
-
-    const getScoreColor = (score: number) => {
-        if (score >= 85) return 'text-emerald-500';
-        if (score >= 70) return 'text-amber-500';
-        return 'text-red-500';
-    };
-    
-    const getProgressColor = (progress: number) => {
-        if (progress > 80) return 'bg-sky-500';
-        if (progress > 60) return 'bg-emerald-500';
-        if (progress > 40) return 'bg-amber-500';
-        return 'bg-red-500';
+    const handleOpenReport = (student: Student) => {
+        setSelectedStudent(student);
+        setReportModalOpen(true);
     };
 
     const handleAddClass = (className: string) => {
-        const newClassId = `class-${Date.now()}`;
+        const newClassId = className.toLowerCase().replace(/\s+/g, '-');
         const newClass = { name: className, students: [] };
         setClasses(prev => ({ ...prev, [newClassId]: newClass }));
         setSelectedClassId(newClassId);
     };
 
     const handleAddStudent = (studentName: string) => {
-        if (!selectedClassId) return;
         const newStudent: Student = {
-            id: `s-${Date.now()}`,
-            name: studentName,
-            avatar: `https://i.pravatar.cc/150?u=${studentName}`,
-            lastActivity: 'Just now',
-            progress: 0,
-            averageScore: 0,
-            timeSpent: '0h 0m',
-            isStruggling: false,
-            scoreHistory: [],
-            assignments: [],
+            id: `s${Date.now()}`, name: studentName, avatar: `https://i.pravatar.cc/150?u=${studentName}`,
+            lastActivity: 'Just now', progress: 0, averageScore: 0, timeSpent: '0m',
+            isStruggling: false, scoreHistory: [], assignments: [],
         };
-        const updatedClasses = { ...classes };
-        updatedClasses[selectedClassId].students.push(newStudent);
-        setClasses(updatedClasses);
+        const updatedClass = { ...selectedClass, students: [...selectedClass.students, newStudent] };
+        setClasses(prev => ({ ...prev, [selectedClassId]: updatedClass }));
     };
 
-    const SortableHeader: React.FC<{ sortKey: SortKey; label: string; }> = ({ sortKey, label }) => (
-        <th scope="col" className="px-6 py-3 cursor-pointer" onClick={() => requestSort(sortKey)}>
-            {label}
-            {sortConfig.key === sortKey && (
-                <i className={`fa-solid ${sortConfig.order === 'asc' ? 'fa-arrow-up-short-wide' : 'fa-arrow-down-wide-short'} ml-2`}></i>
-            )}
-        </th>
-    );
-
     return (
-        <div className="max-w-7xl mx-auto">
-            <header className="flex flex-wrap justify-between items-center mb-8 gap-4">
-                <div>
-                    <h2 className="text-4xl font-extrabold text-slate-800 dark:text-white">Teacher Dashboard</h2>
-                    <p className="text-slate-500 dark:text-slate-400 mt-1">Manage your classes and track student progress.</p>
-                </div>
-                <div className="flex gap-2">
-                    <button onClick={() => setCreateTestOpen(true)} className="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">
-                        Create Test
-                    </button>
-                    <button onClick={() => setAssignHomeworkOpen(true)} className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2">
-                        <i className="fa-solid fa-plus"></i>
-                        Assign Homework
-                    </button>
-                </div>
-            </header>
+        <div className="animate-fade-in p-4 sm:p-6 lg:p-8">
+            <h1 className="text-3xl font-bold mb-6">Teacher Dashboard</h1>
 
-            <div className="bg-white dark:bg-slate-900 rounded-lg shadow-lg overflow-hidden">
-                <div className="p-5 border-b border-slate-200 dark:border-slate-700 flex flex-wrap justify-between items-center gap-4">
-                    <div className="flex items-center gap-4">
-                       <div className="flex items-baseline gap-2">
-                            <label htmlFor="class-select" className="text-sm font-medium text-slate-500 dark:text-slate-400">Class:</label>
-                            <select
-                                id="class-select"
-                                value={selectedClassId}
-                                onChange={(e) => setSelectedClassId(e.target.value)}
-                                className="font-bold text-xl text-slate-800 dark:text-white bg-transparent border-0 focus:ring-0"
-                            >
-                                {Object.entries(classes).map(([id, classData]) => (
-                                    <option key={id} value={id}>{classData.name}</option>
-                                ))}
-                            </select>
-                       </div>
-                        <button onClick={() => setAddClassModalOpen(true)} className="text-xs text-blue-600 hover:underline">+ Add Class</button>
-                    </div>
-                    <button onClick={() => setAddStudentModalOpen(true)} className="text-sm text-blue-600 hover:underline font-semibold">+ Add Student</button>
-                </div>
-                <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left text-slate-500 dark:text-slate-400">
-                        <thead className="text-xs text-slate-700 uppercase bg-slate-50 dark:bg-slate-800 dark:text-slate-300">
-                            <tr>
-                                <SortableHeader sortKey="name" label="Student Name" />
-                                <SortableHeader sortKey="averageScore" label="Avg. Score" />
-                                <SortableHeader sortKey="timeSpent" label="Time Spent" />
-                                <th scope="col" className="px-6 py-3">Progress</th>
-                                <SortableHeader sortKey="progress" label="%" />
-                                <SortableHeader sortKey="lastActivity" label="Last Active" />
-                                <th scope="col" className="px-6 py-3">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {sortedStudents.map(student => (
-                                <tr key={student.id} className="bg-white dark:bg-slate-900 border-b dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                                    <th scope="row" className="px-6 py-4 font-medium text-slate-900 dark:text-white whitespace-nowrap flex items-center gap-3">
-                                        {student.isStruggling && <i className="fa-solid fa-triangle-exclamation text-amber-500" title="Student may be struggling"></i>}
-                                        <img className="w-8 h-8 rounded-full" src={student.avatar} alt={student.name} />
-                                        {student.name}
-                                    </th>
-                                    <td className={`px-6 py-4 font-semibold ${getScoreColor(student.averageScore)}`}>{student.averageScore}</td>
-                                    <td className="px-6 py-4">{student.timeSpent}</td>
-                                    <td className="px-6 py-4 w-40">
-                                        <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
-                                            <div className={`${getProgressColor(student.progress)} h-2 rounded-full`} style={{ width: `${student.progress}%` }}></div>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4">{student.progress}%</td>
-                                    <td className="px-6 py-4">{student.lastActivity}</td>
-                                    <td className="px-6 py-4">
-                                        <button onClick={() => setSelectedStudent(student)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">View Report</button>
-                                    </td>
-                                </tr>
+            <div className="flex flex-col md:flex-row gap-8">
+                <div className="md:w-1/4">
+                    <div className="card-glass p-4">
+                        <h2 className="text-xl font-bold mb-4">Classes</h2>
+                        <div className="space-y-2">
+                            {Object.entries(classes).map(([id, classData]) => (
+                                <button
+                                    key={id} onClick={() => setSelectedClassId(id)}
+                                    className={`w-full text-left px-4 py-2 rounded-lg transition-colors text-sm font-semibold ${
+                                        selectedClassId === id
+                                        ? 'bg-blue-600 text-white shadow-md'
+                                        : 'hover:bg-black/5 dark:hover:bg-white/5'
+                                    }`}
+                                >
+                                    {classData.name}
+                                </button>
                             ))}
-                        </tbody>
-                    </table>
+                        </div>
+                        <button onClick={() => setAddClassModalOpen(true)} className="w-full mt-4 btn btn-secondary text-sm">
+                            <i className="fa-solid fa-plus mr-2"></i> Add Class
+                        </button>
+                    </div>
+                </div>
+
+                <div className="flex-1">
+                    {selectedClass ? (
+                        <div>
+                            <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
+                                <h2 className="text-2xl font-bold">{selectedClass.name}</h2>
+                                <div className="flex items-center gap-2">
+                                    <button onClick={() => setHomeworkModalOpen(true)} className="btn btn-secondary text-sm">Assign Homework</button>
+                                    <button onClick={() => setTestModalOpen(true)} className="btn btn-secondary text-sm">Create Test</button>
+                                </div>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
+                                {selectedClass.students.map(student => (
+                                    <StudentCard key={student.id} student={student} onReportClick={() => handleOpenReport(student)} />
+                                ))}
+                                <button onClick={() => setAddStudentModalOpen(true)} className="card-glass border-2 border-dashed border-slate-300 dark:border-slate-600 flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100/50 dark:hover:bg-slate-700/50 transition-colors">
+                                    <i className="fa-solid fa-plus text-2xl"></i>
+                                    <span className="mt-2 font-semibold">Add Student</span>
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="card-glass p-8 text-center text-slate-500">Select a class to view details.</div>
+                    )}
                 </div>
             </div>
-
-            {selectedStudent && <StudentReportModal student={selectedStudent} onClose={() => setSelectedStudent(null)} />}
-            {isCreateTestOpen && <CreateTestModal onClose={() => setCreateTestOpen(false)} />}
-            {isAssignHomeworkOpen && <AssignHomeworkModal students={students} onClose={() => setAssignHomeworkOpen(false)} />}
+            
+            {isReportModalOpen && selectedStudent && (
+                <StudentReportModal student={selectedStudent} onClose={() => setReportModalOpen(false)} />
+            )}
+            {isTestModalOpen && <CreateTestModal onClose={() => setTestModalOpen(false)} />}
+            {isHomeworkModalOpen && selectedClass && (
+                <AssignHomeworkModal students={selectedClass.students} onClose={() => setHomeworkModalOpen(false)} />
+            )}
             {isAddClassModalOpen && <AddClassModal onClose={() => setAddClassModalOpen(false)} onAddClass={handleAddClass} />}
             {isAddStudentModalOpen && <AddStudentModal onClose={() => setAddStudentModalOpen(false)} onAddStudent={handleAddStudent} />}
         </div>

@@ -1,4 +1,3 @@
-
 import type { User, Classes } from './types';
 
 export const MOCK_USER: User = {
@@ -12,6 +11,7 @@ export const MOCK_USER: User = {
   age: 10,
   gradeLevel: 'Grade 5',
   gender: 'Male',
+  streak: 3,
 };
 
 export const MOCK_CLASSES: Classes = {
