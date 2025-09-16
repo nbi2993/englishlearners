@@ -105,7 +105,7 @@ const LessonView: React.FC<LessonViewProps> = ({ lesson, course, onBack, languag
     <div className="animate-fade-in p-4 sm:p-6 lg:p-8 relative min-h-full pb-28">
       <button onClick={onBack} className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-semibold mb-6 hover:underline">
         <i className="fa-solid fa-arrow-left"></i>
-        Back to {course.title}
+        {language === 'vi' ? `Quay lại ${course.title}`: `Back to ${course.title}`}
       </button>
 
       <div className="mb-6">

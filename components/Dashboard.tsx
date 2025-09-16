@@ -1,5 +1,5 @@
 import React, { useMemo, useEffect, useState } from 'react';
-import type { Course, OtherProgram, Lesson, User } from '../types';
+import type { Course, OtherProgram, User } from '../types';
 import CourseCard from './CourseCard';
 
 interface CurriculumProps {
@@ -7,32 +7,16 @@ interface CurriculumProps {
   setUser: (user: User) => void;
   courses: Course[];
   otherPrograms: OtherProgram[];
-  selectedCourse: Course | null;
   setSelectedCourse: (course: Course | null) => void;
-  onSelectLesson: (lesson: Lesson, course: Course) => void;
-  onBackToCourses: () => void;
   language: 'en' | 'vi';
 }
-
-const LessonListItem: React.FC<{ lesson: Lesson; onClick: () => void; }> = ({ lesson, onClick }) => (
-    <button onClick={onClick} className="w-full text-left p-4 rounded-lg bg-slate-50/50 dark:bg-slate-800/20 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-all flex justify-between items-center border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
-        <div>
-            <p className="font-semibold text-slate-900 dark:text-white">{lesson.rawLesson.day ? `Day ${lesson.rawLesson.day}: ` : ''}{lesson.title}</p>
-            <p className="text-sm text-slate-700 dark:text-slate-400">{lesson.rawLesson.aims.en[0]}</p>
-        </div>
-        <i className="fa-solid fa-chevron-right text-slate-400"></i>
-    </button>
-);
 
 const Curriculum: React.FC<CurriculumProps> = ({
     user,
     setUser,
     courses,
     otherPrograms,
-    selectedCourse,
     setSelectedCourse,
-    onSelectLesson,
-    onBackToCourses,
     language,
 }) => {
     
@@ -73,36 +57,6 @@ const Curriculum: React.FC<CurriculumProps> = ({
         : [...currentPinned, courseId];
       setUser({ ...user, pinnedCourses: newPinned });
     };
-
-    if (selectedCourse) {
-        return (
-            <div className="animate-fade-in p-4 sm:p-6 lg:p-8">
-                <button onClick={onBackToCourses} className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-semibold mb-6 hover:underline">
-                    <i className="fa-solid fa-arrow-left"></i>
-                    Back to All Courses
-                </button>
-                <div className="card-glass p-6 flex flex-col sm:flex-row items-start gap-6 mb-8">
-                    <div className="w-32 h-32 rounded-lg flex-shrink-0" style={{ backgroundColor: selectedCourse.color }}>
-                        {/* Image could go here */}
-                    </div>
-                    <div>
-                        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">{selectedCourse.title}</h1>
-                        <p className="text-slate-700 dark:text-slate-400 mt-1">{selectedCourse.description}</p>
-                        <a href={selectedCourse.rawLevel.ebookPdfUrl} target="_blank" rel="noopener noreferrer" className="mt-4 btn btn-primary">
-                            View eBook PDF <i className="fa-solid fa-external-link-alt ml-2"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <h2 className="text-2xl font-bold mb-4">Lessons</h2>
-                <div className="space-y-3">
-                    {selectedCourse.lessons.map(lesson => (
-                        <LessonListItem key={lesson.id} lesson={lesson} onClick={() => onSelectLesson(lesson, selectedCourse)} />
-                    ))}
-                </div>
-            </div>
-        )
-    }
 
     return (
         <div className="animate-fade-in p-4 sm:p-6 lg:p-8 space-y-8">

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import type { User, Classes, Student, Course, View } from '../types';
+import type { User, Classes, Student, Course } from '../types';
 import CourseCard from './CourseCard';
 
 interface TeacherHomeProps {
@@ -8,7 +8,6 @@ interface TeacherHomeProps {
   classes: Classes;
   courses: Course[];
   language: 'en' | 'vi';
-  setView: (view: View) => void;
   setSelectedCourse: (course: Course | null) => void;
 }
 
@@ -26,7 +25,7 @@ const AtRiskStudentCard: React.FC<{student: Student}> = ({ student }) => (
 );
 
 
-const TeacherHome: React.FC<TeacherHomeProps> = ({ user, setUser, classes, courses, language, setView, setSelectedCourse }) => {
+const TeacherHome: React.FC<TeacherHomeProps> = ({ user, setUser, classes, courses, language, setSelectedCourse }) => {
     const studentsAtRisk = Object.values(classes).flatMap(c => c.students).filter(s => s.isStruggling);
     const totalStudents = Object.values(classes).reduce((sum, c) => sum + c.students.length, 0);
     const totalClasses = Object.keys(classes).length;
@@ -71,15 +70,15 @@ const TeacherHome: React.FC<TeacherHomeProps> = ({ user, setUser, classes, cours
             <section>
                  <h2 className="text-2xl font-bold mb-4">{language === 'vi' ? 'Hành động nhanh' : 'Quick Actions'}</h2>
                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                     <button onClick={() => setView('teacher-dashboard')} className="p-4 card-glass hover:shadow-lg hover:-translate-y-1 transition-all text-blue-600 dark:text-blue-400">
+                     <button onClick={() => alert('Navigate to add class')} className="p-4 card-glass hover:shadow-lg hover:-translate-y-1 transition-all text-blue-600 dark:text-blue-400">
                          <i className="fa-solid fa-plus text-2xl mb-2"></i>
                          <p className="font-semibold">{language === 'vi' ? 'Thêm lớp mới' : 'Add New Class'}</p>
                      </button>
-                      <button onClick={() => setView('teacher-dashboard')} className="p-4 card-glass hover:shadow-lg hover:-translate-y-1 transition-all text-emerald-600 dark:text-emerald-400">
+                      <button onClick={() => alert('Navigate to add student')} className="p-4 card-glass hover:shadow-lg hover:-translate-y-1 transition-all text-emerald-600 dark:text-emerald-400">
                          <i className="fa-solid fa-user-plus text-2xl mb-2"></i>
                          <p className="font-semibold">{language === 'vi' ? 'Thêm học sinh' : 'Add Student'}</p>
                      </button>
-                      <button onClick={() => setView('teacher-dashboard')} className="p-4 card-glass hover:shadow-lg hover:-translate-y-1 transition-all text-violet-600 dark:text-violet-400">
+                      <button onClick={() => alert('Navigate to assign homework')} className="p-4 card-glass hover:shadow-lg hover:-translate-y-1 transition-all text-violet-600 dark:text-violet-400">
                          <i className="fa-solid fa-file-pen text-2xl mb-2"></i>
                          <p className="font-semibold">{language === 'vi' ? 'Giao bài tập' : 'Assign Homework'}</p>
                      </button>
@@ -93,9 +92,6 @@ const TeacherHome: React.FC<TeacherHomeProps> = ({ user, setUser, classes, cours
             <section>
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-2xl font-bold">{language === 'vi' ? 'Chương trình của tôi' : 'My Programs'}</h2>
-                    <button onClick={() => setView('curriculum')} className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline">
-                        {language === 'vi' ? 'Quản lý' : 'Manage'}
-                    </button>
                 </div>
                 {myCourses.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -103,10 +99,7 @@ const TeacherHome: React.FC<TeacherHomeProps> = ({ user, setUser, classes, cours
                             <CourseCard
                                 key={course.id}
                                 course={course}
-                                onClick={() => {
-                                    setSelectedCourse(course);
-                                    setView('curriculum');
-                                }}
+                                onClick={() => setSelectedCourse(course)}
                                 isPinned={(user.pinnedCourses || []).includes(course.id)}
                                 onPinClick={handlePinClick}
                             />
@@ -117,7 +110,7 @@ const TeacherHome: React.FC<TeacherHomeProps> = ({ user, setUser, classes, cours
                          <i className="fa-solid fa-thumbtack text-4xl text-slate-400 mb-4"></i>
                         <p className="text-slate-800 dark:text-slate-200 font-semibold">{language === 'vi' ? 'Chưa có chương trình nào được ghim' : 'No Pinned Programs Yet'}</p>
                         <p className="text-slate-700 dark:text-slate-400 mt-2 mb-4 text-sm">{language === 'vi' ? 'Ghim các chương trình bạn dạy để truy cập nhanh từ đây.' : 'Pin the programs you teach for quick access from your dashboard.'}</p>
-                        <button onClick={() => setView('curriculum')} className="btn btn-primary">
+                        <button onClick={() => alert('Navigate to curriculum')} className="btn btn-primary">
                            {language === 'vi' ? 'Tới trang Chương trình' : 'Go to Curriculum'}
                         </button>
                     </div>

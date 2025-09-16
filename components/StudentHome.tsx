@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import type { User, Course, View } from '../types';
+import type { User, Course } from '../types';
 import ProfileEditModal from './ProfileEditModal';
 import CourseCard from './CourseCard';
 
@@ -8,7 +8,6 @@ interface StudentHomeProps {
   setUser: (user: User) => void;
   courses: Course[];
   language: 'en' | 'vi';
-  setView: (view: View) => void;
   setSelectedCourse: (course: Course | null) => void;
 }
 
@@ -55,7 +54,7 @@ const WelcomeHub: React.FC<{user: User, onEditProfile: () => void, language: 'en
 );
 
 
-const StudentHome: React.FC<StudentHomeProps> = ({ user, setUser, courses, language, setView, setSelectedCourse }) => {
+const StudentHome: React.FC<StudentHomeProps> = ({ user, setUser, courses, language, setSelectedCourse }) => {
     const [isProfileModalOpen, setProfileModalOpen] = useState(false);
 
     const myCourses = useMemo(() => {
@@ -84,9 +83,6 @@ const StudentHome: React.FC<StudentHomeProps> = ({ user, setUser, courses, langu
             <section>
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-2xl font-bold">{language === 'vi' ? 'Các khóa học của tôi' : 'My Courses'}</h2>
-                    <button onClick={() => setView('curriculum')} className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline">
-                        {language === 'vi' ? 'Xem tất cả' : 'View All'}
-                    </button>
                 </div>
                 {myCourses.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -94,10 +90,7 @@ const StudentHome: React.FC<StudentHomeProps> = ({ user, setUser, courses, langu
                             <CourseCard 
                                 key={course.id} 
                                 course={course} 
-                                onClick={() => {
-                                    setSelectedCourse(course);
-                                    setView('curriculum');
-                                }}
+                                onClick={() => setSelectedCourse(course)}
                                 isPinned={(user.pinnedCourses || []).includes(course.id)}
                                 onPinClick={handlePinClick}
                             />
@@ -108,7 +101,7 @@ const StudentHome: React.FC<StudentHomeProps> = ({ user, setUser, courses, langu
                         <i className="fa-solid fa-thumbtack text-4xl text-slate-400 mb-4"></i>
                         <p className="text-slate-800 dark:text-slate-200 font-semibold">{language === 'vi' ? 'Chưa có khóa học nào được ghim' : 'No Pinned Courses Yet'}</p>
                         <p className="text-slate-700 dark:text-slate-400 mt-2 mb-4 text-sm">{language === 'vi' ? 'Đi đến trang Chương trình để chọn và ghim các khóa học bạn muốn truy cập nhanh.' : 'Go to the Curriculum page to select and pin the courses you want to access quickly.'}</p>
-                        <button onClick={() => setView('curriculum')} className="btn btn-primary">
+                        <button onClick={() => alert('Navigate to Curriculum')} className="btn btn-primary">
                            {language === 'vi' ? 'Khám phá Chương trình' : 'Explore Curriculum'}
                         </button>
                     </div>

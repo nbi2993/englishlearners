@@ -7,7 +7,6 @@ interface ProfileEditModalProps {
   onClose: () => void;
 }
 
-// Added more diverse avatar options including the default one
 const avatars = [
   'fa-user-astronaut', 'fa-user-ninja', 'fa-user-secret', 'fa-user-doctor',
   'fa-user-graduate', 'fa-user-tie', 'fa-user-pen', 'fa-music',
@@ -17,9 +16,16 @@ const avatars = [
 const ProfileEditModal: React.FC<ProfileEditModalProps> = ({ user, setUser, onClose }) => {
   const [name, setName] = useState(user.name);
   const [avatar, setAvatar] = useState(user.avatar);
-  const [gradeLevel, setGradeLevel] = useState(user.gradeLevel || '');
   const [age, setAge] = useState(user.age || '');
   const [gender, setGender] = useState(user.gender || '');
+
+  // Student-specific state
+  const [gradeLevel, setGradeLevel] = useState(user.gradeLevel || '');
+
+  // Teacher-specific state
+  const [title, setTitle] = useState(user.title || '');
+  const [subject, setSubject] = useState(user.subject || '');
+
 
   const getEducationLevel = (gradeStr: string): string => {
       if (!gradeStr) return 'N/A';
@@ -31,24 +37,40 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({ user, setUser, onCl
   };
 
   const handleSave = () => {
-    const educationLevel = getEducationLevel(gradeLevel);
-    const newLevel = gradeLevel ? `${educationLevel} - ${gradeLevel}` : educationLevel;
+    let updatedUser: Partial<User> = {};
 
-    setUser({ 
-        ...user, 
-        name, 
-        avatar,
-        gradeLevel,
-        age: age ? Number(age) : undefined,
-        gender,
-        level: newLevel,
-    });
+    if (user.role === 'student') {
+        const educationLevel = getEducationLevel(gradeLevel);
+        const newLevel = gradeLevel ? `${educationLevel} - ${gradeLevel}` : educationLevel;
+        updatedUser = {
+            name,
+            avatar,
+            gradeLevel,
+            age: age ? Number(age) : undefined,
+            gender,
+            level: newLevel,
+            title: undefined, // Clear teacher fields
+            subject: undefined
+        };
+    } else { // Teacher
+        updatedUser = {
+            name,
+            avatar,
+            title,
+            subject,
+            age: age ? Number(age) : undefined,
+            gender,
+            level: title || 'Teacher', // Use title for the level display
+            gradeLevel: undefined, // Clear student field
+        };
+    }
+
+    setUser({ ...user, ...updatedUser });
     onClose();
   };
   
   const handleAvatarChange = () => {
       const currentIndex = avatars.indexOf(avatar);
-      // If current avatar is not in the list, start from the beginning
       const nextIndex = currentIndex > -1 ? (currentIndex + 1) % avatars.length : 0;
       setAvatar(avatars[nextIndex]);
   }
@@ -83,17 +105,44 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({ user, setUser, onCl
                   />
                 </div>
                 
-                <div>
-                    <label htmlFor="gradeLevel" className="block text-sm font-medium text-slate-800 dark:text-slate-300 mb-1">Grade Level</label>
-                    <input
-                        id="gradeLevel"
-                        type="text"
-                        value={gradeLevel}
-                        onChange={(e) => setGradeLevel(e.target.value)}
-                        className="form-input"
-                        placeholder="e.g., Grade 5"
-                    />
-                </div>
+                {user.role === 'student' ? (
+                    <div>
+                        <label htmlFor="gradeLevel" className="block text-sm font-medium text-slate-800 dark:text-slate-300 mb-1">Grade Level</label>
+                        <input
+                            id="gradeLevel"
+                            type="text"
+                            value={gradeLevel}
+                            onChange={(e) => setGradeLevel(e.target.value)}
+                            className="form-input"
+                            placeholder="e.g., Grade 5"
+                        />
+                    </div>
+                ) : (
+                   <>
+                        <div>
+                            <label htmlFor="title" className="block text-sm font-medium text-slate-800 dark:text-slate-300 mb-1">Title / Position</label>
+                            <input
+                                id="title"
+                                type="text"
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                className="form-input"
+                                placeholder="e.g., English Teacher"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="subject" className="block text-sm font-medium text-slate-800 dark:text-slate-300 mb-1">Subject(s)</label>
+                            <input
+                                id="subject"
+                                type="text"
+                                value={subject}
+                                onChange={(e) => setSubject(e.target.value)}
+                                className="form-input"
+                                placeholder="e.g., English, Literature"
+                            />
+                        </div>
+                   </>
+                )}
 
                 <div className="grid grid-cols-2 gap-4">
                     <div>

@@ -13,6 +13,8 @@ export const MOCK_USER: User = {
   gender: '',
   streak: 0,
   pinnedCourses: [],
+  title: '',
+  subject: '',
 };
 
 export const MOCK_CLASSES: Classes = {

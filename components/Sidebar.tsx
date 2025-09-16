@@ -63,7 +63,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, currentView, setView, isSidebar
           <NavItem
             icon="fa-table-columns"
             label={t.curriculum}
-            isActive={currentView === 'curriculum' || currentView === 'lesson'}
+            isActive={currentView === 'curriculum'}
             onClick={() => setView('curriculum')}
           />
           {user.role === 'teacher' && (
@@ -89,6 +89,12 @@ const Sidebar: React.FC<SidebarProps> = ({ user, currentView, setView, isSidebar
           />
         </nav>
         <div className="mt-auto space-y-2">
+           <NavItem
+            icon="fa-circle-question"
+            label={t['user-guide']}
+            isActive={currentView === 'user-guide'}
+            onClick={() => setView('user-guide')}
+          />
           <NavItem
             icon="fa-gear"
             label={t.settings}

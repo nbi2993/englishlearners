@@ -1,5 +1,5 @@
 import React from 'react';
-import type { User, Course, OtherProgram, Classes, View } from '../types';
+import type { User, Course, OtherProgram, Classes } from '../types';
 import StudentHome from './StudentHome';
 import TeacherHome from './TeacherHome';
 
@@ -10,7 +10,6 @@ interface HomeProps {
   otherPrograms: OtherProgram[];
   classes: Classes;
   language: 'en' | 'vi';
-  setView: (view: View) => void;
   setSelectedCourse: (course: Course | null) => void;
 }
 

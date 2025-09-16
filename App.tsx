@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import Home from './components/Home';
 import Curriculum from './components/Dashboard';
+import CourseDetail from './components/CourseDetail';
 import LessonView from './components/LessonView';
 import TeacherDashboard from './components/TeacherDashboard';
 import WritingGrader from './components/WritingGrader';
 import SpeakingPartner from './components/SpeakingPartner';
 import Settings from './components/Settings';
 import RoleSelection from './components/RoleSelection';
+import UserGuide from './components/UserGuide';
 import type { View, User, Course, Lesson, Classes } from './types';
 import { MOCK_USER, MOCK_CLASSES } from './constants';
 import { curriculumData } from './data/curriculum';
@@ -21,6 +23,7 @@ const translations = {
     'speaking-partner': 'Speaking Partner',
     'writing-grader': 'Writing Grader',
     settings: 'Settings',
+    'user-guide': 'User Guide',
   },
   vi: {
     home: 'Trang chủ',
@@ -29,6 +32,7 @@ const translations = {
     'speaking-partner': 'Luyện nói',
     'writing-grader': 'Chấm bài viết',
     settings: 'Cài đặt',
+    'user-guide': 'Hướng dẫn sử dụng',
   }
 };
 
@@ -141,33 +145,13 @@ const App: React.FC = () => {
 
     const handleSetView = (view: View) => {
         setCurrentView(view);
-        setIsSidebarOpen(false);
-        if (view === 'curriculum' || view === 'home') {
-            // Only clear selectedCourse if navigating back to curriculum main page
-            if(view === 'curriculum' && selectedCourse) {
-                // do nothing, we are likely navigating TO a lesson view
-            } else {
-                 setSelectedCourse(null);
-            }
-            setSelectedLesson(null);
-        }
-    };
-
-    const handleSelectLesson = (lesson: Lesson, course: Course) => {
-        setSelectedLesson(lesson);
-        setSelectedCourse(course);
-        setCurrentView('lesson');
-    }
-
-    const handleBackToDashboard = () => {
-        setSelectedLesson(null);
-        setCurrentView('curriculum');
-    }
-
-    const handleBackToCourses = () => {
         setSelectedCourse(null);
         setSelectedLesson(null);
-        setCurrentView('curriculum');
+        setIsSidebarOpen(false);
+    };
+
+    const handleSelectLesson = (lesson: Lesson) => {
+        setSelectedLesson(lesson);
     }
     
     const handleSelectRole = (role: 'student' | 'teacher') => {
@@ -190,13 +174,32 @@ const App: React.FC = () => {
 
 
     const renderContent = () => {
-        if (currentView === 'lesson' && selectedLesson && selectedCourse) {
-            return <LessonView lesson={selectedLesson} course={selectedCourse} onBack={handleBackToDashboard} language={language} />;
+        // Priority 1: Viewing a specific lesson
+        if (selectedLesson && selectedCourse) {
+            return <LessonView 
+                lesson={selectedLesson} 
+                course={selectedCourse} 
+                onBack={() => setSelectedLesson(null)} 
+                language={language} 
+            />;
         }
 
+        // Priority 2: Viewing a course's details
+        if (selectedCourse) {
+            return <CourseDetail
+                user={user}
+                setUser={setUser}
+                course={selectedCourse}
+                onBack={() => setSelectedCourse(null)}
+                onSelectLesson={handleSelectLesson}
+                language={language}
+            />
+        }
+
+        // Priority 3: Main view content
         switch (currentView) {
             case 'teacher-dashboard':
-                return user.role === 'teacher' ? <TeacherDashboard classes={classes} setClasses={setClasses} language={language} translations={translations} /> : <Home user={user} setUser={setUser} courses={courses} otherPrograms={otherProgramsData} classes={classes} language={language} setView={handleSetView} setSelectedCourse={setSelectedCourse} />;
+                return user.role === 'teacher' ? <TeacherDashboard classes={classes} setClasses={setClasses} language={language} translations={translations} /> : <Home user={user} setUser={setUser} courses={courses} otherPrograms={otherProgramsData} classes={classes} language={language} setSelectedCourse={setSelectedCourse} />;
             case 'writing-grader':
                 return <WritingGrader language={language} translations={translations} />;
             case 'speaking-partner':
@@ -211,16 +214,15 @@ const App: React.FC = () => {
                     setTheme={setTheme}
                     translations={translations}
                 />;
+            case 'user-guide':
+                return <UserGuide language={language} />;
             case 'curriculum':
                 return <Curriculum
                     user={user}
                     setUser={setUser}
                     courses={courses}
                     otherPrograms={otherProgramsData}
-                    selectedCourse={selectedCourse}
                     setSelectedCourse={setSelectedCourse}
-                    onSelectLesson={handleSelectLesson}
-                    onBackToCourses={handleBackToCourses}
                     language={language}
                 />;
             case 'home':
@@ -232,7 +234,6 @@ const App: React.FC = () => {
                     otherPrograms={otherProgramsData}
                     classes={classes}
                     language={language}
-                    setView={handleSetView}
                     setSelectedCourse={setSelectedCourse}
                 />;
         }
