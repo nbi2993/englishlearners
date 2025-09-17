@@ -134,7 +134,7 @@ const TeacherHome: React.FC<TeacherHomeProps> = ({ user, onSelectCourse, languag
                 </h2>
                 {pinnedCourses.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {pinnedCourses.slice(0, 2).map(course => (
+                    {pinnedCourses.slice(0, 4).map(course => (
                       <CourseCard
                         key={course.id}
                         course={course}
