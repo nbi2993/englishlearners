@@ -70,8 +70,8 @@
     (() => {
       try {
         const theme = localStorage.getItem('ivs-theme');
-        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (theme === 'dark' || (!theme && systemPrefersDark)) {
+        // Default to dark if theme is 'dark' or if no theme is set.
+        if (theme === 'dark' || !theme) {
           document.documentElement.classList.add('dark');
         }
       } catch (e) {

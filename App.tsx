@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import type { View, User, Course, Classes } from './types';
 import { MOCK_USER, MOCK_CLASSES } from './constants';
 
-import Sidebar from './components/Sidebar';
+// FIX: Add .tsx extension to component imports to resolve module loading issues.
+import Sidebar from './components/Sidebar.tsx';
 import Header from './components/Header';
 import Home from './components/Home';
 import Dashboard from './components/Dashboard';
@@ -12,8 +13,10 @@ import WritingGrader from './components/WritingGrader';
 import SpeakingPartner from './components/SpeakingPartner';
 import Settings from './components/Settings';
 import UserGuide from './components/UserGuide';
-import RoleSelection from './components/RoleSelection';
-import AssistiveTouch from './components/AssistiveTouch';
+// FIX: Add .tsx extension to component imports to resolve module loading issues.
+import RoleSelection from './components/RoleSelection.tsx';
+// FIX: Add .tsx extension to component imports to resolve module loading issues.
+import AssistiveTouch from './components/AssistiveTouch.tsx';
 
 function App() {
   // State for application
@@ -33,7 +36,7 @@ function App() {
   // Appearance states
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     const savedTheme = localStorage.getItem('ivs-theme') as 'light' | 'dark';
-    return savedTheme || 'light';
+    return savedTheme || 'dark';
   });
   const [language, setLanguage] = useState<'en' | 'vi'>(() => {
     const savedLang = localStorage.getItem('ivs-language') as 'en' | 'vi';
@@ -155,7 +158,11 @@ function App() {
   if (!user) {
     return (
       <div className="h-screen bg-slate-100 dark:bg-slate-900">
-          <RoleSelection onSelectRole={handleSelectRole} language={language} />
+          <RoleSelection 
+            onSelectRole={handleSelectRole} 
+            language={language} 
+            setLanguage={setLanguage}
+          />
       </div>
     );
   }

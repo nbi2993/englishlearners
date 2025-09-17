@@ -11,62 +11,58 @@ const AssistiveTouch: React.FC<AssistiveTouchProps> = ({ setView, language }) =>
 
   const t = {
     en: {
-      home: 'Home',
-      speaking: 'Speaking',
-      writing: 'Writing',
-      settings: 'Settings'
+      writingGrader: 'Writing Grader',
+      speakingPartner: 'Speaking Partner',
+      aiTools: 'AI Tools',
     },
     vi: {
-      home: 'Trang chủ',
-      speaking: 'Luyện nói',
-      writing: 'Chấm bài',
-      settings: 'Cài đặt'
+      writingGrader: 'Chấm bài viết',
+      speakingPartner: 'Luyện nói',
+      aiTools: 'Công cụ AI',
     }
-  }[language];
-  
-  const menuItems = [
-    { view: 'home', icon: 'fa-home', label: t.home },
-    { view: 'speaking-partner', icon: 'fa-comments', label: t.speaking },
-    { view: 'writing-grader', icon: 'fa-pen-ruler', label: t.writing },
-    { view: 'settings', icon: 'fa-cog', label: t.settings },
-  ];
+  };
 
-  const handleAction = (view: View) => {
-    setView(view);
-    setIsOpen(false);
+  const menuItems: { view: View; icon: string; label: keyof typeof t.en; color: string }[] = [
+    { view: 'writing-grader', icon: 'fa-pen-ruler', label: 'writingGrader', color: 'bg-blue-500' },
+    { view: 'speaking-partner', icon: 'fa-comments', label: 'speakingPartner', color: 'bg-green-500' },
+  ];
+  
+  const handleToggle = () => {
+      setIsOpen(prev => !prev);
+  };
+  
+  const handleItemClick = (view: View) => {
+      setView(view);
+      setIsOpen(false);
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
-      <div className="relative">
-        {/* Menu items that appear when open */}
-        {isOpen && (
-          <div className="absolute bottom-full right-0 mb-4 flex flex-col items-center gap-3 animate-fade-in">
-            {menuItems.map(item => (
-              <div key={item.view} className="group relative">
-                <button
-                  onClick={() => handleAction(item.view as View)}
-                  className="w-12 h-12 rounded-full bg-slate-700 text-white flex items-center justify-center shadow-lg hover:bg-blue-600 transition-all"
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30">
+        <div className="relative flex flex-col-reverse items-center gap-3">
+             {menuItems.map((item, index) => (
+                <div 
+                    key={item.view}
+                    className={`transition-all duration-300 flex items-center gap-3 ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}
+                    style={{ transitionDelay: `${isOpen ? index * 50 : 0}ms` }}
                 >
-                  <i className={`fa-solid ${item.icon}`}></i>
-                </button>
-                <span className="absolute right-full mr-3 px-2 py-1 text-xs text-white bg-slate-800 rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                  {item.label}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Main floating button */}
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className={`w-16 h-16 rounded-full flex items-center justify-center text-white shadow-2xl transition-all duration-300 ${isOpen ? 'bg-red-500 hover:bg-red-600 rotate-45' : 'bg-blue-500 hover:bg-blue-600'}`}
-          aria-label="Assistive Touch Menu"
-        >
-          <i className={`fa-solid fa-plus text-2xl transition-transform duration-300 ${isOpen ? 'rotate-0' : 'rotate-180'}`}></i>
-        </button>
-      </div>
+                    <span className="text-sm bg-slate-800 text-white px-2 py-1 rounded-md whitespace-nowrap">{t[language][item.label]}</span>
+                     <button
+                        onClick={() => handleItemClick(item.view)}
+                        className={`w-12 h-12 rounded-full flex items-center justify-center text-white text-xl shadow-lg ${item.color} hover:scale-110 transition-transform`}
+                     >
+                        <i className={`fa-solid ${item.icon}`}></i>
+                    </button>
+                </div>
+             ))}
+            
+            <button
+                onClick={handleToggle}
+                className={`w-14 h-14 rounded-full flex items-center justify-center text-white text-2xl shadow-xl transition-all duration-300 ${isOpen ? 'bg-red-500 rotate-45' : 'bg-blue-600'}`}
+                title={t[language].aiTools}
+            >
+                <i className="fa-solid fa-plus"></i>
+            </button>
+        </div>
     </div>
   );
 };
