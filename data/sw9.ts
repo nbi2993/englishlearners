@@ -1054,6 +1054,6 @@ export const sw9Data: CurriculumLevel = {
     level: 9,
     title: { en: 'i-Learn Smart World 9', vi: 'i-Learn Smart World 9' },
     subtitle: { en: 'Secondary School - Grade 9', vi: 'Trung học cơ sở - Lớp 9' },
-    ebookPdfUrl: 'https://drive.google.com/file/d/1Zt3yq4n5k6jL7p8cQ9rXf9wY2bA0sE1f/view?usp=sharing',
+    ebookPdfUrl: 'https://drive.google.com/file/d/1cZAMRzuUDHZFRkMML_nm6fNYPNv9Nfn4/view?usp=sharing',
     units: transformUnits(sw9RawData),
 };

@@ -4,7 +4,7 @@ export const sw6Data: CurriculumLevel = {
     level: 6,
     title: { en: 'i-Learn Smart World 6', vi: 'i-Learn Smart World 6' },
     subtitle: { en: 'Secondary School - Grade 6', vi: 'Trung học cơ sở - Lớp 6' },
-    ebookPdfUrl: 'https://drive.google.com/file/d/1d2FOa20bf6nNhl3cASbnlgwSWcWIqX_u/view?usp=sharing',
+    ebookPdfUrl: 'https://drive.google.com/file/d/1d2FOa20bf6nNhl3cASbnlgwSWcWIqX_u/view?usp=drive_link',
     units: [
       {
         id: 1,
@@ -562,3 +562,4 @@ export const sw6Data: CurriculumLevel = {
       }
     ]
   };
+  

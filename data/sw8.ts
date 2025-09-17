@@ -1045,6 +1045,6 @@ export const sw8Data: CurriculumLevel = {
     level: 8,
     title: { en: 'i-Learn Smart World 8', vi: 'i-Learn Smart World 8' },
     subtitle: { en: 'Secondary School - Grade 8', vi: 'Trung học cơ sở - Lớp 8' },
-    ebookPdfUrl: 'https://drive.google.com/file/d/1_d28c35S1s-0aD2E9M6f4gH5jK7nOp8l/view?usp=sharing',
+    ebookPdfUrl: 'https://drive.google.com/file/d/1gbl9bh_HnkYwHZeRkP6gGJ0dJ5wn0PUf/view?usp=drive_link',
     units: transformUnits(sw8RawData),
 };
