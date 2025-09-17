@@ -57,10 +57,31 @@ const UserGuide: React.FC<UserGuideProps> = ({ language }) => {
             ? '**Quản lý Dữ liệu (Data Management):** Sử dụng nút **Sao lưu (Backup)** để tải xuống tất cả dữ liệu ứng dụng của bạn (hồ sơ, lớp học, cài đặt) vào một tệp JSON. Sử dụng **Khôi phục (Restore)** để tải lên tệp này và khôi phục trạng thái của bạn. Điều này rất hữu ích khi chuyển đổi thiết bị hoặc trình duyệt.'
             : '**Data Management:** Use the **Backup** button to download all your app data (profile, classes, settings) to a JSON file. Use **Restore** to upload this file and restore your state. This is very useful when switching devices or browsers.',
         
+        features_ai_config_title: isVietnamese ? 'Cấu hình Cài đặt AI' : 'AI Settings Configuration',
+        features_ai_config_p1: isVietnamese
+            ? 'Để sử dụng các tính năng AI mạnh mẽ như **Chấm bài viết** và **Luyện nói**, bạn cần có một khóa API Google Gemini. Ứng dụng này không đi kèm với khóa có sẵn.'
+            : 'To use powerful AI features like the **Writing Grader** and **Speaking Partner**, you need a Google Gemini API key. This application does not come with a pre-configured key.',
+        features_ai_config_p2: isVietnamese
+            ? 'Đi đến trang **Cài đặt** và tìm mục "Cài đặt AI". Tại đây, bạn có thể dán khóa API của mình vào ô nhập liệu và nhấp vào **"Lưu khóa"**. Trạng thái dịch vụ AI sẽ chuyển thành "Hoạt động".'
+            : 'Navigate to the **Settings** page and find the "AI Settings" section. Here, you can paste your API key into the input field and click **"Save Key"**. The AI services status will then turn to "Active".',
+        features_ai_config_p3: isVietnamese
+            ? 'Nếu bạn chưa có khóa, bạn có thể nhấp vào nút **"Liên hệ mua Key API"** trong phần Cài đặt để được hỗ trợ.'
+            : 'If you do not have a key, you can click the **"Contact to Buy API Key"** button in the Settings section for assistance.',
+
         teacher_title: isVietnamese ? 'Dành cho Giáo viên' : 'For Teachers',
         teacher_p1: isVietnamese
             ? 'Trên **Bảng điều khiển giáo viên**, bạn có thể tạo các lớp học mới và thêm học sinh vào các lớp đó. Điều này cho phép bạn theo dõi tiến độ và quản lý việc học của họ một cách hiệu quả.'
             : 'In the **Teacher Dashboard**, you can create new classes and add students to them. This allows you to track their progress and manage their learning effectively.',
+        teacher_import_title: isVietnamese ? 'Nhập Học sinh và Bảng điểm từ Excel' : 'Importing Students & Grades from Excel',
+        teacher_import_p1: isVietnamese
+            ? 'Để thêm nhanh nhiều học sinh, hãy sử dụng tính năng **Nhập từ Excel**. Trong bảng điều khiển của một lớp học, nhấp vào **"Tải mẫu"** để tải xuống tệp Excel được định dạng sẵn.'
+            : 'To quickly add multiple students, use the **Import from Excel** feature. Inside a class dashboard, click **"Download Template"** to get a pre-formatted Excel file.',
+        teacher_import_p2: isVietnamese
+            ? 'Tệp mẫu bao gồm các cột cho thông tin học sinh (STT, Họ và tên, Ngày sinh, Giới tính) và các cột điểm khác nhau có hệ số được chỉ định (Điểm Miệng x1, 15 phút x1, Giữa kỳ x2, Cuối kỳ x3).'
+            : 'The template includes columns for student information (No., Full Name, Date of Birth, Gender) and various grade columns with specified coefficients (Oral x1, 15-min x1, Mid-term x2, Final-term x3).',
+        teacher_import_p3: isVietnamese
+            ? 'Sau khi điền thông tin vào tệp, hãy lưu và tải nó lên bằng nút **"Tải file"**. Ứng dụng sẽ tự động thêm các học sinh mới vào lớp của bạn và **tính toán điểm trung bình có trọng số** cho mỗi học sinh dựa trên các điểm đã nhập.'
+            : 'After filling out the file, save and upload it using the **"Upload File"** button. The application will automatically add the new students to your class and **calculate the weighted average score** for each student based on the entered grades.',
 
         student_title: isVietnamese ? 'Dành cho Học sinh' : 'For Students',
         student_p1: isVietnamese
@@ -128,6 +149,12 @@ const UserGuide: React.FC<UserGuideProps> = ({ language }) => {
                     <li dangerouslySetInnerHTML={{ __html: content.features_settings_data }}></li>
                 </ul>
             </GuideSection>
+
+            <GuideSection title={content.features_ai_config_title}>
+                <p>{content.features_ai_config_p1}</p>
+                <p>{content.features_ai_config_p2}</p>
+                <p>{content.features_ai_config_p3}</p>
+            </GuideSection>
             
             <GuideSection title={curriculumContent.title}>
                 <p>{curriculumContent.intro}</p>
@@ -165,6 +192,10 @@ const UserGuide: React.FC<UserGuideProps> = ({ language }) => {
 
             <GuideSection title={content.teacher_title}>
                 <p>{content.teacher_p1}</p>
+                <h3 className="!mt-8">{content.teacher_import_title}</h3>
+                <p>{content.teacher_import_p1}</p>
+                <p>{content.teacher_import_p2}</p>
+                <p>{content.teacher_import_p3}</p>
             </GuideSection>
 
             <GuideSection title={content.student_title}>

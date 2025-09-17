@@ -54,10 +54,11 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
         aiStatusLabel: "AI Services Status:",
         aiStatusActive: "Active",
         aiStatusInactive: "Inactive",
-        aiDesc: "AI features require a Google Gemini API key. Enter your key below to enable the Writing Grader and Speaking Partner.",
+        aiDesc: "AI features require a Google Gemini API key. Enter your key below, or contact us to purchase a key to enable the Writing Grader and Speaking Partner.",
         apiKeyLabel: "Your Google Gemini API Key",
         saveKey: "Save Key",
         clearKey: "Clear Key",
+        contactBuyKey: "Contact to Buy API Key",
         keySaved: "API Key saved successfully!",
         keyCleared: "API Key cleared.",
     },
@@ -90,10 +91,11 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
         aiStatusLabel: "Trạng thái Dịch vụ AI:",
         aiStatusActive: "Hoạt động",
         aiStatusInactive: "Không hoạt động",
-        aiDesc: "Các tính năng AI yêu cầu khóa API của Google Gemini. Nhập khóa của bạn vào bên dưới để kích hoạt Chấm bài viết và Luyện nói.",
+        aiDesc: "Các tính năng AI yêu cầu khóa API của Google Gemini. Nhập khóa của bạn vào bên dưới, hoặc liên hệ với chúng tôi để mua khóa và kích hoạt Chấm bài viết và Luyện nói.",
         apiKeyLabel: "Khóa API Google Gemini của bạn",
         saveKey: "Lưu khóa",
         clearKey: "Xóa khóa",
+        contactBuyKey: "Liên hệ mua Key API",
         keySaved: "Đã lưu khóa API thành công!",
         keyCleared: "Đã xóa khóa API.",
     }
@@ -312,9 +314,12 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
                         </button>
                     </div>
                 </div>
-                <div className="flex gap-2 mt-3">
-                    <button onClick={handleSaveKey} className="btn btn-primary flex-1"><i className="fa-solid fa-save mr-2"></i>{t.saveKey}</button>
-                    <button onClick={handleClearKey} className="btn btn-secondary flex-1"><i className="fa-solid fa-trash mr-2"></i>{t.clearKey}</button>
+                <div className="flex flex-wrap gap-2 mt-3">
+                    <button onClick={handleSaveKey} className="btn btn-primary flex-grow"><i className="fa-solid fa-save mr-2"></i>{t.saveKey}</button>
+                    <button onClick={handleClearKey} className="btn btn-secondary flex-grow"><i className="fa-solid fa-trash mr-2"></i>{t.clearKey}</button>
+                     <a href="https://zalo.me/0795555789" target="_blank" rel="noopener noreferrer" className="btn btn-secondary-outline flex-grow">
+                        <i className="fa-solid fa-key mr-2"></i>{t.contactBuyKey}
+                    </a>
                 </div>
             </section>
 
