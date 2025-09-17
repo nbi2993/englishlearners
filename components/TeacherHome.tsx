@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import type { User, Course, View, Classes, ClassScheduleItem } from '../types';
 import { curriculumData } from '../data/curriculum';
 import CourseCard from './CourseCard';
+import ClassOverviewCard from './ClassOverviewCard';
 
 interface TeacherHomeProps {
   user: User;
@@ -92,69 +93,77 @@ const TeacherHome: React.FC<TeacherHomeProps> = ({ user, onSelectCourse, languag
             <p className="mt-1 text-lg text-slate-600 dark:text-slate-400">{t.subtitle}</p>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            <div className="card-glass p-6">
-                <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-4">
-                    <i className="fa-solid fa-calendar-day mr-2 text-blue-500"></i>
-                    {t.scheduleTitle}
-                </h2>
-                {todaysSchedule.length > 0 ? (
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-sm text-left">
-                            <thead className="bg-slate-100 dark:bg-slate-700/50">
-                                <tr>
-                                    <th className="p-3 font-semibold">{t.timeHeader}</th>
-                                    <th className="p-3 font-semibold">{t.classHeader}</th>
-                                    <th className="p-3 font-semibold text-center">{t.periodHeader}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {todaysSchedule.map(item => (
-                                    <tr key={item.id} className="border-b dark:border-slate-700">
-                                        <td className="p-3 whitespace-nowrap">{item.startTime} - {item.endTime}</td>
-                                        <td className="p-3 font-medium">{item.className}</td>
-                                        <td className="p-3 text-center">{item.period}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                ) : (
-                    <div className="text-center py-10">
-                        <i className="fa-solid fa-mug-hot text-4xl text-slate-400 mb-4"></i>
-                        <p className="text-slate-500">{t.noClasses}</p>
-                    </div>
-                )}
-            </div>
+        <div className="flex flex-col lg:flex-row gap-8">
+            {/* Main Content Area */}
+            <main className="flex-1">
+                <section>
+                    <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-4">
+                        <i className="fa-solid fa-book-bookmark mr-2 text-green-500"></i>
+                        {t.curriculumTitle}
+                    </h2>
+                    {pinnedCourses.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                            {pinnedCourses.map(course => (
+                                <CourseCard
+                                    key={course.id}
+                                    course={course}
+                                    onSelect={() => onSelectCourse(course)}
+                                    isPinned={true}
+                                    onPinToggle={() => {}}
+                                    language={language}
+                                />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-12 card-glass">
+                            <i className="fa-solid fa-thumbtack text-4xl text-slate-400 mb-4"></i>
+                            <p className="text-slate-500 mb-6">{t.pinPrompt}</p>
+                            <button onClick={() => setView('curriculum')} className="btn btn-primary">
+                                {t.goToCurriculum}
+                            </button>
+                        </div>
+                    )}
+                </section>
+            </main>
 
-            <div className="card-glass p-6">
-                <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-4">
-                  <i className="fa-solid fa-book-bookmark mr-2 text-green-500"></i>
-                  {t.curriculumTitle}
-                </h2>
-                {pinnedCourses.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {pinnedCourses.slice(0, 4).map(course => (
-                      <CourseCard
-                        key={course.id}
-                        course={course}
-                        onSelect={() => onSelectCourse(course)}
-                        isPinned={true}
-                        onPinToggle={() => {}}
-                        language={language}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-10">
-                    <i className="fa-solid fa-thumbtack text-4xl text-slate-400 mb-4"></i>
-                    <p className="text-slate-500 mb-6">{t.pinPrompt}</p>
-                     <button onClick={() => setView('curriculum')} className="btn btn-primary">
-                        {t.goToCurriculum}
-                    </button>
-                  </div>
-                )}
-            </div>
+            {/* Sidebar Area */}
+            <aside className="w-full lg:w-80 xl:w-96 flex-shrink-0 space-y-8">
+                <section className="card-glass p-6">
+                    <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-4">
+                        <i className="fa-solid fa-calendar-day mr-2 text-blue-500"></i>
+                        {t.scheduleTitle}
+                    </h2>
+                    {todaysSchedule.length > 0 ? (
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm text-left">
+                                <thead className="bg-slate-100 dark:bg-slate-700/50">
+                                    <tr>
+                                        <th className="p-3 font-semibold">{t.timeHeader}</th>
+                                        <th className="p-3 font-semibold">{t.classHeader}</th>
+                                        <th className="p-3 font-semibold text-center">{t.periodHeader}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {todaysSchedule.map(item => (
+                                        <tr key={item.id} className="border-b dark:border-slate-700 last:border-b-0">
+                                            <td className="p-3 whitespace-nowrap">{item.startTime} - {item.endTime}</td>
+                                            <td className="p-3 font-medium">{item.className}</td>
+                                            <td className="p-3 text-center">{item.period}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    ) : (
+                        <div className="text-center py-10">
+                            <i className="fa-solid fa-mug-hot text-4xl text-slate-400 mb-4"></i>
+                            <p className="text-slate-500">{t.noClasses}</p>
+                        </div>
+                    )}
+                </section>
+                
+                <ClassOverviewCard classes={classes} language={language} setView={setView} />
+            </aside>
         </div>
     </div>
   );
