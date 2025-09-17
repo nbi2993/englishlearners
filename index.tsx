@@ -1,19 +1,23 @@
-
 import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App';
-import { LanguageProvider } from './contexts/i18n';
+import { createRoot } from 'react-dom/client';
+// FIX: Explicitly adding the .tsx extension can help resolve module issues in some environments.
+import App from './App.tsx';
+import './index.css';
 
-const rootElement = document.getElementById('root');
-if (!rootElement) {
-  throw new Error("Could not find root element to mount to");
-}
-
-const root = ReactDOM.createRoot(rootElement);
-root.render(
-  <React.StrictMode>
-    <LanguageProvider>
+const container = document.getElementById('root');
+if (container) {
+  const root = createRoot(container);
+  root.render(
+    <React.StrictMode>
       <App />
-    </LanguageProvider>
-  </React.StrictMode>
-);
+    </React.StrictMode>
+  );
+
+  // Hide the initial loader after the app has been mounted
+  const loader = document.querySelector('.initial-loader');
+  if (loader) {
+    loader.remove();
+  }
+} else {
+  console.error('Fatal Error: Root element #root not found in the DOM.');
+}

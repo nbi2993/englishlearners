@@ -1,116 +1,133 @@
-
-import React, { useMemo } from 'react';
-import { CurriculumLevel, Unit, Lesson } from '../types';
-import { AcademicCapIcon, BookOpenIcon, HashtagIcon, TranslateIcon, ChevronRightIcon } from './Icons';
-import { useTranslation } from '../contexts/i18n';
+import React, { useMemo, useState, useEffect } from 'react';
+import { curriculumData } from '../data/curriculum';
+import CourseCard from './CourseCard';
+import type { Course, User } from '../types';
+import { Course as MappedCourse } from '../types';
 
 interface DashboardProps {
-    level: CurriculumLevel;
-    completedLessons: Set<number>;
-    onLessonClick: (lesson: Lesson, unit: Unit) => void;
-    onOpenEbook: (level: CurriculumLevel) => void;
+  onSelectCourse: (course: Course) => void;
+  user: User;
+  onUpdateUser: (user: User) => void;
+  language: 'en' | 'vi';
 }
 
-const StatCard: React.FC<{ icon: React.ReactNode, label: string, value: string | number }> = ({ icon, label, value }) => (
-    <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-soft border border-slate-200 dark:border-slate-700">
-        <div className="flex items-center">
-            <div className="p-3 rounded-full bg-primary/10 mr-4">
-                {icon}
-            </div>
-            <div>
-                <p className="text-sm font-medium text-secondary dark:text-slate-400">{label}</p>
-                <p className="text-2xl font-bold text-dark dark:text-slate-100">{value}</p>
-            </div>
-        </div>
-    </div>
-);
+const Dashboard: React.FC<DashboardProps> = ({ onSelectCourse, user, onUpdateUser, language }) => {
 
-const Dashboard: React.FC<DashboardProps> = ({ level, completedLessons, onLessonClick, onOpenEbook }) => {
-    const { t, l } = useTranslation();
+  const courses = useMemo(() => {
+    const colorPalette = ['#4A90E2', '#50E3C2', '#F5A623', '#BD10E0', '#9013FE', '#D0021B', '#F8E71C', '#7ED321'];
+    let colorIndex = 0;
+    const slug = (str: string) => str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
-    const stats = useMemo(() => {
-        let totalLessons = 0;
-        let totalVocab = 0;
-        let totalGrammar = 0;
-        let firstUncompleted: { lesson: Lesson, unit: Unit } | null = null;
-
-        for (const unit of level.units) {
-            for (const lesson of unit.lessons) {
-                totalLessons++;
-                totalVocab += lesson.vocabulary.length;
-                totalGrammar += lesson.grammar.length;
-
-                if (!completedLessons.has(lesson.id) && !firstUncompleted) {
-                    firstUncompleted = { lesson, unit };
-                }
-            }
-        }
-        
-        const completedLessonsInLevel = Array.from(completedLessons).filter(id => level.units.some(u => u.lessons.some(l => l.id === id))).length;
-        
-        const progress = totalLessons > 0 ? Math.round((completedLessonsInLevel / totalLessons) * 100) : 0;
-
-        return { totalLessons, totalVocab, totalGrammar, completedCount: completedLessonsInLevel, progress, firstUncompleted };
-    }, [level, completedLessons]);
-
-    const handleContinueClick = () => {
-        if (stats.firstUncompleted) {
-            onLessonClick(stats.firstUncompleted.lesson, stats.firstUncompleted.unit);
-        } else if (level.units.length > 0 && level.units[0].lessons.length > 0) {
-            onLessonClick(level.units[0].lessons[0], level.units[0]);
-        }
-    };
-
-    return (
-        <div className="p-4 sm:p-6 lg:p-8 animate-fade-in main-content-bg h-full overflow-y-auto">
-            <header className="mb-8">
-                <div className="flex flex-wrap items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
-                         <AcademicCapIcon className="h-12 w-12 text-primary" />
-                         <div>
-                            <h1 className="text-4xl font-bold text-dark dark:text-white">{l(level.title)}</h1>
-                            <p className="text-secondary dark:text-slate-400 mt-1">{l(level.subtitle)}</p>
-                         </div>
-                    </div>
-                    {level.ebookPdfUrl && (
-                        <button
-                            onClick={() => onOpenEbook(level)}
-                            className="inline-flex items-center justify-center px-5 py-3 bg-accent text-white font-bold rounded-lg shadow-md hover:bg-accent-hover transition-all transform hover:scale-105"
-                        >
-                            <BookOpenIcon className="h-5 w-5 mr-2"/>
-                            <span>{t('readEBook')}</span>
-                        </button>
-                    )}
-                </div>
-            </header>
-            
-            <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm p-6 rounded-xl shadow-soft-md border border-slate-200 dark:border-slate-700 mb-8">
-                <div className="flex justify-between items-center mb-2">
-                    <h2 className="text-lg font-semibold text-dark dark:text-slate-200">{t('progress')}</h2>
-                    <span className="font-bold text-primary">{stats.progress}%</span>
-                </div>
-                <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5">
-                    <div className="bg-primary h-2.5 rounded-full" style={{ width: `${stats.progress}%` }}></div>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <StatCard icon={<BookOpenIcon className="h-6 w-6 text-primary"/>} label={t('lessonsCompleted')} value={`${stats.completedCount} / ${stats.totalLessons}`} />
-                <StatCard icon={<TranslateIcon className="h-6 w-6 text-primary"/>} label={t('vocabToLearn')} value={stats.totalVocab} />
-                <StatCard icon={<HashtagIcon className="h-6 w-6 text-primary"/>} label={t('grammarPoints')} value={stats.totalGrammar} />
-            </div>
-
-            <div>
-                 <button 
-                    onClick={handleContinueClick}
-                    className="w-full md:w-auto inline-flex items-center justify-center px-8 py-4 bg-primary text-white font-bold rounded-lg shadow-md hover:bg-primary-hover transition-all transform hover:scale-105"
-                >
-                    <span>{stats.completedCount > 0 && stats.firstUncompleted ? t('continueLearning') : t('startLearning')}</span>
-                    <ChevronRightIcon className="h-5 w-5 ml-2"/>
-                </button>
-            </div>
-        </div>
+    return curriculumData.flatMap(category =>
+      category.levels.map(level => {
+        const courseId = `course-${slug(level.title.en)}`;
+        return {
+          id: courseId,
+          title: language === 'vi' ? level.title.vi : level.title.en,
+          series: language === 'vi' ? category.category.vi : category.category.en,
+          level: (level.subtitle.en.split(' - ')[0]) as Course['level'],
+          imageUrl: `https://picsum.photos/seed/${level.level}/400/225`,
+          description: language === 'vi' ? level.subtitle.vi : level.subtitle.en,
+          lessons: level.units.flatMap(unit => unit.lessons.map(l => ({
+            id: l.id.toString(),
+            title: language === 'vi' ? l.title.vi : l.title.en,
+            type: 'ebook',
+            content: '',
+            rawLesson: l
+          }))),
+          color: colorPalette[colorIndex++ % colorPalette.length],
+          progress: Math.floor(Math.random() * 100), // Mock progress
+          rawLevel: level,
+        } as MappedCourse;
+      })
     );
+  }, [language]);
+
+  const groupedCourses = useMemo(() => {
+    return courses.reduce((acc, course) => {
+      const series = course.series;
+      if (!acc[series]) {
+        acc[series] = [];
+      }
+      acc[series].push(course);
+      return acc;
+    }, {} as Record<string, MappedCourse[]>);
+  }, [courses]);
+
+  const [expandedSeries, setExpandedSeries] = useState<string | null>(null);
+
+  // Set the first category to be expanded by default
+  useEffect(() => {
+    const seriesKeys = Object.keys(groupedCourses);
+    if (seriesKeys.length > 0) {
+      setExpandedSeries(seriesKeys[0]);
+    }
+  }, [groupedCourses]);
+
+  const handleToggleSeries = (series: string) => {
+    setExpandedSeries(prev => (prev === series ? null : series));
+  };
+  
+  const handlePinToggle = (courseId: string) => {
+    const pinnedCourses = user.pinnedCourses || [];
+    const newPinnedCourses = pinnedCourses.includes(courseId)
+      ? pinnedCourses.filter(id => id !== courseId)
+      : [...pinnedCourses, courseId];
+    onUpdateUser({ ...user, pinnedCourses: newPinnedCourses });
+  };
+  
+  return (
+    <div className="p-4 sm:p-6 lg:p-8 animate-fade-in">
+      <div className="text-center mb-8">
+        <i className="fa-solid fa-book-open-reader text-5xl text-blue-500 mb-4"></i>
+        <h1 className="text-4xl font-bold text-slate-900 dark:text-white">
+          {language === 'vi' ? 'Chương trình học' : 'Curriculum'}
+        </h1>
+        <p className="mt-2 text-lg text-slate-600 dark:text-slate-400">
+          {language === 'vi' ? 'Khám phá thư viện khóa học toàn diện của chúng tôi.' : 'Explore our comprehensive library of courses.'}
+        </p>
+      </div>
+
+      <div className="space-y-4">
+        {Object.entries(groupedCourses).map(([series, coursesInSeries]) => {
+          const isExpanded = expandedSeries === series;
+          return (
+            <div key={series} className="card-glass overflow-hidden transition-all duration-300">
+              <button
+                onClick={() => handleToggleSeries(series)}
+                className="w-full text-left p-4 flex justify-between items-center hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+                aria-expanded={isExpanded}
+                aria-controls={`series-content-${series.replace(/\s/g, '-')}`}
+              >
+                <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200">{series}</h2>
+                <i className={`fa-solid fa-chevron-down text-slate-500 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}></i>
+              </button>
+              
+              {isExpanded && (
+                <div 
+                  id={`series-content-${series.replace(/\s/g, '-')}`}
+                  className="p-4 sm:p-6 border-t border-slate-200 dark:border-slate-700 animate-fade-in"
+                >
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {coursesInSeries.map(course => (
+                      <CourseCard
+                        key={course.id}
+                        course={course}
+                        onSelect={() => onSelectCourse(course)}
+                        isPinned={user.pinnedCourses?.includes(course.id) || false}
+                        onPinToggle={() => handlePinToggle(course.id)}
+                        language={language}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 };
 
 export default Dashboard;

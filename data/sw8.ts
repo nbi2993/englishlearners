@@ -1,1049 +1,625 @@
-import { CurriculumLevel, Unit, Lesson, VocabularyItem, GrammarPoint, Activity } from '../types';
-
-// Raw curriculum data for "iLearn Smart World 8"
-const sw8RawData = [
-  {
-    id: 'unit-1',
-    title: 'Unit 1: Free Time',
-    lessons: [
-      {
-        id: 'unit-1-lesson-1',
-        title: 'Lesson 1',
-        objectives: [
-          'Talk about leisure activities, likes, and dislikes',
-          'Use verbs (to express preference) + gerund',
-        ],
-        newWords: [
-          'chat',
-          'fishing',
-          'hang out',
-          'jogging',
-          'jewelry',
-          'handball',
-          'rock climbing',
-          'board games',
-        ],
-        grammar: {
-          title: 'Verbs (to express preference) + gerund',
-          explanation: 'We can use verb + gerund (V-ing) to talk about things we prefer, like, and dislike. Some verbs that we often use are: prefer, love, enjoy, like, don\'t (really) like, hate.',
-          examples: [
-            'I like watching handball on the weekends.',
-            'Daniel prefers swimming in the pool to swimming in the sea.',
-            'Jane doesn\'t really like dancing. She prefers singing.',
-            'My brothers hate playing board games.',
-          ],
-        },
-        pronunciation: {
-          title: '/s/ or /z/ sound',
-          focus: 'At the end of words, "s" can sound like /s/ or /z/.',
-          examples: ['sports', 'books', 'games', 'friends'],
-        },
-        conversationSkill: null, // Not explicitly listed for Lesson 1, but "Let's Talk!" is a conversation activity.
-        activities: [
-          { name: 'New Words: Number the pictures, Listen and repeat', type: 'vocabulary' },
-          { name: 'New Words: Write new words into table and add more', type: 'vocabulary' },
-          { name: 'Reading: Read passages, Circle person who prefers indoor activities', type: 'reading' },
-          { name: 'Reading: Match phrases and person they describe', type: 'reading' },
-          { name: 'Grammar: Fill in the blanks (Verbs + gerund)', type: 'grammar' },
-          { name: 'Grammar: Circle correct words (Verbs + gerund)', type: 'grammar' },
-          { name: 'Grammar: Write sentences using gerunds and prompts', type: 'grammar' },
-          { name: 'Pronunciation: Listen and write /s/ or /z/', type: 'pronunciation' },
-          { name: 'Practice: Ask and answer using pictures and prompts', type: 'speaking' },
-          { name: 'Speaking: Survey - Free Time Activities', type: 'speaking' },
-        ],
-      },
-      {
-        id: 'unit-1-lesson-2',
-        title: 'Lesson 2',
-        objectives: [
-          'Make free time activity plans with friends',
-          'Use Present Simple for future meaning and prepositions of time',
-        ],
-        newWords: [
-          'knitting',
-          'karate',
-          'roller skating',
-          'sewing',
-          'practice',
-          'shuttlecock',
-          'cycling',
-          'table tennis',
-        ],
-        grammar: {
-          title: 'Present Simple for future meaning and Prepositions of time',
-          explanation: 'We can use Present Simple for future meaning to talk about a set schedule. We often do this by saying the day or time of the scheduled activity. We can use prepositions of time (from...to..., until) to talk about when we will do something.',
-          examples: [
-            'I have soccer practice at 7 tonight.',
-            'I have English club on Friday at 8 p.m.',
-            'Do you want to go cycling from 5 to 6 p.m.?',
-            'I have English club until 5 p.m.',
-          ],
-        },
-        pronunciation: {
-          title: '/sk/ sound',
-          focus: 'Focus on the /sk/ sound.',
-          examples: ['skating', 'basketball', 'school'],
-        },
-        conversationSkill: {
-          title: 'Starting a telephone conversation',
-          phrases: ['Hi, (Ethan). How\'s it going?', 'Hey, what\'s up?'],
-        },
-        activities: [
-          { name: 'New Words: Read definitions, match words with pictures', type: 'vocabulary' },
-          { name: 'Listening: Two people making plans, complete table', type: 'listening' },
-          { name: 'Grammar: Fill in the blanks (Present Simple for future, prepositions)', type: 'grammar' },
-          { name: 'Grammar: Circle correct words (Present Simple for future, prepositions)', type: 'grammar' },
-          { name: 'Grammar: Answer questions using schedule', type: 'grammar' },
-          { name: 'Pronunciation: Focus on /sk/ sound, listen and cross out different sound', type: 'pronunciation' },
-          { name: 'Practice: Practice conversation with prepositions', type: 'speaking' },
-          { name: 'Speaking: Let\'s Make Plans!', type: 'speaking' },
-        ],
-      },
-      {
-        id: 'unit-1-lesson-3',
-        title: 'Lesson 3',
-        objectives: [
-          'Talk about your favorite hobby',
-          'Write a passage about your favorite hobby',
-        ],
-        newWords: [], // No new words explicitly listed for Lesson 3
-        grammar: null, // No new grammar explicitly listed for Lesson 3, focuses on writing skill
-        pronunciation: null, // No new pronunciation explicitly listed for Lesson 3
-        conversationSkill: null, // Not explicitly listed
-        writingSkill: {
-          title: 'Writing basic descriptive passages',
-          guidelines: [
-            'Start with a topic sentence: tell the readers what your passage is about.',
-            'Write about 3-5 supporting ideas to explain your topic. You can answer questions what, when, where, who, how, etc. about the topic to think of ideas to write about.',
-            'End with a concluding sentence: say your main topic again in different words.',
-          ],
-        },
-        activities: [
-          { name: 'Reading: Read Linh\'s passage, choose best beginning sentence', type: 'reading' },
-          { name: 'Reading: Read Linh\'s passage, answer questions', type: 'reading' },
-          { name: 'Writing: Read about writing skill, underline parts in Linh\'s passage', type: 'writing' },
-          { name: 'Writing: Unscramble sentences and number them', type: 'writing' },
-          { name: 'Speaking: My Favorite Hobby - Discuss hobbies', type: 'speaking' },
-          { name: 'Speaking: My Favorite Hobby - Choose hobby, discuss points', type: 'speaking' },
-          { name: 'Writing: Write a simple passage about your favorite hobby (80-100 words)', type: 'writing' },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'unit-2',
-    title: 'Unit 2: Life in the Country',
-    lessons: [
-      {
-        id: 'unit-2-lesson-1',
-        title: 'Lesson 1',
-        objectives: [
-          'Talk about life in the country and the city',
-          'Use countable and uncountable nouns with indefinite quantifiers',
-        ],
-        newWords: [
-          'entertainment',
-          'nature',
-          'noise',
-          'peace',
-          'fresh',
-          'vehicle',
-          'room',
-          'facility',
-        ],
-        grammar: {
-          title: 'Quantifiers with countable/uncountable nouns',
-          explanation: 'We can use countable/uncountable nouns with the quantifiers: lots of/a lot of, too much, too many, and not enough to talk about amounts. Note: too much, too many, and not enough all have a negative meaning.',
-          examples: [
-            'There are lots of people.',
-            'There is too much work to do.',
-            'There are too many cars on the road.',
-            'There isn\'t enough time to play.',
-          ],
-        },
-        pronunciation: {
-          title: '/tʃ/ sound',
-          focus: 'Focus on the /tʃ/ sound.',
-          examples: ['much', 'nature'],
-        },
-        conversationSkill: {
-          title: 'Politely disagreeing',
-          phrases: ['That\'s true, but...', 'Yes, but...', 'Really? (...)'],
-        },
-        activities: [
-          { name: 'New Words: Read definitions, fill in the blanks', type: 'vocabulary' },
-          { name: 'Listening: Joe and Mai talking about city/country life, fill in blanks', type: 'listening' },
-          { name: 'Grammar: Fill in the blanks (Quantifiers)', type: 'grammar' },
-          { name: 'Grammar: Circle correct words (Quantifiers)', type: 'grammar' },
-          { name: 'Grammar: Write sentences using prompts (Quantifiers)', type: 'grammar' },
-          { name: 'Pronunciation: Focus on /tʃ/ sound, listen and cross out different sound', type: 'pronunciation' },
-          { name: 'Practice: Practice conversation', type: 'speaking' },
-          { name: 'Speaking: Is it better to live in the city or the country?', type: 'speaking' },
-        ],
-      },
-      {
-        id: 'unit-2-lesson-2',
-        title: 'Lesson 2',
-        objectives: [
-          'Talk about folk games and activities in the country',
-          'Use verbs (to express preference) + to-infinitives and adverbs of frequency',
-        ],
-        newWords: [
-          'hometown',
-          'traditional',
-          'tug of war',
-          'jump rope',
-          'pick flowers',
-          'spinning tops',
-          'herd buffalo',
-        ],
-        grammar: {
-          title: 'Verbs (to express preference) + to-infinitives and Adverbs of frequency',
-          explanation: 'We can use verbs with to-infinitives to talk about activities people like or prefer to do. We can use adverbs of frequency (never, rarely, sometimes, often, usually, always) to say how often things happen.',
-          examples: [
-            'They like to play tug of war here.',
-            'She usually plays tug of war with her cousins.',
-            'We always play sports at the park.',
-          ],
-        },
-        pronunciation: {
-          title: 'Intonation for questions',
-          focus: 'Intonation for Yes/No questions rises.',
-          examples: ['Does he like to play folk games?', 'Do they like to jump rope?'],
-        },
-        conversationSkill: null, // Not explicitly listed
-        activities: [
-          { name: 'New Words: Read sentences, match words with definitions', type: 'vocabulary' },
-          { name: 'Reading: Read blog post, circle correct answers', type: 'reading' },
-          { name: 'Grammar: Fill in the blanks (Verbs + to-infinitives, adverbs of frequency)', type: 'grammar' },
-          { name: 'Grammar: Unscramble sentences', type: 'grammar' },
-          { name: 'Grammar: Write sentences using prompts', type: 'grammar' },
-          { name: 'Pronunciation: Listen and cross out sentence that doesn\'t follow intonation rule', type: 'pronunciation' },
-          { name: 'Practice: Ask and answer about what young people like to do', type: 'speaking' },
-          { name: 'Speaking: Fun and Games in the Country', type: 'speaking' },
-        ],
-      },
-      {
-        id: 'unit-2-lesson-3',
-        title: 'Lesson 3',
-        objectives: [
-          'Talk about festivals in the country',
-          'Write an announcement for a festival in the country',
-        ],
-        newWords: [], // No new words explicitly listed for Lesson 3
-        grammar: null, // No new grammar explicitly listed for Lesson 3, focuses on writing skill
-        pronunciation: null, // No new pronunciation explicitly listed for Lesson 3
-        conversationSkill: null, // Not explicitly listed
-        writingSkill: {
-          title: 'Writing long-form announcements',
-          guidelines: [
-            'Write a heading. Say what the event is.',
-            'Write a summary sentence about what, where, and when the festival is.',
-            'Give a call to action. Ask the readers to take part or join in.',
-            'Say the cost.',
-            'Say the different activities and food at the festival.',
-          ],
-        },
-        activities: [
-          { name: 'Reading: Read announcement, main purpose', type: 'reading' },
-          { name: 'Reading: Read announcement, True/False/Doesn\'t say', type: 'reading' },
-          { name: 'Writing: Read about writing skill, underline parts in announcement', type: 'writing' },
-          { name: 'Writing: Reorder parts of the announcement', type: 'writing' },
-          { name: 'Speaking: Planning a Traditional Festival - Discuss activities and food', type: 'speaking' },
-          { name: 'Speaking: Planning a Traditional Festival - Plan a festival', type: 'speaking' },
-          { name: 'Writing: Write an announcement for the festival (80-100 words)', type: 'writing' },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'unit-3',
-    title: 'Unit 3: Protecting the Environment',
-    lessons: [
-      {
-        id: 'unit-3-lesson-1',
-        title: 'Lesson 1',
-        objectives: [
-          'Talk about the effects of pollution',
-          'Use First Conditional',
-        ],
-        newWords: [
-          'affect',
-          'cause',
-          'pollute',
-          'disease',
-          'wildlife',
-          'tourism',
-          'environment',
-          'damage',
-        ],
-        grammar: {
-          title: 'First Conditional with "if" or "unless"',
-          explanation: 'We use First Conditional to talk about future situations we think are real or will happen and their results. We can use unless to say what will happen if we don\'t do something.',
-          examples: [
-            'If people keep burning trash, the air will be polluted.',
-            'Unless we stop burning trash, the air will be polluted.',
-          ],
-        },
-        pronunciation: {
-          title: '/t/ sound',
-          focus: 'Focus on the /t/ sound.',
-          examples: ['affect', 'pollute', 'protect'],
-        },
-        conversationSkill: null, // Not explicitly listed
-        activities: [
-          { name: 'New Words: Read definitions, fill in the blanks', type: 'vocabulary' },
-          { name: 'Reading: Read essay, choose best introduction', type: 'reading' },
-          { name: 'Reading: Read essay, True/False/Doesn\'t say', type: 'reading' },
-          { name: 'Grammar: Fill in the blanks (First Conditional)', type: 'grammar' },
-          { name: 'Grammar: Fill in the blanks with correct verb form (First Conditional)', type: 'grammar' },
-          { name: 'Grammar: Write First Conditional sentences using notes', type: 'grammar' },
-          { name: 'Pronunciation: Focus on /t/ sound, listen and cross out different sound', type: 'pronunciation' },
-          { name: 'Practice: Ask and answer about effects of pollution', type: 'speaking' },
-          { name: 'Speaking: Effects of Pollution - Plan a presentation', type: 'speaking' },
-        ],
-      },
-      {
-        id: 'unit-3-lesson-2',
-        title: 'Lesson 2',
-        objectives: [
-          'Give advice about how to reduce pollution',
-          'Use conjunctions to make compound and complex sentences',
-        ],
-        newWords: [
-          'recycle',
-          'reuse',
-          'reduce',
-          'save',
-          'waste',
-          'clean up',
-          'electricity',
-          'air conditioner',
-        ],
-        grammar: {
-          title: 'Compound sentences with "and" and Complex sentences with "so (that)"',
-          explanation: 'We can use "and" to add another idea and join the ideas together. We can use "so that" to show purpose. We usually leave out "that" after "so" in informal situations.',
-          examples: [
-            'We should use the school bus, and we can start a "walk to school" group.',
-            'We should have cheap public transportation so (that) we can reduce air pollution.',
-          ],
-        },
-        pronunciation: {
-          title: 'Word stress for most two-syllable verbs',
-          focus: 'Stress the second syllable for most two-syllable verbs.',
-          examples: ['reuse', 'collect', 'reduce'],
-        },
-        conversationSkill: {
-          title: 'Encouraging the speaker to continue',
-          phrases: ['What else...?', 'Anything else?'],
-        },
-        activities: [
-          { name: 'New Words: Match words with descriptions', type: 'vocabulary' },
-          { name: 'New Words: Say what you can/can\'t recycle, reuse, or save', type: 'vocabulary' },
-          { name: 'Listening: Amy and Daniel talking about reducing pollution, fill in blanks', type: 'listening' },
-          { name: 'Grammar: Tick/Cross and rewrite sentences (conjunctions)', type: 'grammar' },
-          { name: 'Grammar: Combine sentences using "and" or "so (that)"', type: 'grammar' },
-          { name: 'Pronunciation: Focus on word stress, listen and cross out different stress', type: 'pronunciation' },
-          { name: 'Practice: Ask and answer about how to reduce pollution', type: 'speaking' },
-          { name: 'Speaking: Solutions to Pollution - Make a poster', type: 'speaking' },
-        ],
-      },
-      {
-        id: 'unit-3-lesson-3',
-        title: 'Lesson 3',
-        objectives: [
-          'Talk about ways to protect the environment',
-          'Write a short guide to make your school greener',
-        ],
-        newWords: [], // No new words explicitly listed for Lesson 3
-        grammar: null, // No new grammar explicitly listed for Lesson 3, focuses on writing skill
-        pronunciation: null, // No new pronunciation explicitly listed for Lesson 3
-        conversationSkill: null, // Not explicitly listed
-        writingSkill: {
-          title: 'Writing guides',
-          guidelines: [
-            'Create a title. Tell everyone what this guide is for.',
-            'Write an introduction. Tell everyone what the topic is and that you are going to tell them how to do it.',
-            'Create clear, short headings. Begin each point with a clear heading. Remember to use imperatives.',
-            'Explain each step. Under your headings, give more information about how to do it or why it\'s important. Your sentences should be clear and easy to understand.',
-          ],
-        },
-        activities: [
-          { name: 'Reading: Read guide, write correct heading for each section', type: 'reading' },
-          { name: 'Reading: Read guide, circle correct answers', type: 'reading' },
-          { name: 'Writing: Read about writing skill, circle imperatives and underline reasons', type: 'writing' },
-          { name: 'Writing: Read guide, write headings for each section', type: 'writing' },
-          { name: 'Speaking: Make Our School Greener - Discuss ways', type: 'speaking' },
-          { name: 'Speaking: Make Our School Greener - Choose solutions, discuss points', type: 'speaking' },
-          { name: 'Writing: Write a guide to make your school greener (80-100 words)', type: 'writing' },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'unit-4',
-    title: 'Unit 4: Disasters',
-    lessons: [
-      {
-        id: 'unit-4-lesson-1',
-        title: 'Lesson 1',
-        objectives: [
-          'Talk about disasters',
-          'Use Wh-questions',
-        ],
-        newWords: [
-          'typhoon',
-          'blizzard',
-          'drought',
-          'wildfire',
-          'flood',
-          'avalanche',
-          'landslide',
-          'tsunami',
-          'earthquake',
-          'heat wave',
-        ],
-        grammar: {
-          title: 'Wh-questions',
-          explanation: 'We can use Wh-questions to ask for detailed information about an action or event.',
-          examples: [
-            'When was the biggest wildfire?',
-            'What was the biggest tsunami?',
-            'How many people died in the flood?',
-            'How much damage did the flood cause?',
-          ],
-        },
-        pronunciation: {
-          title: 'Sound changes for "...was..."',
-          focus: '"...was..." often sounds like /wəz/.',
-          examples: ['Where was the flood?', 'It was in Japan.'],
-        },
-        conversationSkill: null, // Not explicitly listed
-        activities: [
-          { name: 'New Words: Match words with pictures', type: 'vocabulary' },
-          { name: 'Reading: Read quick facts, topic NOT mentioned', type: 'reading' },
-          { name: 'Reading: Read quick facts, True/False/Doesn\'t say', type: 'reading' },
-          { name: 'Grammar: Fill in the blanks (Wh-questions)', type: 'grammar' },
-          { name: 'Grammar: Write questions for underlined information', type: 'grammar' },
-          { name: 'Pronunciation: Focus on sound changes for "...was...", listen and cross out different sound', type: 'pronunciation' },
-          { name: 'Practice: Ask and answer about world\'s biggest disasters', type: 'speaking' },
-          { name: 'Speaking: Play the Disasters Quiz Show!', type: 'speaking' },
-        ],
-      },
-      {
-        id: 'unit-4-lesson-2',
-        title: 'Lesson 2',
-        objectives: [
-          'Give advice on what to do in a disaster',
-          'Use prepositions of place and movement',
-        ],
-        newWords: [
-          'escape plan',
-          'board up',
-          'emergency services',
-          'fire extinguisher',
-          'stock up on',
-          'flashlight',
-          'first aid kit',
-          'supplies',
-        ],
-        grammar: {
-          title: 'Prepositions of place and movement',
-          explanation: 'We can use prepositions of place (inside, outside, under, near) to show where something or someone is. We can use prepositions of movement (into, to) to show movement from one place to another.',
-          examples: [
-            'Stay inside your house.',
-            'You shouldn\'t go into flood water.',
-          ],
-        },
-        pronunciation: {
-          title: 'Sentence stress for negative advice',
-          focus: 'Stress "shouldn\'t" for negative advice.',
-          examples: ['You shouldn\'t open the windows.', 'We shouldn\'t try to swim.'],
-        },
-        conversationSkill: {
-          title: 'Working through tasks in groups',
-          phrases: ['What\'s next?', 'Next is (fires). What should we...?'],
-        },
-        activities: [
-          { name: 'New Words: Match bold words with pictures', type: 'vocabulary' },
-          { name: 'Listening: Two students talking about safety tips, number tips', type: 'listening' },
-          { name: 'Listening: Fill in the blanks (why follow safety tips)', type: 'listening' },
-          { name: 'Grammar: Fill in the blanks (prepositions)', type: 'grammar' },
-          { name: 'Grammar: Circle correct words (prepositions)', type: 'grammar' },
-          { name: 'Grammar: Fill in the blanks with words from box (prepositions)', type: 'grammar' },
-          { name: 'Pronunciation: Focus on sentence stress, listen and cross out different stress', type: 'pronunciation' },
-          { name: 'Practice: Ask and answer about safety tips', type: 'speaking' },
-          { name: 'Speaking: What to do in a Disaster - Make a poster', type: 'speaking' },
-        ],
-      },
-      {
-        id: 'unit-4-lesson-3',
-        title: 'Lesson 3',
-        objectives: [
-          'Talk about the dangers of disasters and what you should do',
-          'Write an emergency announcement for a disaster',
-        ],
-        newWords: [], // No new words explicitly listed for Lesson 3
-        grammar: null, // No new grammar explicitly listed for Lesson 3, focuses on writing skill
-        pronunciation: null, // No new pronunciation explicitly listed for Lesson 3
-        conversationSkill: null, // Not explicitly listed
-        writingSkill: {
-          title: 'Writing emergency announcements',
-          guidelines: [
-            'Heading - Note the emergency type, who is sending the announcement, and when.',
-            'What/Where/When notes - Keep these short and simple.',
-            'Summary - Briefly note the cause and main dangers.',
-            'Instructions - Note what people should do as point form notes.',
-          ],
-        },
-        activities: [
-          { name: 'Reading: Read emergency announcement, choose best heading', type: 'reading' },
-          { name: 'Reading: Read emergency announcement, write short answers', type: 'reading' },
-          { name: 'Writing: Read about writing skill, circle and number parts of announcement', type: 'writing' },
-          { name: 'Writing: Number sentences to match parts of announcement', type: 'writing' },
-          { name: 'Speaking: Discuss dangers of disasters and what to do', type: 'speaking' },
-          { name: 'Speaking: Imagine your job to warn town, complete table', type: 'speaking' },
-          { name: 'Writing: Write an emergency announcement (80-100 words)', type: 'writing' },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'unit-5',
-    title: 'Unit 5: Science and Technology',
-    lessons: [
-      {
-        id: 'unit-5-lesson-1',
-        title: 'Lesson 1',
-        objectives: [
-          'Ask and answer about devices',
-          'Use Wh-questions and Yes/No questions',
-        ],
-        newWords: [
-          'storage',
-          'weight',
-          'screen',
-          'inch (")',
-          'gigabyte (GB)',
-          'tablet',
-        ],
-        grammar: {
-          title: 'Wh-questions and Yes/No questions',
-          explanation: 'We can use Wh-questions to ask for detailed information about things, people, events, etc. We can use Yes/No questions to ask about specific things. We ask them to get one of two answers, yes or no.',
-          examples: [
-            'What\'s the screen size?',
-            'How much is this tablet?',
-            'Does this phone have a good screen?',
-            'Is it easy to use?',
-          ],
-        },
-        pronunciation: {
-          title: '/eɪ/ sound',
-          focus: 'Focus on the /eɪ/ sound.',
-          examples: ['weight', 'play', 'space'],
-        },
-        conversationSkill: null, // Not explicitly listed
-        activities: [
-          { name: 'New Words: Fill in the blanks', type: 'vocabulary' },
-          { name: 'Reading: Read article, choose best title', type: 'reading' },
-          { name: 'Reading: Read article, answer questions', type: 'reading' },
-          { name: 'Grammar: Fill in the blanks (Wh-questions and Yes/No questions)', type: 'grammar' },
-          { name: 'Grammar: Write questions and answers using prompts', type: 'grammar' },
-          { name: 'Pronunciation: Focus on /eɪ/ sound, listen and cross out different sound', type: 'pronunciation' },
-          { name: 'Practice: Practice conversation (choosing a laptop)', type: 'speaking' },
-          { name: 'Speaking: Buying a New Laptop or Tablet', type: 'speaking' },
-        ],
-      },
-      {
-        id: 'unit-5-lesson-2',
-        title: 'Lesson 2',
-        objectives: [
-          'Compare robots',
-          'Use comparative adverbs',
-        ],
-        newWords: [
-          'rescue',
-          'lift',
-          'complete',
-          'navigate',
-          'carefully',
-          'quietly',
-          'recognize',
-          'safely',
-        ],
-        grammar: {
-          title: 'Comparative adverbs',
-          explanation: 'We can use comparative adverbs to compare two actions.',
-          examples: [
-            'Tsunami moves more slowly than Octopus 1.',
-            'Wall-D can jump higher than Twitchy.',
-          ],
-        },
-        pronunciation: {
-          title: 'Word stress for words ending in "-ly"',
-          focus: 'Stress the first syllable for most 3-syllable words ending in "-ly".',
-          examples: ['carefully', 'quietly', 'perfectly'],
-        },
-        conversationSkill: {
-          title: 'Showing agreement',
-          phrases: ['I agree.', 'You\'re right.'],
-        },
-        activities: [
-          { name: 'New Words: Match underlined words with definitions', type: 'vocabulary' },
-          { name: 'Listening: Report about robot competition, True/False', type: 'listening' },
-          { name: 'Grammar: Fill in the blank (comparative adverbs)', type: 'grammar' },
-          { name: 'Grammar: Fill in the blanks (comparative adverbs)', type: 'grammar' },
-          { name: 'Grammar: Write sentences using adverbs and information', type: 'grammar' },
-          { name: 'Pronunciation: Focus on word stress, listen and cross out different stress', type: 'pronunciation' },
-          { name: 'Practice: Make sentences using comparative adverbs', type: 'speaking' },
-          { name: 'Speaking: Which Robot For the Job?', type: 'speaking' },
-        ],
-      },
-      {
-        id: 'unit-5-lesson-3',
-        title: 'Lesson 3',
-        objectives: [
-          'Talk about smartphones',
-          'Write an email about a new smartphone',
-        ],
-        newWords: [], // No new words explicitly listed for Lesson 3
-        grammar: null, // No new grammar explicitly listed for Lesson 3, focuses on writing skill
-        pronunciation: null, // No new pronunciation explicitly listed for Lesson 3
-        conversationSkill: null, // Not explicitly listed
-        writingSkill: {
-          title: 'Using conjunctions to make longer, more interesting sentences',
-          guidelines: [
-            'Use "and" to link ideas in one sentence, or "also" to link two sentences.',
-            'Use "but" to link contrasting ideas in one sentence, or "however" to link two sentences.',
-            'Use "so" to talk about results.',
-          ],
-        },
-        activities: [
-          { name: 'Reading: Read Kate\'s email, feature NOT mentioned', type: 'reading' },
-          { name: 'Reading: Read Kate\'s email, fill in the blanks', type: 'reading' },
-          { name: 'Writing: Read about writing skill, underline conjunctions', type: 'writing' },
-          { name: 'Writing: Fill in the blanks with conjunctions', type: 'writing' },
-          { name: 'Speaking: Buying a New Phone - Choose features, choose phone', type: 'speaking' },
-          { name: 'Speaking: Buying a New Phone - Talk about points for email', type: 'speaking' },
-          { name: 'Writing: Write an email to your friend about smartphone (80-100 words)', type: 'writing' },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'unit-6',
-    title: 'Unit 6: Life on Other Planets',
-    lessons: [
-      {
-        id: 'unit-6-lesson-1',
-        title: 'Lesson 1',
-        objectives: [
-          'Make predictions about where humans will live in the future',
-          'Use Future Simple',
-        ],
-        newWords: [
-          'Earth',
-          'temperature',
-          'gravity',
-          'Mars',
-          'Venus',
-          'space station',
-          'oxygen',
-        ],
-        grammar: {
-          title: 'Future Simple (will)',
-          explanation: 'We can use "will" to predict what we think will happen based on our own opinions and experiences.',
-          examples: [
-            'I think that in 2150, people will live on Mars.',
-            'In 30 years, Earth will be more crowded.',
-            'Humans won\'t live on the moon.',
-          ],
-        },
-        pronunciation: {
-          title: 'Intonation for Interest/opinion words',
-          focus: 'Intonation falls on interest/opinion words and the sound is longer.',
-          examples: ['That\'s terrible!', 'That sounds dangerous.'],
-        },
-        conversationSkill: null, // Not explicitly listed
-        activities: [
-          { name: 'New Words: Look at pictures, fill in the blanks', type: 'vocabulary' },
-          { name: 'Reading: Read magazine article, what is it about?', type: 'reading' },
-          { name: 'Reading: Read magazine article, answer questions', type: 'reading' },
-          { name: 'Grammar: Fill in the blanks (Future Simple)', type: 'grammar' },
-          { name: 'Grammar: Unscramble sentences', type: 'grammar' },
-          { name: 'Grammar: Fill in the blanks with words from box', type: 'grammar' },
-          { name: 'Pronunciation: Focus on intonation, listen and cross out different sound', type: 'pronunciation' },
-          { name: 'Practice: Ask and answer using prompts (Future Simple)', type: 'speaking' },
-          { name: 'Speaking: Our Next Home - Make predictions', type: 'speaking' },
-        ],
-      },
-      {
-        id: 'unit-6-lesson-2',
-        title: 'Lesson 2',
-        objectives: [
-          'Talk about possible UFO and alien sightings in the past',
-          'Use Past Continuous and Past Simple',
-        ],
-        newWords: [
-          'UFOs',
-          'flying saucers',
-          'disk-shaped',
-          'appeared',
-          'strange',
-          'disappeared',
-          'aliens',
-          'huge',
-          'tiny',
-          'terrified',
-        ],
-        grammar: {
-          title: 'Past Continuous and Past Simple',
-          explanation: 'We use this to describe an action that continued for a period of time in the past. We often use it to introduce a story, then use the Past Simple to show the main event that interrupted the continuous action.',
-          examples: [
-            'I was doing my homework when suddenly I heard a loud noise outside.',
-            'We were walking home when we saw a strange light in the sky.',
-          ],
-        },
-        pronunciation: {
-          title: 'Sound changes for "...-ing..."',
-          focus: '"...-ing..." often sounds like /ɪn/.',
-          examples: ['I was walking through the forest.', 'What were they doing?'],
-        },
-        conversationSkill: {
-          title: 'Showing interest',
-          phrases: ['That\'s (strange).', 'That sounds (scary).'],
-        },
-        activities: [
-          { name: 'New Words: Read text, number definitions', type: 'vocabulary' },
-          { name: 'Listening: Two interviews, how people felt, fill in blanks', type: 'listening' },
-          { name: 'Grammar: Fill in the blank (Past Continuous and Past Simple)', type: 'grammar' },
-          { name: 'Grammar: Fill in the blanks with words from box', type: 'grammar' },
-          { name: 'Grammar: Write sentences using prompts and "when"', type: 'grammar' },
-          { name: 'Pronunciation: Focus on sound changes, listen and cross out different sound', type: 'pronunciation' },
-          { name: 'Practice: Practice conversation (Past Continuous and Past Simple)', type: 'speaking' },
-          { name: 'Speaking: Alien and UFO Sightings - Interview', type: 'speaking' },
-        ],
-      },
-      {
-        id: 'unit-6-lesson-3',
-        title: 'Lesson 3',
-        objectives: [
-          'Talk about seeing UFOs and aliens',
-          'Write a story about seeing visitors from another planet',
-        ],
-        newWords: [], // No new words explicitly listed for Lesson 3
-        grammar: null, // No new grammar explicitly listed for Lesson 3, focuses on writing skill
-        pronunciation: null, // No new pronunciation explicitly listed for Lesson 3
-        conversationSkill: null, // Not explicitly listed
-        writingSkill: {
-          title: 'Writing narrative passages',
-          guidelines: [
-            'Start by saying the main thing that your story is about.',
-            'Introduce the situation and main characters.',
-            'Write the events of the story in the order that they happened. Add details about what you saw, heard, and felt.',
-            'End the story by giving your feelings or opinions about what happened in the story.',
-          ],
-        },
-        activities: [
-          { name: 'Reading: Read blog post, do Andy and brother agree?', type: 'reading' },
-          { name: 'Reading: Read blog post, True/False/Doesn\'t say', type: 'reading' },
-          { name: 'Writing: Read about writing skill, underline descriptive sentences', type: 'writing' },
-          { name: 'Writing: Reorder the narrative passage', type: 'writing' },
-          { name: 'Speaking: Strange Visitor from Another Planet - Discuss UFOs and aliens', type: 'speaking' },
-          { name: 'Speaking: Strange Visitor from Another Planet - Plan a story', type: 'speaking' },
-          { name: 'Writing: Write a narrative passage (80-100 words)', type: 'writing' },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'unit-7',
-    title: 'Unit 7: Teens',
-    lessons: [
-      {
-        id: 'unit-7-lesson-1',
-        title: 'Lesson 1',
-        objectives: [
-          'Talk about dreams and dream jobs',
-          'Use possessive pronouns',
-        ],
-        newWords: [
-          'dream',
-          'director',
-          'vlogger',
-          'musician',
-          'game designer',
-          'veterinarian',
-          'dentist',
-          'engineer',
-          'journalist',
-          'flight attendant',
-        ],
-        grammar: {
-          title: 'Possessive pronouns',
-          explanation: 'We can use possessive pronouns (mine, yours, his, hers, ours, and theirs) to replace words when talking about things or ideas that belong to people. These ideas can be opinions, plans, and dreams.',
-          examples: [
-            'My dream is to be a doctor. What\'s yours?',
-            'Mine is to become a game designer.',
-          ],
-        },
-        pronunciation: {
-          title: '/iː/ sound',
-          focus: 'Focus on the /iː/ sound.',
-          examples: ['dream', 'be', 'teacher'],
-        },
-        conversationSkill: {
-          title: 'Responding to ideas',
-          phrases: ['That\'s a (good) idea.', 'That sounds (great).'],
-        },
-        activities: [
-          { name: 'New Words: Look at pictures, fill in the blanks', type: 'vocabulary' },
-          { name: 'Listening: Margaret talking to her mother, dream come true?, fill in blanks', type: 'listening' },
-          { name: 'Grammar: Fill in the blanks (possessive pronouns)', type: 'grammar' },
-          { name: 'Grammar: Rewrite underlined parts using possessive pronouns', type: 'grammar' },
-          { name: 'Pronunciation: Focus on /iː/ sound, listen and cross out different sound', type: 'pronunciation' },
-          { name: 'Practice: Practice conversation (dream jobs)', type: 'speaking' },
-          { name: 'Speaking: What is your dream job? - Survey', type: 'speaking' },
-        ],
-      },
-      {
-        id: 'unit-7-lesson-2',
-        title: 'Lesson 2',
-        objectives: [
-          'Report how teen celebrities live',
-          'Use reported speech for statements',
-        ],
-        newWords: [
-          'celebrity',
-          'millionaire',
-          'mansion',
-          'home theater',
-          'sports cars',
-          'helicopter',
-          'jet',
-          'yacht',
-        ],
-        grammar: {
-          title: 'Reported speech for statements',
-          explanation: 'We can use reported speech to repeat what people said in the past in our own words. We usually begin with subject + said (that) or subject + told + object (that). We often change Present Simple to Past Simple, and "can" to "could". We also change pronouns and possessive adjectives.',
-          examples: [
-            'Jane said she had a helicopter and a mansion.',
-            'He told me he couldn\'t sing.',
-          ],
-        },
-        pronunciation: {
-          title: 'Final /d/ sound',
-          focus: 'Focus on the final /d/ sound.',
-          examples: ['reported', 'told', 'said'],
-        },
-        conversationSkill: null, // Not explicitly listed
-        activities: [
-          { name: 'New Words: Match underlined words to pictures', type: 'vocabulary' },
-          { name: 'Reading: Read article about TJ Rockwilder, does he live like normal teen?, circle answers', type: 'reading' },
-          { name: 'Grammar: Fill in the blanks (reported speech)', type: 'grammar' },
-          { name: 'Grammar: Complete sentences to report what people said', type: 'grammar' },
-          { name: 'Pronunciation: Focus on final /d/ sound, listen and circle word', type: 'pronunciation' },
-          { name: 'Practice: Ask and answer about what people said using reported speech', type: 'speaking' },
-          { name: 'Speaking: Reporting an Interview with a Teenage Celebrity', type: 'speaking' },
-        ],
-      },
-      {
-        id: 'unit-7-lesson-3',
-        title: 'Lesson 3',
-        objectives: [
-          'Talk about problems teens have where you live',
-          'Write a passage about a problem teenagers have',
-        ],
-        newWords: [], // No new words explicitly listed for Lesson 3
-        grammar: null, // No new grammar explicitly listed for Lesson 3
-        pronunciation: null, // No new pronunciation explicitly listed for Lesson 3
-        conversationSkill: null, // Not explicitly listed
-        writingSkill: {
-          title: 'Writing problem and solution passages',
-          guidelines: [
-            'Introduce the problem.',
-            'Explain the problem in detail. You can talk about its causes and/or effects.',
-            'Give solutions and explain why they work.',
-            'Summarize your main points and say how your solutions will solve the problem.',
-          ],
-        },
-        activities: [
-          { name: 'Reading: Read Alex\'s passage about stress, main cause', type: 'reading' },
-          { name: 'Reading: Read Alex\'s passage, answer questions', type: 'reading' },
-          { name: 'Writing: Read about writing skill, how many causes/solutions?', type: 'writing' },
-          { name: 'Writing: Read sentences, write P for problem or S for solution', type: 'writing' },
-          { name: 'Speaking: The Biggest Problems for Teenagers - Discuss problems', type: 'speaking' },
-          { name: 'Speaking: The Biggest Problems for Teenagers - Choose problem, discuss points', type: 'speaking' },
-          { name: 'Writing: Write a problem and solution passage (80-100 words)', type: 'writing' },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'unit-8',
-    title: 'Unit 8: Traditions of Ethnic Groups in Vietnam',
-    lessons: [
-      {
-        id: 'unit-8-lesson-1',
-        title: 'Lesson 1',
-        objectives: [
-          'Talk about the culture of ethnic groups in Vietnam',
-          'Use articles',
-        ],
-        newWords: [
-          'headscarf',
-          'pottery',
-          'embroidery',
-          'cloth',
-          'basket',
-          'ethnic',
-          'silver',
-          'pattern',
-          'product',
-        ],
-        grammar: {
-          title: 'Articles (the, a/an, zero article)',
-          explanation: 'We can use the definite article (the) when our listener/reader knows the particular person, people, or thing(s) we\'re talking about, or when there is only one of that thing. We can use the indefinite article (a/an) when we talk about one thing or one member of a group of things. We use the zero article (Ø) when we talk about things in general or when we use names of people and places.',
-          examples: [
-            'The Chăm people have a traditional dance.',
-            'The M\'Nông people in (Ø) Đắk Nông Province have lots of (Ø) interesting folk tales.',
-          ],
-        },
-        pronunciation: {
-          title: 'Word stress for two-syllable adjectives',
-          focus: 'Stress the first syllable for most two-syllable adjectives.',
-          examples: ['ethnic', 'silver', 'shiny'],
-        },
-        conversationSkill: null, // Not explicitly listed
-        activities: [
-          { name: 'New Words: Match words with pictures', type: 'vocabulary' },
-          { name: 'New Words: Fill in the blanks with correct words', type: 'vocabulary' },
-          { name: 'Reading: Read article about Chăm people, main topic', type: 'reading' },
-          { name: 'Reading: Read article, circle best fit for blank, fill in blanks', type: 'reading' },
-          { name: 'Reading: Read article, similarities and differences', type: 'reading' },
-          { name: 'Grammar: Fill in the blanks (articles)', type: 'grammar' },
-          { name: 'Grammar: Unscramble sentences', type: 'grammar' },
-          { name: 'Grammar: Fill in the blanks with a, an, the, or zero article', type: 'grammar' },
-          { name: 'Pronunciation: Focus on word stress, listen and cross out different stress', type: 'pronunciation' },
-          { name: 'Practice: Practice conversation (articles)', type: 'speaking' },
-          { name: 'Speaking: The People of Vietnam - Ask and complete notes', type: 'speaking' },
-        ],
-      },
-      {
-        id: 'unit-8-lesson-2',
-        title: 'Lesson 2',
-        objectives: [
-          'Report a conversation with an ethnic minority about crafts, food, and culture',
-          'Use reported speech for questions',
-        ],
-        newWords: [
-          'blouse',
-          'apron',
-          'sticky rice',
-          'steamed',
-          'utensils',
-          'corn',
-        ],
-        grammar: {
-          title: 'Reported speech for questions',
-          explanation: 'We can use reported speech to say or repeat questions that someone asked before the time of speaking. To report a Wh-question: Speaker + asked + listener + Wh-question (in a past statement form). To report a Yes/No question: Speaker + asked + listener + if/whether + Yes/No question (in a past statement form).',
-          examples: [
-            'I asked him what food he liked best.',
-            'I asked her if she had any brothers or sisters.',
-          ],
-        },
-        pronunciation: {
-          title: '/oʊ/ sound',
-          focus: 'Focus on the sound /oʊ/.',
-          examples: ['grow', 'sewing', 'oh'],
-        },
-        conversationSkill: {
-          title: 'Showing interest to get more information',
-          phrases: ['Oh?', 'And?'],
-        },
-        activities: [
-          { name: 'New Words: Look at pictures, fill in the blanks', type: 'vocabulary' },
-          { name: 'Listening: Sarah telling John about vacation, John\'s opinion, circle correct answer', type: 'listening' },
-          { name: 'Grammar: Fill in the blanks (reported speech for questions)', type: 'grammar' },
-          { name: 'Grammar: Circle correct words (reported speech for questions)', type: 'grammar' },
-          { name: 'Grammar: Complete sentences to report questions', type: 'grammar' },
-          { name: 'Pronunciation: Focus on /oʊ/ sound, listen and cross out different sound', type: 'pronunciation' },
-          { name: 'Practice: Report questions and answers', type: 'speaking' },
-          { name: 'Speaking: Meeting Someone Interesting - Tell friend about vacation', type: 'speaking' },
-        ],
-      },
-      {
-        id: 'unit-8-lesson-3',
-        title: 'Lesson 3',
-        objectives: [
-          'Talk about fun things to do at ethnic villages in Vietnam',
-          'Write a passage about a trip to an ethnic village in Vietnam',
-        ],
-        newWords: [], // No new words explicitly listed for Lesson 3
-        grammar: null, // No new grammar explicitly listed for Lesson 3
-        pronunciation: null, // No new pronunciation explicitly listed for Lesson 3
-        conversationSkill: null, // Not explicitly listed
-        writingSkill: {
-          title: 'Giving supporting information',
-          guidelines: [
-            'Facts - give true information to support the main point. The information answers questions like who, what, when,...?',
-            'Examples - give specific examples to support the main point',
-            'Opinions - give your personal opinions to help support the main point',
-          ],
-        },
-        activities: [
-          { name: 'Reading: Read Lan\'s passage, choose best topic sentence', type: 'reading' },
-          { name: 'Reading: Read Lan\'s passage, answer questions', type: 'reading' },
-          { name: 'Writing: Read about writing skill, underline facts, examples, opinions', type: 'writing' },
-          { name: 'Writing: Read topic sentence and supporting information, write F/E/O', type: 'writing' },
-          { name: 'Speaking: Trips to Ethnic Villages in Vietnam - Ask and take notes', type: 'speaking' },
-          { name: 'Writing: Write a passage about one of the trips (80-100 words)', type: 'writing' },
-        ],
-      },
-    ],
-  },
-];
 
 
-const transformLessons = (lessons: any[], unitId: number): Lesson[] => {
-    return lessons.map((lesson, lessonIndex) => {
-        const lessonNum = parseInt((lesson.title.split(' ').pop() || '1'));
-        const grammarPoints: GrammarPoint[] = [];
-        if (lesson.grammar) {
-            grammarPoints.push({
-                title: { en: lesson.grammar.title, vi: lesson.grammar.title },
-                explanation: { en: [lesson.grammar.explanation, ...lesson.grammar.examples], vi: [lesson.grammar.explanation, ...lesson.grammar.examples] },
-            });
-        }
-        return {
-            id: unitId * 100 + lessonNum,
-            title: { en: lesson.title, vi: `Bài ${lessonNum}` },
-            aims: { en: lesson.objectives, vi: lesson.objectives },
-            vocabulary: lesson.newWords.map((word: string) => ({ term: word, vietnamese: word, pronunciation: '' })),
-            grammar: grammarPoints,
-            activities: lesson.activities.map((act: any) => ({ type: 'Practice', description: { en: [act.name], vi: [act.name] } })),
-        };
-    });
-};
+import { CurriculumLevel } from '../types';
 
-const transformUnits = (units: any[]): Unit[] => {
-    return units.map((unit) => {
-        const unitNum = parseInt((unit.id.split('-').pop() || '1'));
-        const unitId = 800 + unitNum;
-        const titleParts = unit.title.split(': ');
-        const enTitle = titleParts.length > 1 ? titleParts[1] : unit.title;
-        return {
-            id: unitId,
-            title: { en: enTitle, vi: enTitle },
-            lessons: transformLessons(unit.lessons, unitId),
-        };
-    });
-};
-
+// Fix: Renamed sw7Data to sw8Data and updated content to reflect Grade 8.
 export const sw8Data: CurriculumLevel = {
     level: 8,
     title: { en: 'i-Learn Smart World 8', vi: 'i-Learn Smart World 8' },
     subtitle: { en: 'Secondary School - Grade 8', vi: 'Trung học cơ sở - Lớp 8' },
-    ebookPdfUrl: 'https://drive.google.com/file/d/1_d28c35S1s-0aD2E9M6f4gH5jK7nOp8l/view?usp=sharing',
-    units: transformUnits(sw8RawData),
+    ebookPdfUrl: 'https://drive.google.com/file/d/1gbl9bh_HnkYwHZeRkP6gGJ0dJ5wn0PUf/view?usp=drive_link', // Note: This URL might still be for SW7.
+    units: [
+        {
+            id: 801,
+            title: { en: 'Unit 1: Free Time', vi: 'Bài 1: Thời gian rảnh' },
+            lessons: [
+                {
+                    id: 80101,
+                    title: { en: 'Lesson 1: Hobbies', vi: 'Bài học 1: Sở thích' },
+                    aims: {
+                        en: ['Ask and answer about hobbies', 'Use the Present Simple for habits'],
+                        vi: ['Hỏi và trả lời về sở thích', 'Sử dụng thì Hiện tại đơn cho thói quen'],
+                    },
+                    vocabulary: [
+                        { term: 'collect soccer stickers', pronunciation: '/kəˈlekt ˈsɑːkər ˈstɪkərz/', vietnamese: 'sưu tầm nhãn dán bóng đá' },
+                        { term: 'build models', pronunciation: '/bɪld ˈmɑːdlz/', vietnamese: 'xây dựng mô hình' },
+                        { term: 'bake cakes', pronunciation: '/beɪk keɪks/', vietnamese: 'nướng bánh' },
+                        { term: 'make vlogs', pronunciation: '/meɪk vlɔːɡz/', vietnamese: 'làm vlog' },
+                        { term: 'read comics', pronunciation: '/riːd ˈkɑːmɪks/', vietnamese: 'đọc truyện tranh' },
+                        { term: 'play online games', pronunciation: '/pleɪ ˈɑːnlaɪn ɡeɪmz/', vietnamese: 'chơi game online' },
+                    ],
+                    grammar: [
+                        { title: { en: 'Present Simple for habits', vi: 'Thì Hiện tại đơn cho thói quen' }, explanation: { en: ['We can use the Present Simple to talk about habits or things that happen regularly.', 'I/You/We/They play soccer.', 'He/She reads comics.', 'What do you do in your free time? - I play soccer on Tuesday evenings.'], vi: ['Chúng ta có thể sử dụng thì Hiện tại đơn để nói về thói quen hoặc những điều xảy ra thường xuyên.', 'Tôi/Bạn/Chúng tôi/Họ chơi bóng đá.', 'Anh ấy/Cô ấy đọc truyện tranh.', 'Bạn làm gì vào thời gian rảnh? - Tôi chơi bóng đá vào các buổi tối thứ Ba.'] } },
+                    ],
+                    activities: [],
+                },
+                {
+                    id: 80102,
+                    title: { en: 'Lesson 2: Making Plans', vi: 'Bài học 2: Lên kế hoạch' },
+                    aims: {
+                        en: ['Make future plans', 'Use the Present Continuous for future plans and prepositions of place', 'Start a friendly conversation'],
+                        vi: ['Lên kế hoạch tương lai', 'Sử dụng thì Hiện tại tiếp diễn cho kế hoạch tương lai và giới từ chỉ nơi chốn', 'Bắt đầu một cuộc trò chuyện thân mật'],
+                    },
+                    vocabulary: [
+                        { term: 'sports center', pronunciation: '/spɔːrts ˈsentər/', vietnamese: 'trung tâm thể thao' },
+                        { term: 'bowling alley', pronunciation: '/ˈboʊlɪŋ ˈæli/', vietnamese: 'sân chơi bowling' },
+                        { term: 'theater', pronunciation: '/ˈθiːətər/', vietnamese: 'nhà hát' },
+                        { term: 'ice rink', pronunciation: '/aɪs rɪŋk/', vietnamese: 'sân băng' },
+                        { term: 'water park', pronunciation: '/ˈwɔːtər pɑːrk/', vietnamese: 'công viên nước' },
+                        { term: 'market', pronunciation: '/ˈmɑːrkɪt/', vietnamese: 'chợ' },
+                        { term: 'fair', pronunciation: '/fer/', vietnamese: 'hội chợ' },
+                    ],
+                    grammar: [
+                        { title: { en: 'Present Continuous for future plans', vi: 'Thì Hiện tại tiếp diễn cho kế hoạch tương lai' }, explanation: { en: ['We can use the Present Continuous to talk about future plans.', 'I\'m going to the sports center tonight.', 'He/She is going to the bowling alley this evening.'], vi: ['Chúng ta có thể sử dụng thì Hiện tại tiếp diễn để nói về các kế hoạch trong tương lai.', 'Tôi sẽ đến trung tâm thể thao tối nay.', 'Anh ấy/Cô ấy sẽ đến sân chơi bowling tối nay.'] } },
+                        { title: { en: 'Prepositions of place', vi: 'Giới từ chỉ nơi chốn' }, explanation: { en: ['We use prepositions of place to talk about where something or someone is located.', 'in front of, behind, next to, opposite.'], vi: ['Chúng ta sử dụng giới từ chỉ nơi chốn để nói về vị trí của một cái gì đó hoặc ai đó.', 'ở phía trước, phía sau, bên cạnh, đối diện.'] } },
+                    ],
+                    activities: [],
+                },
+                {
+                    id: 80103,
+                    title: { en: 'Lesson 3: Extreme Sports', vi: 'Bài học 3: Thể thao mạo hiểm' },
+                    aims: {
+                        en: ['Talk about extreme sports', 'Write emails inviting people to join you in an activity'],
+                        vi: ['Nói về các môn thể thao mạo hiểm', 'Viết email mời mọi người tham gia một hoạt động'],
+                    },
+                    vocabulary: [
+                        { term: 'skateboarding', pronunciation: '/ˈskeɪtbɔːrdɪŋ/', vietnamese: 'trượt ván' },
+                        { term: 'surfing', pronunciation: '/ˈsɜːrfɪŋ/', vietnamese: 'lướt sóng' },
+                        { term: 'rock climbing', pronunciation: '/rɑːk ˈklaɪmɪŋ/', vietnamese: 'leo núi đá' },
+                        { term: 'zorbing', pronunciation: '/ˈzɔːrbɪŋ/', vietnamese: 'trượt bóng zorbing' },
+                    ],
+                    grammar: [],
+                    activities: [],
+                }
+            ]
+        },
+        {
+            id: 802,
+            title: { en: 'Unit 2: Health', vi: 'Bài 2: Sức khỏe' },
+            lessons: [
+                 {
+                    id: 80201,
+                    title: { en: 'Lesson 1: Healthy Lifestyle', vi: 'Bài học 1: Lối sống lành mạnh' },
+                    aims: {
+                        en: ['Talk about what makes a healthy lifestyle', 'Use indefinite quantifiers'],
+                        vi: ['Nói về điều gì tạo nên một lối sống lành mạnh', 'Sử dụng các lượng từ bất định']
+                    },
+                    vocabulary: [
+                        { term: 'get (some) sleep', pronunciation: '/ɡet (sʌm) sliːp/', vietnamese: 'ngủ một chút' },
+                        { term: 'eat fruit and vegetables', pronunciation: '/iːt fruːt ænd ˈvɛdʒtəbəlz/', vietnamese: 'ăn trái cây và rau củ' },
+                        { term: 'eat fast food', pronunciation: '/iːt fæst fuːd/', vietnamese: 'ăn đồ ăn nhanh' },
+                        { term: 'drink soda', pronunciation: '/drɪŋk ˈsoʊdə/', vietnamese: 'uống soda' },
+                        { term: 'healthy', pronunciation: '/ˈhɛlθi/', vietnamese: 'khỏe mạnh' },
+                        { term: 'unhealthy', pronunciation: '/ʌnˈhɛlθi/', vietnamese: 'không lành mạnh' },
+                    ],
+                    grammar: [{
+                        title: { en: 'Indefinite quantifiers', vi: 'Lượng từ bất định' },
+                        explanation: { en: ['We can use a little, not much, some, and lots of/a lot of to say how much we do something.', 'Use with uncountable nouns (e.g., junk food) and plural countable nouns (e.g., vegetables).'], vi: ['Chúng ta có thể sử dụng a little, not much, some, và lots of/a lot of để nói về mức độ chúng ta làm điều gì đó.', 'Sử dụng với danh từ không đếm được (VD: đồ ăn vặt) và danh từ đếm được số nhiều (VD: rau củ).'] }
+                    }],
+                    activities: []
+                },
+                {
+                    id: 80202,
+                    title: { en: 'Lesson 2: Advice', vi: 'Bài học 2: Lời khuyên' },
+                    aims: {
+                        en: ['Give advice and persuade someone to have a healthy lifestyle', 'Use "should" and "shouldn\'t"'],
+                        vi: ['Đưa ra lời khuyên và thuyết phục ai đó có lối sống lành mạnh', 'Sử dụng "should" và "shouldn\'t"']
+                    },
+                    vocabulary: [
+                        { term: 'feel weak', pronunciation: '/fiːl wiːk/', vietnamese: 'cảm thấy yếu' },
+                        { term: 'have a sore throat', pronunciation: '/hæv ə sɔːr θroʊt/', vietnamese: 'bị đau họng' },
+                        { term: 'get some rest', pronunciation: '/ɡet sʌm rest/', vietnamese: 'nghỉ ngơi' },
+                        { term: 'take vitamins', pronunciation: '/teɪk ˈvaɪtəmɪnz/', vietnamese: 'uống vitamin' },
+                        { term: 'have a fever', pronunciation: '/hæv ə ˈfiːvər/', vietnamese: 'bị sốt' },
+                        { term: 'take medicine', pronunciation: '/teɪk ˈmɛdəsɪn/', vietnamese: 'uống thuốc' },
+                        { term: 'stay up late', pronunciation: '/steɪ ʌp leɪt/', vietnamese: 'thức khuya' },
+                        { term: 'keep warm', pronunciation: '/kiːp wɔːrm/', vietnamese: 'giữ ấm' },
+                    ],
+                    grammar: [{
+                        title: { en: 'should / shouldn\'t', vi: 'should / shouldn\'t' },
+                        explanation: { en: ['We can use should and shouldn\'t to give advice. We can use should to ask for advice.', 'You should eat fresh fruit. You shouldn\'t eat fast food.', 'What should I do? Should I take some medicine?'], vi: ['Chúng ta có thể dùng should và shouldn\'t để đưa ra lời khuyên. Chúng ta có thể dùng should để hỏi xin lời khuyên.', 'Bạn nên ăn trái cây tươi. Bạn không nên ăn đồ ăn nhanh.', 'Tôi nên làm gì? Tôi có nên uống thuốc không?'] }
+                    }],
+                    activities: []
+                },
+                {
+                    id: 80203,
+                    title: { en: 'Lesson 3: Healthy Food', vi: 'Bài học 3: Thực phẩm lành mạnh' },
+                    aims: {
+                        en: ['Talk about healthy food', 'Write a request letter'],
+                        vi: ['Nói về thực phẩm lành mạnh', 'Viết một lá thư yêu cầu']
+                    },
+                    vocabulary: [],
+                    grammar: [],
+                    activities: []
+                }
+            ]
+        },
+        {
+            id: 803,
+            title: { en: 'Unit 3: Music and Arts', vi: 'Bài 3: Âm nhạc và Nghệ thuật' },
+            lessons: [
+                {
+                    id: 80301,
+                    title: {en: 'Lesson 1: Music Types', vi: 'Bài học 1: Các loại nhạc'},
+                    aims: {
+                        en: ['Talk about music that you like', 'Use the Present Simple for facts'],
+                        vi: ['Nói về thể loại nhạc bạn thích', 'Sử dụng thì Hiện tại đơn cho các sự thật']
+                    },
+                    vocabulary: [
+                        {term: 'jazz', pronunciation: '/dʒæz/', vietnamese: 'nhạc jazz'},
+                        {term: 'pop', pronunciation: '/pɑːp/', vietnamese: 'nhạc pop'},
+                        {term: 'hip hop', pronunciation: '/ˈhɪp hɑːp/', vietnamese: 'nhạc hip hop'},
+                        {term: 'classical music', pronunciation: '/ˈklæsɪkl ˈmjuːzɪk/', vietnamese: 'nhạc cổ điển'},
+                        {term: 'rock', pronunciation: '/rɑːk/', vietnamese: 'nhạc rock'},
+                        {term: 'country (music)', pronunciation: '/ˈkʌntri ˈmjuːzɪk/', vietnamese: 'nhạc đồng quê'}
+                    ],
+                    grammar: [{
+                        title: {en: 'Present Simple for facts', vi: 'Thì Hiện tại đơn cho sự thật'},
+                        explanation: {en: ['We can use the Present Simple to talk about things that we consider as facts (such as likes and dislikes).', 'I like jazz. Does he enjoy listening to rock?'], vi: ['Chúng ta có thể sử dụng thì Hiện tại đơn để nói về những điều chúng ta coi là sự thật (chẳng hạn như sở thích và không thích).', 'Tôi thích nhạc jazz. Anh ấy có thích nghe nhạc rock không?']}
+                    }],
+                    activities: []
+                },
+                {
+                    id: 80302,
+                    title: {en: 'Lesson 2: Music Events', vi: 'Bài học 2: Sự kiện âm nhạc'},
+                    aims: {
+                        en: ['Plan to go to a music event', 'Use prepositions of time and possessive adjectives'],
+                        vi: ['Lên kế hoạch đi xem một sự kiện âm nhạc', 'Sử dụng giới từ chỉ thời gian và tính từ sở hữu']
+                    },
+                    vocabulary: [
+                        {term: 'electronic', pronunciation: '/ɪˌlɛkˈtrɑːnɪk/', vietnamese: 'nhạc điện tử'},
+                        {term: 'heavy metal', pronunciation: '/ˈhɛvi ˈmɛtl/', vietnamese: 'nhạc heavy metal'},
+                        {term: 'reggae', pronunciation: '/ˈrɛɡeɪ/', vietnamese: 'nhạc reggae'},
+                        {term: 'blues', pronunciation: '/bluːz/', vietnamese: 'nhạc blues'},
+                        {term: 'folk (music)', pronunciation: '/foʊk ˈmjuːzɪk/', vietnamese: 'nhạc dân gian'},
+                        {term: 'RnB', pronunciation: '/ˌɑːr ən ˈbiː/', vietnamese: 'nhạc RnB'}
+                    ],
+                    grammar: [
+                        {title: {en: 'Prepositions of time', vi: 'Giới từ chỉ thời gian'}, explanation: {en: ['We use in with parts of the day, months, seasons, and years.', 'We use on with days and dates.', 'We use at with times of the day and meals.'], vi: ['Chúng ta dùng in với các buổi trong ngày, tháng, mùa và năm.', 'Chúng ta dùng on với các ngày và ngày tháng.', 'Chúng ta dùng at với thời gian trong ngày và các bữa ăn.']}},
+                        {title: {en: 'Possessive adjectives', vi: 'Tính từ sở hữu'}, explanation: {en: ['We use possessive adjectives to express possession.', 'my, your, his, her, its, our, their.'], vi: ['Chúng ta dùng tính từ sở hữu để diễn tả sự sở hữu.', 'my, your, his, her, its, our, their.']}}
+                    ],
+                    activities: []
+                },
+                {
+                    id: 80303,
+                    title: {en: 'Lesson 3: Movies', vi: 'Bài học 3: Phim ảnh'},
+                    aims: {
+                        en: ['Talk about a movie you like', 'Write a paragraph describing a movie'],
+                        vi: ['Nói về một bộ phim bạn thích', 'Viết một đoạn văn mô tả một bộ phim']
+                    },
+                    vocabulary: [
+                        {term: 'conclusion', pronunciation: '/kənˈkluːʒən/', vietnamese: 'kết luận'},
+                        {term: 'plot', pronunciation: '/plɑːt/', vietnamese: 'cốt truyện'},
+                        {term: 'star', pronunciation: '/stɑːr/', vietnamese: 'ngôi sao (diễn viên chính)'},
+                        {term: 'setting', pronunciation: '/ˈsɛtɪŋ/', vietnamese: 'bối cảnh'}
+                    ],
+                    grammar: [],
+                    activities: []
+                }
+            ]
+        },
+        {
+            id: 804,
+            title: { en: 'Unit 4: Community Services', vi: 'Bài 4: Dịch vụ Cộng đồng' },
+            lessons: [
+                {
+                    id: 80401,
+                    title: {en: 'Lesson 1: Charity Events', vi: 'Bài học 1: Sự kiện từ thiện'},
+                    aims: {
+                        en: ['Suggest and plan a charity event', 'Use "should," "Let\'s," and "How about" to make suggestions'],
+                        vi: ['Đề xuất và lên kế hoạch cho một sự kiện từ thiện', 'Sử dụng "should," "Let\'s," và "How about" để đưa ra gợi ý']
+                    },
+                    vocabulary: [
+                        {term: 'car wash', pronunciation: '/kɑːr wɑːʃ/', vietnamese: 'rửa xe'},
+                        {term: 'bake sale', pronunciation: '/beɪk seɪl/', vietnamese: 'bán bánh gây quỹ'},
+                        {term: 'craft fair', pronunciation: '/kræft fer/', vietnamese: 'hội chợ thủ công'},
+                        {term: 'talent show', pronunciation: '/ˈtælənt ʃoʊ/', vietnamese: 'buổi biểu diễn tài năng'},
+                        {term: 'fun run', pronunciation: '/fʌn rʌn/', vietnamese: 'cuộc chạy bộ vui vẻ'}
+                    ],
+                    grammar: [{
+                        title: {en: 'Making suggestions', vi: 'Đưa ra gợi ý'},
+                        explanation: {en: ['We can make suggestions to offer ideas or plans for someone to think about.', 'should + bare infinitive', 'Let\'s + bare infinitive', 'How about + V-ing?'], vi: ['Chúng ta có thể đưa ra gợi ý để đề xuất ý tưởng hoặc kế hoạch cho ai đó suy nghĩ.', 'should + động từ nguyên mẫu', 'Let\'s + động từ nguyên mẫu', 'How about + V-ing?']}
+                    }],
+                    activities: []
+                },
+                {
+                    id: 80402,
+                    title: {en: 'Lesson 2: Helping the Community', vi: 'Bài học 2: Giúp đỡ cộng đồng'},
+                    aims: {
+                        en: ['Talk about things we did to help our community', 'Use the Past Simple with regular verbs'],
+                        vi: ['Nói về những việc chúng ta đã làm để giúp đỡ cộng đồng', 'Sử dụng thì Quá khứ đơn với động từ có quy tắc']
+                    },
+                    vocabulary: [
+                        {term: 'recycle', pronunciation: '/ˌriːˈsaɪkl/', vietnamese: 'tái chế'},
+                        {term: 'raise', pronunciation: '/reɪz/', vietnamese: 'quyên góp'},
+                        {term: 'plant', pronunciation: '/plænt/', vietnamese: 'trồng cây'},
+                        {term: 'donate', pronunciation: '/ˈdoʊneɪt/', vietnamese: 'hiến tặng'},
+                        {term: 'clean up', pronunciation: '/kliːn ʌp/', vietnamese: 'dọn dẹp'}
+                    ],
+                    grammar: [{
+                        title: {en: 'Past Simple with regular verbs', vi: 'Thì Quá khứ đơn với động từ có quy tắc'},
+                        explanation: {en: ['We use the Past Simple to talk about an action that started and finished in the past.', 'Last month, we raised money to help the local charity.'], vi: ['Chúng ta sử dụng thì Quá khứ đơn để nói về một hành động đã bắt đầu và kết thúc trong quá khứ.', 'Tháng trước, chúng tôi đã quyên góp tiền để giúp đỡ tổ chức từ thiện địa phương.']}
+                    }],
+                    activities: []
+                },
+                {
+                    id: 80403,
+                    title: {en: 'Lesson 3: Environmental Clean-up', vi: 'Bài học 3: Dọn dẹp môi trường'},
+                    aims: {
+                        en: ['Talk about how to help the environment', 'Write an email about an environmental clean-up'],
+                        vi: ['Nói về cách giúp đỡ môi trường', 'Viết một email về một cuộc dọn dẹp môi trường']
+                    },
+                    vocabulary: [],
+                    grammar: [],
+                    activities: []
+                }
+            ]
+        },
+        {
+            id: 805,
+            title: { en: 'Unit 5: Food and Drinks', vi: 'Bài 5: Đồ ăn và Thức uống' },
+            lessons: [
+                {
+                    id: 80501,
+                    title: {en: 'Lesson 1: Ingredients', vi: 'Bài học 1: Nguyên liệu'},
+                    aims: {
+                        en: ['Talk about what food you need to buy', 'Use quantifiers and amounts'],
+                        vi: ['Nói về thực phẩm bạn cần mua', 'Sử dụng các từ chỉ số lượng và khối lượng']
+                    },
+                    vocabulary: [
+                        {term: 'spaghetti', pronunciation: '/spəˈɡɛti/', vietnamese: 'mì Ý'},
+                        {term: 'milliliters (ml)', pronunciation: '/ˈmɪlɪˌliːtərz/', vietnamese: 'mililit'},
+                        {term: 'lemon', pronunciation: '/ˈlɛmən/', vietnamese: 'chanh vàng'},
+                        {term: 'grams (g)', pronunciation: '/ɡræmz/', vietnamese: 'gam'},
+                        {term: 'tablespoon (tbsp)', pronunciation: '/ˈteɪblspuːn/', vietnamese: 'thìa canh'},
+                        {term: 'onion', pronunciation: '/ˈʌnjən/', vietnamese: 'hành tây'},
+                        {term: 'teaspoon (tsp)', pronunciation: '/ˈtiːspuːn/', vietnamese: 'thìa cà phê'},
+                        {term: 'tomato', pronunciation: '/təˈmeɪtoʊ/', vietnamese: 'cà chua'}
+                    ],
+                    grammar: [{
+                        title: {en: 'Much and Many', vi: 'Much và Many'},
+                        explanation: {en: ['We can use much for uncountable nouns and many for plural countable nouns.', 'How much sugar do we need?', 'How many eggs do we need?'], vi: ['Chúng ta có thể dùng much cho danh từ không đếm được và many cho danh từ đếm được số nhiều.', 'Chúng ta cần bao nhiêu đường?', 'Chúng ta cần bao nhiêu trứng?']}
+                    }],
+                    activities: []
+                },
+                {
+                    id: 80502,
+                    title: {en: 'Lesson 2: Containers', vi: 'Bài học 2: Đồ đựng'},
+                    aims: {
+                        en: ['Talk about containers and quantities of food and drinks', 'Use indefinite and definite articles'],
+                        vi: ['Nói về đồ đựng và số lượng đồ ăn, thức uống', 'Sử dụng mạo từ không xác định và xác định']
+                    },
+                    vocabulary: [
+                        {term: 'bag', pronunciation: '/bæɡ/', vietnamese: 'túi'},
+                        {term: 'bunch', pronunciation: '/bʌntʃ/', vietnamese: 'nải, chùm'},
+                        {term: 'can', pronunciation: '/kæn/', vietnamese: 'lon'},
+                        {term: 'bottle', pronunciation: '/ˈbɑːtl/', vietnamese: 'chai'},
+                        {term: 'stick', pronunciation: '/stɪk/', vietnamese: 'thỏi'},
+                        {term: 'carton (x2)', pronunciation: '/ˈkɑːrtn/', vietnamese: 'hộp (giấy)'},
+                        {term: 'box', pronunciation: '/bɑːks/', vietnamese: 'hộp'}
+                    ],
+                    grammar: [{
+                        title: {en: 'Indefinite and definite articles', vi: 'Mạo từ không xác định và xác định'},
+                        explanation: {en: ['We use a/an with singular nouns when we talk about something for the first time. After that, we use the.', 'I bought a can of beans. I put the can of beans in the cupboard.'], vi: ['Chúng ta dùng a/an với danh từ số ít khi nói về một cái gì đó lần đầu tiên. Sau đó, chúng ta dùng the.', 'Tôi đã mua một lon đậu. Tôi đã đặt lon đậu vào tủ.']}
+                    }],
+                    activities: []
+                },
+                {
+                    id: 80503,
+                    title: {en: 'Lesson 3: Unusual Food', vi: 'Bài học 3: Món ăn lạ'},
+                    aims: {
+                        en: ['Talk about unusual food posts in Vietnam', 'Write a food blog post'],
+                        vi: ['Nói về các bài đăng món ăn lạ ở Việt Nam', 'Viết một bài blog về ẩm thực']
+                    },
+                    vocabulary: [],
+                    grammar: [],
+                    activities: []
+                }
+            ]
+        },
+        {
+            id: 806,
+            title: { en: 'Unit 6: Education', vi: 'Bài 6: Giáo dục' },
+            lessons: [
+                {
+                    id: 80601,
+                    title: {en: 'Lesson 1: School Work', vi: 'Bài học 1: Việc học ở trường'},
+                    aims: {
+                        en: ['Decline invitations and express obligations', 'Use Present Simple and "have to"'],
+                        vi: ['Từ chối lời mời và bày tỏ nghĩa vụ', 'Sử dụng thì Hiện tại đơn và "have to"']
+                    },
+                    vocabulary: [
+                        {term: 'essay', pronunciation: '/ˈɛseɪ/', vietnamese: 'bài luận'},
+                        {term: 'project', pronunciation: '/ˈprɑːdʒɛkt/', vietnamese: 'dự án'},
+                        {term: 'homework', pronunciation: '/ˈhoʊmwɜːrk/', vietnamese: 'bài tập về nhà'},
+                        {term: 'book report', pronunciation: '/bʊk rɪˈpɔːrt/', vietnamese: 'bài báo cáo sách'},
+                        {term: 'test', pronunciation: '/tɛst/', vietnamese: 'bài kiểm tra'},
+                        {term: 'presentation', pronunciation: '/ˌpriːzɛnˈteɪʃən/', vietnamese: 'bài thuyết trình'}
+                    ],
+                    grammar: [{
+                        title: {en: 'have to', vi: 'have to'},
+                        explanation: {en: ['We use have to + infinitive to talk about an action we can choose to do if we want to.', 'I have to study for a test. He has to do homework.'], vi: ['Chúng ta dùng have to + động từ nguyên mẫu để nói về một hành động mà chúng ta có thể chọn làm nếu muốn.', 'Tôi phải học cho bài kiểm tra. Anh ấy phải làm bài tập về nhà.']}
+                    }],
+                    activities: []
+                },
+                {
+                    id: 80602,
+                    title: {en: 'Lesson 2: Feelings about School', vi: 'Bài học 2: Cảm xúc về trường học'},
+                    aims: {
+                        en: ['Talk about how you feel about school', 'Use intensifiers and "because"'],
+                        vi: ['Nói về cảm xúc của bạn về trường học', 'Sử dụng các từ nhấn mạnh và "because"']
+                    },
+                    vocabulary: [
+                        {term: 'upset', pronunciation: '/ʌpˈsɛt/', vietnamese: 'buồn bã'},
+                        {term: 'fail', pronunciation: '/feɪl/', vietnamese: 'trượt'},
+                        {term: 'pleased', pronunciation: '/pliːzd/', vietnamese: 'hài lòng'},
+                        {term: 'disappointed', pronunciation: '/ˌdɪsəˈpɔɪntɪd/', vietnamese: 'thất vọng'},
+                        {term: 'surprised', pronunciation: '/sərˈpraɪzd/', vietnamese: 'ngạc nhiên'},
+                        {term: 'delighted', pronunciation: '/dɪˈlaɪtɪd/', vietnamese: 'vui mừng'},
+                        {term: 'annoyed', pronunciation: '/əˈnɔɪd/', vietnamese: 'bực mình'},
+                        {term: 'pass', pronunciation: '/pæs/', vietnamese: 'đỗ'}
+                    ],
+                    grammar: [
+                        {title: {en: 'because', vi: 'because'}, explanation: {en: ['We use the subordinating conjunction because to connect two clauses in a sentence.', 'I failed my math test because I didn\'t study.'], vi: ['Chúng ta dùng liên từ phụ thuộc because để nối hai mệnh đề trong một câu.', 'Tôi đã trượt bài kiểm tra toán vì tôi không học.']}},
+                        {title: {en: 'so and really', vi: 'so và really'}, explanation: {en: ['We use the intensifiers so and really to make adjectives stronger.', 'He is so happy because he passed his test.'], vi: ['Chúng ta dùng các từ nhấn mạnh so và really để làm cho tính từ mạnh hơn.', 'Anh ấy rất vui vì đã đỗ bài kiểm tra.']}}
+                    ],
+                    activities: []
+                },
+                {
+                    id: 80603,
+                    title: {en: 'Lesson 3: Studying Abroad', vi: 'Bài học 3: Du học'},
+                    aims: {
+                        en: ['Talk about studying abroad', 'Write a paragraph about studying abroad'],
+                        vi: ['Nói về việc du học', 'Viết một đoạn văn về việc du học']
+                    },
+                    vocabulary: [],
+                    grammar: [{
+                        title: {en: 'Using conjunctions (however, although)', vi: 'Sử dụng liên từ (however, although)'},
+                        explanation: {en: ['To show two ideas are different, you should use "however" and "although."', 'I woke up early. I missed the bus. -> Although I woke up early, I missed the bus.'], vi: ['Để thể hiện hai ý tưởng khác nhau, bạn nên dùng "however" và "although."', 'Tôi thức dậy sớm. Tôi đã lỡ chuyến xe buýt. -> Mặc dù tôi thức dậy sớm, tôi đã lỡ chuyến xe buýt.']}
+                    }],
+                    activities: []
+                }
+            ]
+        },
+        {
+            id: 807,
+            title: { en: 'Unit 7: Transportation', vi: 'Bài 7: Giao thông' },
+            lessons: [
+                {
+                    id: 80701,
+                    title: {en: 'Lesson 1: At the Airport', vi: 'Bài học 1: Ở sân bay'},
+                    aims: {
+                        en: ['Describe and identify personal belongings', 'Use possessive pronouns and adjectives in order'],
+                        vi: ['Mô tả và nhận dạng đồ dùng cá nhân', 'Sử dụng đại từ sở hữu và tính từ theo thứ tự']
+                    },
+                    vocabulary: [
+                        {term: 'boarding pass', pronunciation: '/ˈbɔːrdɪŋ pæs/', vietnamese: 'thẻ lên máy bay'},
+                        {term: 'passport', pronunciation: '/ˈpæspɔːrt/', vietnamese: 'hộ chiếu'},
+                        {term: 'customs', pronunciation: '/ˈkʌstəmz/', vietnamese: 'hải quan'},
+                        {term: 'baggage claim', pronunciation: '/ˈbæɡɪdʒ kleɪm/', vietnamese: 'nơi nhận hành lý'},
+                        {term: 'suitcase', pronunciation: '/ˈsuːtkeɪs/', vietnamese: 'va li'},
+                        {term: 'backpack', pronunciation: '/ˈbækpæk/', vietnamese: 'ba lô'},
+                        {term: 'luggage', pronunciation: '/ˈlʌɡɪdʒ/', vietnamese: 'hành lý'}
+                    ],
+                    grammar: [
+                        {title: {en: 'Ordering adjectives', vi: 'Thứ tự tính từ'}, explanation: {en: ['We put adjectives in the order of size, age, color in our sentences.', 'Mine is a small new yellow backpack.'], vi: ['Chúng ta đặt tính từ theo thứ tự kích thước, tuổi, màu sắc trong câu.', 'Của tôi là một chiếc ba lô màu vàng, mới, nhỏ.']}},
+                        {title: {en: 'Possessive Pronouns', vi: 'Đại từ sở hữu'}, explanation: {en: ['We use possessive pronouns (mine, yours, his, hers, ours, theirs) to talk about what we own and what belongs to us.', 'My backpack is red. -> Mine is red.'], vi: ['Chúng ta dùng đại từ sở hữu (của tôi, của bạn, của anh ấy, của cô ấy, của chúng tôi, của họ) để nói về những gì chúng ta sở hữu và những gì thuộc về chúng ta.', 'Ba lô của tôi màu đỏ. -> Cái của tôi màu đỏ.']}}
+                    ],
+                    activities: []
+                },
+                {
+                    id: 80702,
+                    title: {en: 'Lesson 2: Types of Transportation', vi: 'Bài học 2: Các loại phương tiện giao thông'},
+                    aims: {
+                        en: ['Compare different types of transportation', 'Use "(not) as...as..." to compare things'],
+                        vi: ['So sánh các loại phương tiện giao thông khác nhau', 'Sử dụng "(not) as...as..." để so sánh mọi thứ']
+                    },
+                    vocabulary: [
+                        {term: 'frequent', pronunciation: '/ˈfriːkwənt/', vietnamese: 'thường xuyên'},
+                        {term: 'eco-friendly', pronunciation: '/ˈiːkoʊ ˈfrɛndli/', vietnamese: 'thân thiện với môi trường'},
+                        {term: 'comfortable', pronunciation: '/ˈkʌmfərtəbl/', vietnamese: 'thoải mái'},
+                        {term: 'convenient', pronunciation: '/kənˈviːniənt/', vietnamese: 'tiện lợi'},
+                        {term: 'public', pronunciation: '/ˈpʌblɪk/', vietnamese: 'công cộng'},
+                        {term: 'ticket', pronunciation: '/ˈtɪkɪt/', vietnamese: 'vé'},
+                        {term: 'reliable', pronunciation: '/rɪˈlaɪəbl/', vietnamese: 'đáng tin cậy'}
+                    ],
+                    grammar: [{
+                        title: {en: '(not) as...as...', vi: '(không) bằng...'},
+                        explanation: {en: ['We can compare things using not as...as... if they are different or as...as... if they are the same.', 'The tickets are as expensive as a train ticket. Buses aren\'t as fast as trains.'], vi: ['Chúng ta có thể so sánh mọi thứ bằng cách sử dụng not as...as... nếu chúng khác nhau hoặc as...as... nếu chúng giống nhau.', 'Vé cũng đắt như vé tàu. Xe buýt không nhanh bằng tàu hỏa.']}
+                    }],
+                    activities: []
+                },
+                {
+                    id: 80703,
+                    title: {en: 'Lesson 3: Personal Transport', vi: 'Bài học 3: Phương tiện cá nhân'},
+                    aims: {
+                        en: ['Talk about transportation', 'Write an opinion paragraph about a type of transportation'],
+                        vi: ['Nói về phương tiện giao thông', 'Viết một đoạn văn bày tỏ quan điểm về một loại phương tiện giao thông']
+                    },
+                    vocabulary: [],
+                    grammar: [],
+                    activities: []
+                }
+            ]
+        },
+        {
+            id: 808,
+            title: { en: 'Unit 8: Festivals around the World', vi: 'Bài 8: Các lễ hội trên thế giới' },
+            lessons: [
+                {
+                    id: 80801,
+                    title: {en: 'Lesson 1: Festivals', vi: 'Bài học 1: Lễ hội'},
+                    aims: {
+                        en: ['Talk about the festivals around the world', 'Use the Future Simple'],
+                        vi: ['Nói về các lễ hội trên thế giới', 'Sử dụng thì Tương lai đơn']
+                    },
+                    vocabulary: [
+                        {term: 'lantern', pronunciation: '/ˈlæntərn/', vietnamese: 'đèn lồng'},
+                        {term: 'bonfire', pronunciation: '/ˈbɑːnfaɪər/', vietnamese: 'lửa trại'},
+                        {term: 'race', pronunciation: '/reɪs/', vietnamese: 'cuộc đua'},
+                        {term: '(eating) competition', pronunciation: '/kɑːmpəˈtɪʃn/', vietnamese: 'cuộc thi (ăn)'},
+                        {term: 'sculpture', pronunciation: '/ˈskʌlptʃər/', vietnamese: 'tác phẩm điêu khắc'},
+                        {term: '(water) fight', pronunciation: '/faɪt/', vietnamese: 'cuộc chiến (nước)'},
+                        {term: 'hot-air balloon', pronunciation: '/hɑːt ɛər bəˈluːn/', vietnamese: 'khinh khí cầu'}
+                    ],
+                    grammar: [{
+                        title: {en: 'Future Simple', vi: 'Thì Tương lai đơn'},
+                        explanation: {en: ['We can use the Future Simple to give or ask for information about events in the future.', 'It will take place from May 12th to 15th.', 'Rob Curly will not/won\'t perform this year.'], vi: ['Chúng ta có thể sử dụng thì Tương lai đơn để đưa ra hoặc hỏi thông tin về các sự kiện trong tương lai.', 'Nó sẽ diễn ra từ ngày 12 đến ngày 15 tháng 5.', 'Rob Curly sẽ không biểu diễn trong năm nay.']}
+                    }],
+                    activities: []
+                },
+                {
+                    id: 80802,
+                    title: {en: 'Lesson 2: Traditions', vi: 'Bài học 2: Truyền thống'},
+                    aims: {
+                        en: ['Compare how different countries celebrate festivals', 'Use "like" and "different from" to compare'],
+                        vi: ['So sánh cách các quốc gia khác nhau tổ chức lễ hội', 'Sử dụng "like" và "different from" để so sánh']
+                    },
+                    vocabulary: [
+                        {term: 'exchange', pronunciation: '/ɪksˈtʃeɪndʒ/', vietnamese: 'trao đổi'},
+                        {term: 'tradition', pronunciation: '/trəˈdɪʃn/', vietnamese: 'truyền thống'},
+                        {term: 'midnight', pronunciation: '/ˈmɪdnaɪt/', vietnamese: 'nửa đêm'},
+                        {term: 'wish', pronunciation: '/wɪʃ/', vietnamese: 'ước'},
+                        {term: 'greeting', pronunciation: '/ˈɡriːtɪŋ/', vietnamese: 'lời chào'},
+                        {term: 'celebrate', pronunciation: '/ˈsɛləbreɪt/', vietnamese: 'tổ chức lễ'}
+                    ],
+                    grammar: [{
+                        title: {en: 'different from and like', vi: 'khác với và giống'},
+                        explanation: {en: ['We use be + different from to say that one thing is not the same as another.', 'We use like + noun to say that two things are similar.', 'In Italy, they eat seafood at Christmas. That\'s different from Japan.'], vi: ['Chúng ta dùng be + different from để nói rằng một thứ không giống thứ khác.', 'Chúng ta dùng like + danh từ để nói rằng hai thứ giống nhau.', 'Ở Ý, họ ăn hải sản vào Giáng sinh. Điều đó khác với Nhật Bản.']}
+                    }],
+                    activities: []
+                },
+                {
+                    id: 80803,
+                    title: {en: 'Lesson 3: Local Festivals', vi: 'Bài học 3: Lễ hội địa phương'},
+                    aims: {
+                        en: ['Talk about unusual festivals in Vietnam', 'Write a blog post about your favorite festivals'],
+                        vi: ['Nói về các lễ hội lạ ở Việt Nam', 'Viết một bài blog về các lễ hội yêu thích của bạn']
+                    },
+                    vocabulary: [],
+                    grammar: [],
+                    activities: []
+                }
+            ]
+        },
+        {
+            id: 809,
+            title: { en: 'Unit 9: English in the World', vi: 'Bài 9: Tiếng Anh trên thế giới' },
+            lessons: [
+                {
+                    id: 80901,
+                    title: {en: 'Lesson 1: Tourist Attractions', vi: 'Bài học 1: Địa điểm du lịch'},
+                    aims: {
+                        en: ['Talk about tourist attractions and cultures of English-speaking countries', 'Use articles'],
+                        vi: ['Nói về các điểm du lịch và văn hóa của các nước nói tiếng Anh', 'Sử dụng mạo từ']
+                    },
+                    vocabulary: [
+                        {term: 'tour guide', pronunciation: '/tʊər ɡaɪd/', vietnamese: 'hướng dẫn viên du lịch'},
+                        {term: 'stadium', pronunciation: '/ˈsteɪdiəm/', vietnamese: 'sân vận động'},
+                        {term: 'flight', pronunciation: '/flaɪt/', vietnamese: 'chuyến bay'},
+                        {term: 'historic', pronunciation: '/hɪˈstɔːrɪk/', vietnamese: 'có tính lịch sử'},
+                        {term: 'jog', pronunciation: '/dʒɑːɡ/', vietnamese: 'chạy bộ'},
+                        {term: 'ferry', pronunciation: '/ˈfɛri/', vietnamese: 'phà'}
+                    ],
+                    grammar: [{
+                        title: {en: 'Articles', vi: 'Mạo từ'},
+                        explanation: {en: ['We use the zero article (Ø) with names of streets, parks, lakes, rivers, beaches, towns, cities, islands, and most countries.', 'We use the with some countries (the United States of America, the United Kingdom, the Netherlands, the Philippines).', 'We use the with famous buildings, museums, most hotels, and restaurants (the Empire State Building).'], vi: ['Chúng ta dùng mạo từ zero (Ø) với tên đường, công viên, hồ, sông, bãi biển, thị trấn, thành phố, đảo, và hầu hết các quốc gia.', 'Chúng ta dùng the với một số quốc gia (Hợp chủng quốc Hoa Kỳ, Vương quốc Anh, Hà Lan, Philippines).', 'Chúng ta dùng the với các tòa nhà, bảo tàng, hầu hết khách sạn và nhà hàng nổi tiếng (Tòa nhà Empire State).']}
+                    }],
+                    activities: []
+                },
+                {
+                    id: 80902,
+                    title: {en: 'Lesson 2: Holidays', vi: 'Bài học 2: Kỳ nghỉ'},
+                    aims: {
+                        en: ['Talk about holidays in English-speaking countries', 'Use the Past Simple with irregular verbs'],
+                        vi: ['Nói về các kỳ nghỉ ở các nước nói tiếng Anh', 'Sử dụng thì Quá khứ đơn với động từ bất quy tắc']
+                    },
+                    vocabulary: [
+                        {term: 'souvenirs', pronunciation: '/ˌsuːvəˈnɪrz/', vietnamese: 'đồ lưu niệm'},
+                        {term: 'sightseeing', pronunciation: '/ˈsaɪtsiːɪŋ/', vietnamese: 'ngắm cảnh'},
+                        {term: 'swimsuit', pronunciation: '/ˈswɪmsuːt/', vietnamese: 'đồ bơi'},
+                        {term: 'postcards', pronunciation: '/ˈpoʊstkɑːrdz/', vietnamese: 'bưu thiếp'},
+                        {term: 'photos', pronunciation: '/ˈfoʊtoʊz/', vietnamese: 'ảnh'},
+                        {term: 'beach', pronunciation: '/biːtʃ/', vietnamese: 'bãi biển'},
+                        {term: 'wallet', pronunciation: '/ˈwɑːlɪt/', vietnamese: 'ví'}
+                    ],
+                    grammar: [{
+                        title: {en: 'Past Simple with irregular verbs', vi: 'Thì Quá khứ đơn với động từ bất quy tắc'},
+                        explanation: {en: ['Some verbs are irregular. Their Past Simple forms do not end with -ed.', 'go - went, take - took, buy - bought, see - saw, etc.'], vi: ['Một số động từ là bất quy tắc. Dạng Quá khứ đơn của chúng không kết thúc bằng -ed.', 'go - went, take - took, buy - bought, see - saw, v.v.']}
+                    }],
+                    activities: []
+                },
+                {
+                    id: 80903,
+                    title: {en: 'Lesson 3: Benefits of English', vi: 'Bài học 3: Lợi ích của tiếng Anh'},
+                    aims: {
+                        en: ['Talk about the benefits of speaking English', 'Write a postcard to a friend'],
+                        vi: ['Nói về lợi ích của việc nói tiếng Anh', 'Viết bưu thiếp cho bạn bè']
+                    },
+                    vocabulary: [],
+                    grammar: [],
+                    activities: []
+                }
+            ]
+        },
+        {
+            id: 810,
+            title: { en: 'Unit 10: Energy Sources', vi: 'Bài 10: Nguồn năng lượng' },
+            lessons: [
+                {
+                    id: 81001,
+                    title: {en: 'Lesson 1: Types of Energy', vi: 'Bài học 1: Các loại năng lượng'},
+                    aims: {
+                        en: ['Talk about types and sources of energy', 'Use "more...than..." and "less...than..." to make comparisons'],
+                        vi: ['Nói về các loại và nguồn năng lượng', 'Sử dụng "more...than..." và "less...than..." để so sánh']
+                    },
+                    vocabulary: [
+                        {term: 'renewable energy', pronunciation: '/rɪˈnuːəbl ˈɛnərdʒi/', vietnamese: 'năng lượng tái tạo'},
+                        {term: 'non-renewable energy', pronunciation: '/nɑːn rɪˈnuːəbl ˈɛnərdʒi/', vietnamese: 'năng lượng không tái tạo'},
+                        {term: 'solar power', pronunciation: '/ˈsoʊlər ˈpaʊər/', vietnamese: 'năng lượng mặt trời'},
+                        {term: 'wind power', pronunciation: '/wɪnd ˈpaʊər/', vietnamese: 'năng lượng gió'},
+                        {term: 'oil', pronunciation: '/ɔɪl/', vietnamese: 'dầu'},
+                        {term: 'coal', pronunciation: '/koʊl/', vietnamese: 'than đá'},
+                        {term: 'natural gas', pronunciation: '/ˈnætʃərəl ɡæs/', vietnamese: 'khí tự nhiên'},
+                        {term: 'hydropower', pronunciation: '/ˈhaɪdroʊˌpaʊər/', vietnamese: 'thủy điện'}
+                    ],
+                    grammar: [{
+                        title: {en: 'more...than... / less...than...', vi: 'nhiều hơn... / ít hơn...'},
+                        explanation: {en: ['We use more...than... and less...than... to compare different things.', 'Springfield uses 40% more coal than Twin Peaks.'], vi: ['Chúng ta dùng more...than... và less...than... để so sánh những thứ khác nhau.', 'Springfield sử dụng nhiều hơn 40% than đá so với Twin Peaks.']}
+                    }],
+                    activities: []
+                },
+                {
+                    id: 81002,
+                    title: {en: 'Lesson 2: Advantages and Disadvantages', vi: 'Bài học 2: Ưu điểm và Nhược điểm'},
+                    aims: {
+                        en: ['Talk about advantages and disadvantages of energy sources', 'Use "and" and "but"'],
+                        vi: ['Nói về ưu và nhược điểm của các nguồn năng lượng', 'Sử dụng "and" và "but"']
+                    },
+                    vocabulary: [
+                        {term: 'power plant', pronunciation: '/ˈpaʊər plænt/', vietnamese: 'nhà máy điện'},
+                        {term: 'wind turbine', pronunciation: '/wɪnd ˈtɜːrbaɪn/', vietnamese: 'tua-bin gió'},
+                        {term: 'solar panel', pronunciation: '/ˈsoʊlər ˈpænl/', vietnamese: 'tấm pin mặt trời'},
+                        {term: 'nuclear power', pronunciation: '/ˈnuːkliər ˈpaʊər/', vietnamese: 'năng lượng hạt nhân'}
+                    ],
+                    grammar: [{
+                        title: {en: 'and and but', vi: 'and và but'},
+                        explanation: {en: ['We use and to add similar ideas. It\'s cheap to run and it\'s renewable.', 'We use but to add different or unexpected information. It\'s cheap to build a power plant, but it causes pollution.'], vi: ['Chúng ta dùng and để thêm các ý tưởng tương tự. Nó rẻ để vận hành và có thể tái tạo.', 'Chúng ta dùng but để thêm thông tin khác biệt hoặc bất ngờ. Xây dựng một nhà máy điện thì rẻ, nhưng nó gây ô nhiễm.']}
+                    }],
+                    activities: []
+                },
+                {
+                    id: 81003,
+                    title: {en: 'Lesson 3: City Energy Problems', vi: 'Bài học 3: Vấn đề năng lượng đô thị'},
+                    aims: {
+                        en: ['Talk about different energy sources', 'Write a formal email'],
+                        vi: ['Nói về các nguồn năng lượng khác nhau', 'Viết một email trang trọng']
+                    },
+                    vocabulary: [],
+                    grammar: [],
+                    activities: []
+                }
+            ]
+        }
+    ]
 };

@@ -1,306 +1,338 @@
-
-import React, { useState, useEffect, useCallback } from 'react';
-import { Lesson, Unit, CurriculumLevel, VocabularyItem, GrammarPoint, Activity } from '../types';
-import { AnnotationIcon, BookOpenIcon, ClipboardListIcon, LightBulbIcon, SparklesIcon, VolumeUpIcon, CheckCircleIcon, BeakerIcon, DuplicateIcon, MicrophoneIcon, ImageIcon, ArrowLeftIcon } from './Icons';
-import { useTranslation } from '../contexts/i18n';
-import FlashcardPlayer from './FlashcardPlayer';
-import { speak } from '../services/speechService';
-import PronunciationPracticeModal from './PronunciationPracticeModal';
-import LessonSidebar from './LessonSidebar';
-import { generateImageForTerm } from '../services/geminiService';
-import Loader from './Loader';
+import React, { useState, useEffect } from 'react';
+import type { Lesson, VocabularyItem, QuizQuestion, GeneratedSentence, View } from '../types';
+import { translateToVietnamese, isAiConfigured, generateQuiz, generateSampleSentences, generateStoryStarter } from '../services/geminiService';
 
 interface LessonViewProps {
   lesson: Lesson;
-  unit: Unit;
-  level: CurriculumLevel;
-  completedLessons: Set<number>;
-  onToggleComplete: (lessonId: number) => void;
-  onOpenQuiz: () => void;
-  onGoBack: () => void;
-  onLessonClick: (lesson: Lesson, unit: Unit) => void;
+  language: 'en' | 'vi';
+  setView: (view: View) => void;
 }
 
-type Tab = 'aims' | 'vocabulary' | 'grammar' | 'activities' | 'flashcards';
+const LessonView: React.FC<LessonViewProps> = ({ lesson, language, setView }) => {
+  const [activeTab, setActiveTab] = useState('aims');
+  const [translation, setTranslation] = useState<Record<string, string>>({});
+  const [isTranslating, setIsTranslating] = useState<Record<string, boolean>>({});
+  const [aiConfigured, setAiConfigured] = useState(false);
+  
+  // AI Tools State
+  const [aiToolView, setAiToolView] = useState<'selection' | 'quiz' | 'sentences' | 'story'>('selection');
+  const [aiData, setAiData] = useState<any>(null);
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+  const [revealedAnswers, setRevealedAnswers] = useState<Record<number, boolean>>({});
 
-const TabButton: React.FC<{ active: boolean, onClick: () => void, children: React.ReactNode, icon: React.ReactNode, disabled?: boolean }> = ({ active, onClick, children, icon, disabled = false }) => (
-    <button
-        onClick={onClick}
-        disabled={disabled}
-        className={`flex items-center px-4 py-2 text-sm font-medium rounded-t-lg border-b-2 transition-all duration-200 focus:outline-none ${
-            active
-                ? 'border-primary text-primary bg-primary/10'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:border-slate-600'
-        } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-        aria-disabled={disabled}
-    >
-        {icon}
-        <span className="ml-2">{children}</span>
-    </button>
-);
+  useEffect(() => {
+    setAiConfigured(isAiConfigured());
+  }, []);
+  
+  const aims = lesson.rawLesson.aims[language];
+  const grammar = lesson.rawLesson.grammar;
+  const activities = lesson.rawLesson.activities;
 
-const VocabularyCard: React.FC<{
-    item: VocabularyItem;
-    onPractice: (item: VocabularyItem) => void;
-    generatedImageUrl?: string;
-    isGenerating: boolean;
-    onGenerateImage: () => void;
-}> = ({ item, onPractice, generatedImageUrl, isGenerating, onGenerateImage }) => {
-    const { term, pronunciation, vietnamese, imageUrl } = item;
-    
-    const displayTerm = term || '';
-    const displayPronunciation = pronunciation || '';
-    const finalImageUrl = imageUrl || generatedImageUrl;
-
-    const handlePronounce = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        speak(displayTerm, 'en-US');
+  const handleTranslate = async (term: string) => {
+    if (!aiConfigured) {
+        // FIX: Updated alert message according to new API key policy.
+        alert("AI features are not available. Please contact your administrator.");
+        return;
     }
+    if (translation[term]) return; // Already translated
+    setIsTranslating(prev => ({ ...prev, [term]: true }));
+    try {
+      const translatedText = await translateToVietnamese(term);
+      setTranslation(prev => ({ ...prev, [term]: translatedText }));
+    } catch (error) {
+      console.error("Translation failed:", error);
+      setTranslation(prev => ({ ...prev, [term]: "Translation failed" }));
+    } finally {
+      setIsTranslating(prev => ({ ...prev, [term]: false }));
+    }
+  };
 
-    useEffect(() => {
-        if (!finalImageUrl && !isGenerating) {
-            onGenerateImage();
+  const resetAiTool = () => {
+    setAiToolView('selection');
+    setAiData(null);
+    setAiError(null);
+    setRevealedAnswers({});
+  };
+
+  const handleGenerateQuiz = async () => {
+    setAiToolView('quiz');
+    setIsAiLoading(true);
+    setAiError(null);
+    try {
+      const questions = await generateQuiz(lesson.rawLesson, language);
+      setAiData(questions);
+    } catch (err) {
+      setAiError(err instanceof Error ? err.message : 'Unknown error');
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+  
+  const handleGenerateSentences = async () => {
+    setAiToolView('sentences');
+    setIsAiLoading(true);
+    setAiError(null);
+    try {
+      const sentences = await generateSampleSentences(lesson.rawLesson, language);
+      setAiData(sentences);
+    } catch (err) {
+      setAiError(err instanceof Error ? err.message : 'Unknown error');
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+  
+  const handleGenerateStory = async () => {
+    setAiToolView('story');
+    setIsAiLoading(true);
+    setAiError(null);
+    try {
+      const story = await generateStoryStarter(lesson.rawLesson, language);
+      setAiData(story);
+    } catch (err) {
+      setAiError(err instanceof Error ? err.message : 'Unknown error');
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+  
+  const renderVocabulary = (item: VocabularyItem) => (
+    <div key={item.term} className="card-glass p-4 flex flex-col sm:flex-row items-center gap-4">
+      {item.imageUrl && (
+        <img src={item.imageUrl} alt={item.term} className="w-24 h-24 object-cover rounded-lg" />
+      )}
+      <div className="flex-1 text-center sm:text-left">
+        <h4 className="text-xl font-bold">{item.term}</h4>
+        <p className="text-slate-500 dark:text-slate-400">{item.pronunciation}</p>
+        <p className="text-blue-600 dark:text-blue-400 font-medium">{item.vietnamese}</p>
+         {language === 'en' && (
+            <div className="mt-2">
+                 <button 
+                    onClick={() => handleTranslate(item.term)}
+                    disabled={isTranslating[item.term] || !aiConfigured}
+                    className="text-xs btn btn-secondary-outline"
+                    title={!aiConfigured ? TABS[language].find(t => t.id === 'ai-tools')?.aiWarningBody : ''}
+                  >
+                     {isTranslating[item.term] ? 'Translating...' : (translation[item.term] ? translation[item.term] : `Translate with AI`)}
+                 </button>
+            </div>
+         )}
+      </div>
+    </div>
+  );
+  
+  const TabButton = ({ id, icon, label }: { id: string, icon: string, label: string }) => (
+    <button
+      onClick={() => {
+        setActiveTab(id);
+        if (id !== 'ai-tools') {
+            resetAiTool();
         }
-    }, [finalImageUrl, isGenerating, onGenerateImage]);
+      }}
+      className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-3 text-sm sm:text-base font-semibold border-b-4 transition-all duration-300 ${
+        activeTab === id
+          ? 'border-blue-500 text-blue-500'
+          : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200'
+      }`}
+    >
+      <i className={`fa-solid ${icon}`}></i>
+      <span>{label}</span>
+    </button>
+  );
+  
+  // FIX: Updated AI warning messages to align with new API key policy.
+  const TABS = {
+    en: [
+      { id: 'aims', icon: 'fa-bullseye-arrow', label: 'Lesson Aims' },
+      { id: 'vocabulary', icon: 'fa-book-sparkles', label: 'Vocabulary' },
+      { id: 'grammar', icon: 'fa-spell-check', label: 'Grammar' },
+      { id: 'activities', icon: 'fa-pencil-ruler', label: 'Activities' },
+      { id: 'ai-tools', icon: 'fa-robot', label: 'AI Tools', aiWarningBody: "AI features are not available. Please contact your administrator to enable them." },
+    ],
+    vi: [
+      { id: 'aims', icon: 'fa-bullseye-arrow', label: 'Mục tiêu' },
+      { id: 'vocabulary', icon: 'fa-book-sparkles', label: 'Từ vựng' },
+      { id: 'grammar', icon: 'fa-spell-check', label: 'Ngữ pháp' },
+      { id: 'activities', icon: 'fa-pencil-ruler', label: 'Hoạt động' },
+      { id: 'ai-tools', icon: 'fa-robot', label: 'Công cụ AI', aiWarningBody: "Các tính năng AI không khả dụng. Vui lòng liên hệ quản trị viên để kích hoạt." },
+    ]
+  };
+  const t = TABS[language];
 
-
-    return (
-        <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-soft hover:shadow-soft-md hover:border-primary/50 transition-all duration-200 border border-slate-200 dark:border-slate-700 flex flex-col">
-            <div className="w-full h-40 mb-4 rounded-lg overflow-hidden bg-gray-100 dark:bg-slate-700 flex items-center justify-center">
-                {finalImageUrl ? (
-                    <img src={finalImageUrl} alt={displayTerm} className="w-full h-full object-contain" />
-                ) : isGenerating ? (
-                    <div className="flex flex-col items-center">
-                        <Loader />
-                        <span className="text-sm text-gray-500 dark:text-slate-400 mt-2">Generating...</span>
-                    </div>
-                ) : (
-                    <ImageIcon className="h-16 w-16 text-gray-300 dark:text-gray-500" />
-                )}
-            </div>
-            <div className="flex justify-between items-start flex-grow">
-                <div>
-                    <h3 className="text-2xl font-bold text-dark dark:text-slate-100 font-sans">{displayTerm}</h3>
-                    <p className="text-secondary dark:text-slate-400">{displayPronunciation}</p>
-                </div>
-                <div className="flex items-center space-x-1">
-                    <button 
-                        onClick={() => onPractice(item)}
-                        className="p-1 text-gray-400 hover:text-primary transition-colors" title="Practice Pronunciation">
-                        <MicrophoneIcon className="h-5 w-5"/>
-                    </button>
-                    <button 
-                        onClick={handlePronounce}
-                        className="p-1 text-gray-400 hover:text-primary transition-colors" title="Pronounce">
-                        <VolumeUpIcon className="h-5 w-5"/>
-                    </button>
-                </div>
-            </div>
-            <p className="mt-2 text-gray-600 dark:text-slate-300">{vietnamese}</p>
-        </div>
-    );
-};
-
-
-const GrammarCard: React.FC<{item: GrammarPoint}> = ({ item }) => {
-    const { l } = useTranslation();
-
-    const englishTitle = typeof item.title === 'string' ? item.title : (item.title as import('../types').LocalizedString).en;
-    const englishExplanationLines = Array.isArray(item.explanation) 
-        ? item.explanation 
-        : (item.explanation as import('../types').LocalizedStringArray).en;
-
-    return (
-        <div className="mb-6 p-5 bg-white dark:bg-slate-800 rounded-xl shadow-soft hover:shadow-soft-md hover:border-primary/50 transition-all duration-200 border border-slate-200 dark:border-slate-700">
-            <div className="flex items-center justify-between">
-                <h4 className="text-lg font-semibold text-primary flex items-center pr-2">
-                    <AnnotationIcon className="h-5 w-5 mr-2"/> {l(item.title)}
-                </h4>
-                <button 
-                    onClick={() => speak(englishTitle, 'en-US')}
-                    className="p-1 text-gray-400 hover:text-primary transition-colors flex-shrink-0" title="Pronounce title">
-                    <VolumeUpIcon className="h-5 w-5"/>
+  const renderAiToolContent = () => {
+    if (!aiConfigured) {
+        return (
+            <div className="text-center p-8 bg-amber-50 dark:bg-amber-900/30 rounded-lg">
+                <i className="fa-solid fa-triangle-exclamation text-4xl text-amber-500 mb-4"></i>
+                <h3 className="text-xl font-bold text-amber-800 dark:text-amber-200">{t.find(tab => tab.id === 'ai-tools')?.label}</h3>
+                <p className="text-amber-700 dark:text-amber-300 mt-2 mb-4">{t.find(tab => tab.id === 'ai-tools')?.aiWarningBody}</p>
+                <button onClick={() => setView('settings')} className="btn bg-amber-500 hover:bg-amber-600 text-white">
+                    <i className="fa-solid fa-cogs mr-2"></i> {language === 'vi' ? 'Xem trạng thái AI' : 'Check AI Status'}
                 </button>
             </div>
-            {(l(item.explanation) as string[]).map((line, index) => (
-                 <div key={index} className="mt-2 flex items-center justify-between text-gray-600 dark:text-slate-300 leading-relaxed">
-                    <p className="flex-grow pr-2" dangerouslySetInnerHTML={{ __html: (line ?? '').replace(/\((.*?)\)/g, '<i class="text-gray-500 dark:text-slate-400">($1)</i>') }}></p>
-                    <button 
-                        onClick={() => speak(englishExplanationLines[index], 'en-US')}
-                        className="p-1 text-gray-400 hover:text-primary transition-colors flex-shrink-0 ml-2" title="Pronounce line">
-                        <VolumeUpIcon className="h-5 w-5"/>
+        );
+    }
+
+    if (isAiLoading) {
+      return (
+        <div className="text-center py-8">
+            <i className="fa-solid fa-robot text-4xl text-blue-500 animate-bounce"></i>
+            <p className="mt-4 text-slate-500 dark:text-slate-400">{language === 'vi' ? 'AI đang làm việc...' : 'AI is working...'}</p>
+        </div>
+      );
+    }
+    
+    if (aiError) {
+        return (
+            <div className="text-center p-6">
+                <div className="alert-danger mb-4">{aiError}</div>
+                <button onClick={resetAiTool} className="btn btn-secondary-outline">
+                    <i className="fa-solid fa-arrow-left mr-2"></i> {language === 'vi' ? 'Thử lại' : 'Try Again'}
+                </button>
+            </div>
+        );
+    }
+    
+    switch (aiToolView) {
+        case 'quiz':
+            const quizData = aiData as QuizQuestion[] | null;
+            return (
+                <div>
+                    <button onClick={resetAiTool} className="btn btn-secondary-outline mb-4 text-sm">
+                        <i className="fa-solid fa-arrow-left mr-2"></i> {language === 'vi' ? 'Công cụ khác' : 'Other Tools'}
+                    </button>
+                    <div className="space-y-6">
+                        {quizData?.map((q, index) => (
+                            <div key={index} className="bg-slate-100 dark:bg-slate-800/50 p-4 rounded-lg">
+                                <p className="font-semibold mb-3"><strong>{index + 1}.</strong> {q.question}</p>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    {q.options.map((opt, i) => (
+                                        <div key={i} className={`p-2 rounded border-2 ${revealedAnswers[index] ? (opt === q.answer ? 'border-green-500 bg-green-100 dark:bg-green-900/50' : 'border-slate-300 dark:border-slate-600') : 'border-slate-300 dark:border-slate-600'}`}>
+                                            {opt}
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="mt-3 text-right">
+                                    <button onClick={() => setRevealedAnswers(prev => ({ ...prev, [index]: !prev[index] }))} className="btn btn-secondary text-xs !py-1 !px-2">
+                                        {revealedAnswers[index] ? (language === 'vi' ? 'Ẩn đáp án' : 'Hide Answer') : (language === 'vi' ? 'Hiện đáp án' : 'Show Answer')}
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        case 'sentences':
+             const sentenceData = aiData as GeneratedSentence[] | null;
+             return (
+                <div>
+                     <button onClick={resetAiTool} className="btn btn-secondary-outline mb-4 text-sm">
+                        <i className="fa-solid fa-arrow-left mr-2"></i> {language === 'vi' ? 'Công cụ khác' : 'Other Tools'}
+                    </button>
+                    <div className="space-y-4">
+                        {sentenceData?.map((s, index) => (
+                            <div key={index} className="bg-slate-100 dark:bg-slate-800/50 p-4 rounded-lg">
+                                <p className="text-lg mb-1">"{s.sentence}"</p>
+                                <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">{language === 'vi' ? 'Tập trung vào' : 'Focus'}: {s.focus}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        case 'story':
+            return (
+                <div>
+                    <button onClick={resetAiTool} className="btn btn-secondary-outline mb-4 text-sm">
+                        <i className="fa-solid fa-arrow-left mr-2"></i> {language === 'vi' ? 'Công cụ khác' : 'Other Tools'}
+                    </button>
+                    <div className="bg-slate-100 dark:bg-slate-800/50 p-6 rounded-lg prose prose-slate dark:prose-invert max-w-none">
+                        <h4 className="!mt-0">{language === 'vi' ? 'Bắt đầu câu chuyện của bạn!' : 'Start Your Story!'}</h4>
+                        <p>{aiData}</p>
+                    </div>
+                </div>
+            );
+        case 'selection':
+        default:
+            return (
+                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                    <button onClick={handleGenerateQuiz} className="card-glass p-6 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:shadow-lg hover:-translate-y-1 transition-all">
+                        <i className="fa-solid fa-file-circle-question text-4xl text-blue-500 mb-3"></i>
+                        <h4 className="font-bold">{language === 'vi' ? 'Tạo Câu đố' : 'Generate Quiz'}</h4>
+                        <p className="text-xs text-slate-500 mt-1">{language === 'vi' ? 'Kiểm tra kiến thức bài học' : 'Test your lesson knowledge'}</p>
+                    </button>
+                    <button onClick={handleGenerateSentences} className="card-glass p-6 hover:bg-green-50 dark:hover:bg-green-900/30 hover:shadow-lg hover:-translate-y-1 transition-all">
+                        <i className="fa-solid fa-comment-lines text-4xl text-green-500 mb-3"></i>
+                        <h4 className="font-bold">{language === 'vi' ? 'Tạo câu mẫu' : 'Sample Sentences'}</h4>
+                        <p className="text-xs text-slate-500 mt-1">{language === 'vi' ? 'Xem ví dụ về từ vựng & ngữ pháp' : 'See vocab & grammar in action'}</p>
+                    </button>
+                    <button onClick={handleGenerateStory} className="card-glass p-6 hover:bg-purple-50 dark:hover:bg-purple-900/30 hover:shadow-lg hover:-translate-y-1 transition-all">
+                        <i className="fa-solid fa-feather-pointed text-4xl text-purple-500 mb-3"></i>
+                        <h4 className="font-bold">{language === 'vi' ? 'Bắt đầu câu chuyện' : 'Story Starter'}</h4>
+                        <p className="text-xs text-slate-500 mt-1">{language === 'vi' ? 'Lấy cảm hứng viết sáng tạo' : 'Get creative writing inspiration'}</p>
                     </button>
                 </div>
-            ))}
+            );
+    }
+  };
+
+
+  return (
+    <div className="p-4 sm:p-6 lg:p-8 animate-fade-in">
+      <h1 className="text-3xl font-bold mb-6">{lesson.title}</h1>
+
+      <div className="card-glass p-0 mb-6">
+        <div className="flex flex-wrap sm:flex-nowrap border-b border-slate-200 dark:border-slate-700">
+          {t.map(tab => (
+            <TabButton key={tab.id} id={tab.id} icon={tab.icon} label={tab.label} />
+          ))}
         </div>
-    );
-};
-
-
-const ActivitySection: React.FC<{item: Activity}> = ({ item }) => {
-    const { l } = useTranslation();
-    return (
-        <div className="mb-6 last:mb-0 p-5 bg-white dark:bg-slate-800 rounded-xl shadow-soft hover:shadow-soft-md hover:border-primary/50 transition-all duration-200 border border-slate-200 dark:border-slate-700">
-            <h4 className="text-lg font-semibold text-primary flex items-center">
-                <SparklesIcon className="h-5 w-5 mr-2"/> {item.type}
-            </h4>
-            <ul className="mt-2 list-disc list-inside text-gray-600 dark:text-slate-300 space-y-1">
-                {(l(item.description) as string[]).map((desc, index) => (
-                    <li key={index}>{desc}</li>
-                ))}
-            </ul>
-        </div>
-    );
-};
-
-const LessonView: React.FC<LessonViewProps> = ({ lesson, unit, level, completedLessons, onToggleComplete, onOpenQuiz, onGoBack, onLessonClick }) => {
-    const [activeTab, setActiveTab] = useState<Tab>('aims');
-    const [practiceItem, setPracticeItem] = useState<VocabularyItem | null>(null);
-    const { l, t } = useTranslation();
-    const isCompleted = completedLessons.has(lesson.id);
-    const hasVocabulary = lesson.vocabulary.length > 0;
-    
-    const [generatedImages, setGeneratedImages] = useState<Map<string, string>>(new Map());
-    const [generatingTerms, setGeneratingTerms] = useState<Set<string>>(new Set());
-
-    const handleGenerateImage = useCallback(async (term: string) => {
-        if (generatingTerms.has(term) || !term || generatedImages.has(term)) return;
-
-        setGeneratingTerms(prev => new Set(prev).add(term));
-        try {
-            const imageUrl = await generateImageForTerm(term);
-            setGeneratedImages(prev => new Map(prev).set(term, imageUrl));
-        } catch (error) {
-            console.error("Image generation failed:", error);
-        } finally {
-            setGeneratingTerms(prev => {
-                const newSet = new Set(prev);
-                newSet.delete(term);
-                return newSet;
-            });
-        }
-    }, [generatingTerms, generatedImages]);
-
-    useEffect(() => {
-        setActiveTab('aims');
-        setGeneratedImages(new Map());
-        setGeneratingTerms(new Set());
-    }, [lesson.id]);
-
-    return (
-        <div className="flex items-start">
-            <LessonSidebar 
-                level={level}
-                activeLessonId={lesson.id}
-                completedLessons={completedLessons}
-                onLessonClick={onLessonClick}
-            />
-
-            <div className="flex-1 min-w-0">
-                <div className="p-4 sm:p-6 lg:p-8">
-                    <header className="mb-6">
-                        <div className="flex items-center text-sm font-medium text-secondary dark:text-slate-400 mb-2">
-                            <button
-                                onClick={onGoBack}
-                                className="flex items-center hover:text-primary transition-colors mr-2 group"
-                                aria-label={t('dashboard')}
-                            >
-                                <ArrowLeftIcon className="h-4 w-4 mr-1 transition-transform group-hover:-translate-x-1" />
-                                <span className="font-semibold">{t('dashboard')}</span>
-                            </button>
-                            <span className="text-slate-300 dark:text-slate-600">|</span>
-                            <p className="ml-2 truncate">{l(level.title)} &gt; {l(unit.title)}</p>
-                        </div>
-                        <h1 className="text-4xl font-bold text-dark dark:text-white">{l(lesson.title)}</h1>
-                    </header>
-                    
-                    <div className="border-b border-gray-200 dark:border-slate-700 mb-6">
-                        <nav className="-mb-px flex space-x-1 sm:space-x-4 overflow-x-auto" aria-label="Tabs">
-                            <TabButton active={activeTab === 'aims'} onClick={() => setActiveTab('aims')} icon={<LightBulbIcon className="h-5 w-5" />}>{t('aims')}</TabButton>
-                            <TabButton active={activeTab === 'vocabulary'} onClick={() => setActiveTab('vocabulary')} icon={<BookOpenIcon className="h-5 w-5" />} disabled={!hasVocabulary}>{t('vocabulary')}</TabButton>
-                            <TabButton active={activeTab === 'flashcards'} onClick={() => setActiveTab('flashcards')} icon={<DuplicateIcon className="h-5 w-5" />} disabled={!hasVocabulary}>{t('flashcards')}</TabButton>
-                            <TabButton active={activeTab === 'grammar'} onClick={() => setActiveTab('grammar')} icon={<AnnotationIcon className="h-5 w-5" />}>{t('grammar')}</TabButton>
-                            <TabButton active={activeTab === 'activities'} onClick={() => setActiveTab('activities')} icon={<ClipboardListIcon className="h-5 w-5" />}>{t('activities')}</TabButton>
-                        </nav>
-                    </div>
-
-                    <div className="min-h-[400px]">
-                        {activeTab === 'aims' && (
-                            <div className="p-5 bg-white dark:bg-slate-800 rounded-xl shadow-soft border border-slate-200 dark:border-slate-700 animate-fade-in">
-                                 <h3 className="text-xl font-semibold text-primary mb-3">{t('learningObjectives')}</h3>
-                                 <ul className="space-y-2 list-disc list-inside text-gray-700 dark:text-slate-300">
-                                    {(l(lesson.aims) as string[]).map((aim, index) => <li key={index}>{aim}</li>)}
-                                 </ul>
-                            </div>
-                        )}
-                        {activeTab === 'vocabulary' && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-fade-in">
-                                {lesson.vocabulary.map((item, index) => {
-                                    const term = item.term || '';
-                                    return (
-                                        <VocabularyCard 
-                                            key={index} 
-                                            item={item} 
-                                            onPractice={setPracticeItem} 
-                                            generatedImageUrl={generatedImages.get(term)}
-                                            isGenerating={generatingTerms.has(term)}
-                                            onGenerateImage={() => handleGenerateImage(term)}
-                                        />
-                                    );
-                                })}
-                            </div>
-                        )}
-                         {activeTab === 'flashcards' && hasVocabulary && (
-                             <div className="animate-fade-in">
-                                <FlashcardPlayer vocabulary={lesson.vocabulary} />
-                            </div>
-                        )}
-                        {activeTab === 'grammar' && (
-                             <div className="animate-fade-in">
-                                {lesson.grammar.map((item, index) => <GrammarCard key={index} item={item} />)}
-                            </div>
-                        )}
-                        {activeTab === 'activities' && (
-                             <div className="animate-fade-in">
-                                {lesson.activities.map((item, index) => <ActivitySection key={index} item={item} />)}
-                            </div>
-                        )}
-                    </div>
-                    
-                    <div className="mt-8 pt-6 border-t border-gray-200 dark:border-slate-700">
-                        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-4">
-                            <button
-                                onClick={onOpenQuiz}
-                                className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-accent hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent transition-colors"
-                            >
-                                <BeakerIcon className="h-5 w-5 mr-2" />
-                                {t('testYourKnowledge')}
-                            </button>
-                            <button
-                                onClick={() => onToggleComplete(lesson.id)}
-                                className={`w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white ${
-                                    isCompleted
-                                        ? 'bg-green-600 hover:bg-green-700'
-                                        : 'bg-primary hover:bg-primary-hover'
-                                } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors`}
-                            >
-                                <CheckCircleIcon className="h-5 w-5 mr-2"/>
-                                {isCompleted ? t('completed') : t('markAsComplete')}
-                            </button>
-                        </div>
-                    </div>
-                </div>
+        
+        <div className="p-6 animate-fade-in min-h-[300px]">
+          {activeTab === 'aims' && (
+            <div className="prose prose-slate dark:prose-invert max-w-none">
+              <ul className="list-disc list-inside space-y-2">
+                {aims.map((aim, index) => <li key={index}>{aim}</li>)}
+              </ul>
             </div>
+          )}
 
-            {practiceItem && (
-                <PronunciationPracticeModal
-                    item={practiceItem}
-                    level={level}
-                    onClose={() => setPracticeItem(null)}
-                />
-            )}
+          {activeTab === 'vocabulary' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {lesson.rawLesson.vocabulary.map(renderVocabulary)}
+            </div>
+          )}
+
+          {activeTab === 'grammar' && (
+            <div className="space-y-6">
+              {grammar.map((point, index) => (
+                <div key={index} className="bg-slate-100 dark:bg-slate-800/50 p-6 rounded-lg">
+                  <h3 className="text-xl font-bold mb-3">{point.title[language]}</h3>
+                  <div className="prose prose-slate dark:prose-invert max-w-none">
+                      {point.explanation[language].map((line, i) => <p key={i}>{line}</p>)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {activeTab === 'activities' && (
+             <div className="space-y-6">
+              {activities.map((activity, index) => (
+                <div key={index} className="bg-slate-100 dark:bg-slate-800/50 p-6 rounded-lg">
+                  <h3 className="text-xl font-bold mb-3">{activity.type}</h3>
+                  <div className="prose prose-slate dark:prose-invert max-w-none">
+                      {activity.description[language].map((line, i) => <p key={i}>{line}</p>)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          {activeTab === 'ai-tools' && renderAiToolContent()}
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 export default LessonView;

@@ -3,266 +3,502 @@ import { CurriculumLevel } from '../types';
 const SM_BASE = 'https://storage.googleapis.com/maker-suite-project-files-prod/upload/flashcard_images/superminds_';
 
 export const sm1Data: CurriculumLevel = {
-    level: 2, // Updated to Level 2 for Primary School - Grade 2
+    level: 2,
     title: { en: 'Super Minds 1', vi: 'Super Minds 1' },
     subtitle: { en: 'Primary School - Grade 2', vi: 'Tiểu học - Lớp 2' },
-    ebookPdfUrl: 'https://drive.google.com/file/d/1wUw0aGEa5dTA6KzezWMjMtZpXj_1TLZl/view?usp=drive_link', // Placeholder, replace with actual SM1 PDF if available
+    ebookPdfUrl: 'https://drive.google.com/file/d/1wUw0aGEa5dTA6KzezWMjMtZpXj_1TLZl/view?usp=drive_link',
     units: [
         {
-            id: 1,
-            title: { en: 'Unit 1: Friends', vi: 'Bài 1: Bạn bè' },
+            id: 0,
+            title: { en: 'Friends', vi: 'Bạn bè' },
             lessons: [
                 {
-                    id: 50101,
-                    title: { en: 'Meet the Super Friends', vi: 'Gặp gỡ những người bạn siêu đẳng' },
+                    id: 101,
+                    title: { en: 'Greetings and Numbers', vi: 'Chào hỏi và Số đếm' },
                     aims: {
-                        en: ['Introduce yourself and others.', 'Ask and answer about names and ages.'],
-                        vi: ['Giới thiệu bản thân và người khác.', 'Hỏi và trả lời về tên và tuổi.']
+                        en: ['Introduce yourself and others.', 'Ask and answer about names and ages.', 'Count from 1 to 10.'],
+                        vi: ['Giới thiệu bản thân và người khác.', 'Hỏi và trả lời về tên và tuổi.', 'Đếm từ 1 đến 10.']
                     },
                     vocabulary: [
-                        { term: 'What\'s your name?', pronunciation: '/wʌts jʊər neɪm/', vietnamese: 'Tên bạn là gì?' },
-                        { term: 'I\'m (Thunder).', pronunciation: '/aɪm ˈθʌndər/', vietnamese: 'Tôi là (Thunder).' },
-                        { term: 'How old are you?', pronunciation: '/haʊ oʊld ɑːr ju/', vietnamese: 'Bạn bao nhiêu tuổi?' },
-                        { term: 'I\'m (seven).', pronunciation: '/aɪm ˈsɛvən/', vietnamese: 'Tôi (bảy) tuổi.' },
-                        { term: 'Hello', pronunciation: '/həˈloʊ/', vietnamese: 'Xin chào' },
-                        { term: 'Hi', pronunciation: '/haɪ/', vietnamese: 'Chào' }
+                        { term: 'Whisper', pronunciation: '/ˈwɪspər/', vietnamese: 'Whisper' },
+                        { term: 'Thunder', pronunciation: '/ˈθʌndər/', vietnamese: 'Thunder' },
+                        { term: 'Misty', pronunciation: '/ˈmɪsti/', vietnamese: 'Misty' },
+                        { term: 'Flash', pronunciation: '/flæʃ/', vietnamese: 'Flash' },
+                        { term: 'one', pronunciation: '/wʌn/', vietnamese: 'một' },
+                        { term: 'two', pronunciation: '/tuː/', vietnamese: 'hai' },
+                        { term: 'three', pronunciation: '/θriː/', vietnamese: 'ba' },
+                        { term: 'four', pronunciation: '/fɔːr/', vietnamese: 'bốn' },
+                        { term: 'five', pronunciation: '/faɪv/', vietnamese: 'năm' },
+                        { term: 'six', pronunciation: '/sɪks/', vietnamese: 'sáu' },
+                        { term: 'seven', pronunciation: '/ˈsɛvən/', vietnamese: 'bảy' },
+                        { term: 'eight', pronunciation: '/eɪt/', vietnamese: 'tám' },
+                        { term: 'nine', pronunciation: '/naɪn/', vietnamese: 'chín' },
+                        { term: 'ten', pronunciation: '/tɛn/', vietnamese: 'mười' },
                     ],
                     grammar: [
                         { title: { en: 'Greetings and Introductions', vi: 'Chào hỏi và Giới thiệu' }, explanation: { en: ["Use 'What's your name?' and 'How old are you?' to ask personal information.", "Respond with 'I'm [name]' and 'I'm [age].'"], vi: ['Sử dụng "Tên bạn là gì?" và "Bạn bao nhiêu tuổi?" để hỏi thông tin cá nhân.', 'Trả lời bằng "Tôi là [tên]" và "Tôi [tuổi]".'] } }
                     ],
                     activities: [
-                        { type: 'Practice', description: { en: ['Sing the ABC song.', 'Role-play introductions with a partner.'], vi: ['Hát bài hát ABC.', 'Đóng vai giới thiệu bản thân với bạn cặp.'] } }
+                        { type: 'Practice', description: { en: ['Listen and chant names.', 'Listen, point and write numbers.'], vi: ['Nghe và đọc theo vần các tên.', 'Nghe, chỉ và viết các số.'] } }
+                    ]
+                },
+                {
+                    id: 102,
+                    title: { en: 'Alphabet and Colors', vi: 'Bảng chữ cái và Màu sắc' },
+                    aims: {
+                        en: ['Sing the alphabet song.', 'Identify and name colors.'],
+                        vi: ['Hát bài hát chữ cái.', 'Nhận biết và gọi tên các màu sắc.']
+                    },
+                    vocabulary: [
+                        { term: 'red', pronunciation: '/rɛd/', vietnamese: 'màu đỏ' },
+                        { term: 'yellow', pronunciation: '/ˈjɛloʊ/', vietnamese: 'màu vàng' },
+                        { term: 'purple', pronunciation: '/ˈpɜːrpəl/', vietnamese: 'màu tím' },
+                        { term: 'blue', pronunciation: '/bluː/', vietnamese: 'màu xanh dương' },
+                        { term: 'orange', pronunciation: '/ˈɔːrɪndʒ/', vietnamese: 'màu cam' },
+                        { term: 'green', pronunciation: '/ɡriːn/', vietnamese: 'màu xanh lá' },
+                    ],
+                    grammar: [],
+                    activities: [
+                        { type: 'Practice', description: { en: ['Listen and sing the ABC song.', 'Listen and point to the balloons.'], vi: ['Nghe và hát bài hát ABC.', 'Nghe và chỉ vào các quả bóng bay.'] } }
+                    ]
+                }
+            ]
+        },
+        {
+            id: 1,
+            title: { en: 'At school', vi: 'Ở trường học' },
+            lessons: [
+                {
+                    id: 101,
+                    title: { en: 'Classroom Objects', vi: 'Đồ dùng học tập' },
+                    aims: {
+                        en: ['Identify and name classroom objects.', 'Ask "What\'s this?"'],
+                        vi: ['Nhận biết và gọi tên đồ dùng học tập.', 'Hỏi "Đây là cái gì?"']
+                    },
+                    vocabulary: [
+                        { term: 'pen', pronunciation: '/pɛn/', vietnamese: 'bút mực' },
+                        { term: 'rubber', pronunciation: '/ˈrʌbər/', vietnamese: 'cục tẩy' },
+                        { term: 'pencil', pronunciation: '/ˈpɛnsəl/', vietnamese: 'bút chì' },
+                        { term: 'book', pronunciation: '/bʊk/', vietnamese: 'sách' },
+                        { term: 'notebook', pronunciation: '/ˈnoʊtbʊk/', vietnamese: 'vở' },
+                        { term: 'bag', pronunciation: '/bæɡ/', vietnamese: 'cặp' },
+                        { term: 'desk', pronunciation: '/dɛsk/', vietnamese: 'bàn học' },
+                        { term: 'ruler', pronunciation: '/ˈruːlər/', vietnamese: 'thước kẻ' },
+                        { term: 'pencil case', pronunciation: '/ˈpɛnsəl keɪs/', vietnamese: 'hộp bút' },
+                    ],
+                    grammar: [
+                        { title: { en: 'Asking about objects', vi: 'Hỏi về đồ vật' }, explanation: { en: ["Use 'What's this? It's a (pencil).'", "Use 'Is it a pen? Yes, it is. / No, it isn't.'"], vi: ['Sử dụng "Đây là cái gì? Đó là một (bút chì)."', 'Sử dụng "Đây có phải là bút mực không? Vâng, phải. / Không, không phải."'] } }
+                    ],
+                    activities: [
+                        { type: 'Practice', description: { en: ['Play the guessing game.', 'Listen and chant about classroom objects.'], vi: ['Chơi trò chơi đoán đồ vật.', 'Nghe và đọc theo vần về đồ dùng học tập.'] } }
+                    ]
+                },
+                {
+                    id: 102,
+                    title: { en: 'Imperatives', vi: 'Câu mệnh lệnh' },
+                    aims: {
+                        en: ['Understand and use simple classroom commands.'],
+                        vi: ['Hiểu và sử dụng các câu mệnh lệnh đơn giản trong lớp học.']
+                    },
+                    vocabulary: [
+                         { term: 'Sit at your desk', pronunciation: '/sɪt æt jʊər dɛsk/', vietnamese: 'Ngồi vào bàn' },
+                         { term: 'Open your book', pronunciation: '/ˈoʊpən jʊər bʊk/', vietnamese: 'Mở sách ra' },
+                         { term: 'Close your bag', pronunciation: '/kloʊz jʊər bæɡ/', vietnamese: 'Đóng cặp lại' },
+                         { term: 'Pass me a ruler', pronunciation: '/pæs mi ə ˈruːlər/', vietnamese: 'Chuyền cho tôi cây thước' },
+                    ],
+                    grammar: [
+                        { title: { en: 'Classroom commands', vi: 'Mệnh lệnh trong lớp học' }, explanation: { en: ["'Open your book, please.'", "'Close your bag, please.'"], vi: ['"Làm ơn mở sách ra."', '"Làm ơn đóng cặp lại."'] } }
+                    ],
+                    activities: [
+                        { type: 'Practice', description: { en: ['Listen, stick, and write the words.', 'Play the chain game.'], vi: ['Nghe, dán và viết từ.', 'Chơi trò chơi nối tiếp.'] } }
                     ]
                 }
             ]
         },
         {
             id: 2,
-            title: { en: 'Unit 2: At school', vi: 'Bài 2: Ở trường học' },
+            title: { en: 'Let\'s play!', vi: 'Cùng chơi nào!' },
             lessons: [
-                {
-                    id: 50201,
-                    title: { en: 'Classroom objects', vi: 'Đồ vật trong lớp học' },
+                 {
+                    id: 201,
+                    title: { en: 'Toys', vi: 'Đồ chơi' },
                     aims: {
-                        en: ['Identify and name classroom objects.', 'Ask and answer about objects.', 'Follow simple commands.'],
-                        vi: ['Nhận biết và gọi tên đồ vật trong lớp học.', 'Hỏi và trả lời về đồ vật.', 'Thực hiện các mệnh lệnh đơn giản.']
+                        en: ['Identify and name different toys.', 'Ask and answer about names, age, and favorite toys.'],
+                        vi: ['Nhận biết và gọi tên các loại đồ chơi khác nhau.', 'Hỏi và trả lời về tên, tuổi và đồ chơi yêu thích.']
                     },
                     vocabulary: [
-                        { term: 'pencil', pronunciation: '/ˈpɛnsəl/', vietnamese: 'bút chì', imageUrl: `${SM_BASE}pencil.png` },
-                        { term: 'pen', pronunciation: '/pɛn/', vietnamese: 'bút mực', imageUrl: `${SM_BASE}pen.png` },
-                        { term: 'book', pronunciation: '/bʊk/', vietnamese: 'sách', imageUrl: `${SM_BASE}book.png` },
-                        { term: 'rubber', pronunciation: '/ˈrʌbər/', vietnamese: 'cục tẩy', imageUrl: `${SM_BASE}rubber.png` },
-                        { term: 'bag', pronunciation: '/bæɡ/', vietnamese: 'cặp sách', imageUrl: `${SM_BASE}bag.png` },
-                        { term: 'desk', pronunciation: '/dɛsk/', vietnamese: 'bàn học', imageUrl: `${SM_BASE}desk.png` },
-                        { term: 'chair', pronunciation: '/tʃɛər/', vietnamese: 'ghế', imageUrl: `${SM_BASE}chair.png` }
+                        { term: 'kite', pronunciation: '/kaɪt/', vietnamese: 'cái diều' },
+                        { term: 'doll', pronunciation: '/dɒl/', vietnamese: 'búp bê' },
+                        { term: 'monster', pronunciation: '/ˈmɒnstər/', vietnamese: 'quái vật' },
+                        { term: 'plane', pronunciation: '/pleɪn/', vietnamese: 'máy bay' },
+                        { term: 'computer game', pronunciation: '/kəmˈpjuːtər ɡeɪm/', vietnamese: 'trò chơi điện tử' },
+                        { term: 'train', pronunciation: '/treɪn/', vietnamese: 'tàu hỏa' },
+                        { term: 'car', pronunciation: '/kɑːr/', vietnamese: 'ô tô' },
+                        { term: 'bike', pronunciation: '/baɪk/', vietnamese: 'xe đạp' },
+                        { term: 'ball', pronunciation: '/bɔːl/', vietnamese: 'quả bóng' },
+                        { term: 'go-kart', pronunciation: '/ˈɡoʊ kɑːrt/', vietnamese: 'xe đua go-kart' },
                     ],
                     grammar: [
-                        { title: { en: 'Asking about objects', vi: 'Hỏi về đồ vật' }, explanation: { en: ["Use 'What's this? It's a (pencil).'", "Use 'Is it a pen? Yes, it is. / No, it isn't.'"], vi: ['Sử dụng "Đây là cái gì? Đó là một (bút chì)."', 'Sử dụng "Đây có phải là bút mực không? Vâng, phải. / Không, không phải."'] } },
-                        { title: { en: 'Classroom commands', vi: 'Mệnh lệnh trong lớp học' }, explanation: { en: ["'Open your book, please.'", "'Close your book, please.'"], vi: ['"Làm ơn mở sách ra."', '"Làm ơn đóng sách lại."'] } }
+                        { title: { en: 'Asking about others', vi: 'Hỏi về người khác' }, explanation: { en: ["Use 'What's his/her name? His/Her name's (Ben/Sue).'", "Use 'What's his/her favourite toy?'", "Use 'How old is he/she?'"], vi: ['Sử dụng "Tên của anh ấy/cô ấy là gì? Tên của anh ấy/cô ấy là (Ben/Sue)."', 'Sử dụng "Đồ chơi yêu thích của anh ấy/cô ấy là gì?"', 'Sử dụng "Anh ấy/cô ấy bao nhiêu tuổi?"'] } }
                     ],
                     activities: [
-                        { type: 'Practice', description: { en: ['Listen and point to classroom objects.', 'Practice giving and following commands.'], vi: ['Nghe và chỉ vào đồ vật trong lớp học.', 'Thực hành ra lệnh và làm theo lệnh.'] } }
+                        { type: 'Practice', description: { en: ['Listen and stick the names.', 'Ask and answer about the children in the pictures.'], vi: ['Nghe và dán tên.', 'Hỏi và trả lời về các bạn nhỏ trong tranh.'] } }
+                    ]
+                },
+                {
+                    id: 202,
+                    title: { en: 'Adjectives', vi: 'Tính từ' },
+                    aims: {
+                        en: ['Describe toys using adjectives.'],
+                        vi: ['Mô tả đồ chơi bằng tính từ.']
+                    },
+                    vocabulary: [
+                        { term: 'long', pronunciation: '/lɒŋ/', vietnamese: 'dài' },
+                        { term: 'short', pronunciation: '/ʃɔːrt/', vietnamese: 'ngắn' },
+                        { term: 'big', pronunciation: '/bɪɡ/', vietnamese: 'to' },
+                        { term: 'small', pronunciation: '/smɔːl/', vietnamese: 'nhỏ' },
+                        { term: 'ugly', pronunciation: '/ˈʌɡli/', vietnamese: 'xấu xí' },
+                        { term: 'beautiful', pronunciation: '/ˈbjuːtɪfəl/', vietnamese: 'xinh đẹp' },
+                        { term: 'old', pronunciation: '/oʊld/', vietnamese: 'cũ' },
+                        { term: 'new', pronunciation: '/njuː/', vietnamese: 'mới' },
+                    ],
+                    grammar: [
+                        { title: { en: 'Describing with adjectives', vi: 'Mô tả bằng tính từ' }, explanation: { en: ["Use 'It's a/an...' with an adjective before the noun.", "Example: It's a new kite. It's an ugly monster."], vi: ['Sử dụng "Nó là một..." với một tính từ đứng trước danh từ.', 'Ví dụ: Nó là một cái diều mới. Nó là một con quái vật xấu xí.'] } }
+                    ],
+                    activities: [
+                        { type: 'Practice', description: { en: ['Listen and number the pictures.', 'Draw a toy and describe it to a partner.'], vi: ['Nghe và đánh số các bức tranh.', 'Vẽ một món đồ chơi và mô tả nó cho bạn của bạn.'] } }
                     ]
                 }
             ]
         },
         {
             id: 3,
-            title: { en: 'Unit 3: Let\'s play!', vi: 'Bài 3: Cùng chơi nào!' },
+            title: { en: 'Pet show', vi: 'Buổi biểu diễn thú cưng' },
             lessons: [
                 {
-                    id: 50301,
-                    title: { en: 'Toys', vi: 'Đồ chơi' },
+                    id: 301,
+                    title: { en: 'Animals and Prepositions', vi: 'Động vật và Giới từ' },
                     aims: {
-                        en: ['Identify and name different toys.', 'Ask and answer about favorite toys.', 'Talk about what someone has.'],
-                        vi: ['Nhận biết và gọi tên các loại đồ chơi khác nhau.', 'Hỏi và trả lời về đồ chơi yêu thích.', 'Nói về những gì ai đó có.']
+                        en: ['Identify and name animals.', 'Use prepositions of place: in, on, under.'],
+                        vi: ['Nhận biết và gọi tên các loài động vật.', 'Sử dụng giới từ chỉ nơi chốn: in, on, under.']
                     },
                     vocabulary: [
-                        { term: 'ball', pronunciation: '/bɔl/', vietnamese: 'quả bóng', imageUrl: `${SM_BASE}ball.png` },
-                        { term: 'kite', pronunciation: '/kaɪt/', vietnamese: 'cái diều', imageUrl: `${SM_BASE}kite.png` },
-                        { term: 'doll', pronunciation: '/dɑl/', vietnamese: 'búp bê', imageUrl: `${SM_BASE}doll.png` },
-                        { term: 'teddy bear', pronunciation: '/ˈtɛdi bɛər/', vietnamese: 'gấu bông', imageUrl: `${SM_BASE}teddy_bear.png` },
-                        { term: 'car', pronunciation: '/kɑr/', vietnamese: 'ô tô', imageUrl: `${SM_BASE}car.png` },
-                        { term: 'plane', pronunciation: '/pleɪn/', vietnamese: 'máy bay', imageUrl: `${SM_BASE}plane.png` }
+                        { term: 'elephant', pronunciation: '/ˈɛlɪfənt/', vietnamese: 'con voi' },
+                        { term: 'rat', pronunciation: '/ræt/', vietnamese: 'con chuột' },
+                        { term: 'lizard', pronunciation: '/ˈlɪzərd/', vietnamese: 'con thằn lằn' },
+                        { term: 'frog', pronunciation: '/frɒɡ/', vietnamese: 'con ếch' },
+                        { term: 'spider', pronunciation: '/ˈspaɪdər/', vietnamese: 'con nhện' },
+                        { term: 'duck', pronunciation: '/dʌk/', vietnamese: 'con vịt' },
+                        { term: 'dog', pronunciation: '/dɒɡ/', vietnamese: 'con chó' },
+                        { term: 'cat', pronunciation: '/kæt/', vietnamese: 'con mèo' },
                     ],
                     grammar: [
-                        { title: { en: 'Possession with "has"', vi: 'Sở hữu với "có"' }, explanation: { en: ["Use 'What's his/her name? His/Her name's (Ben/Sue).'", "Use 'What's his/her favourite toy?'", "Use 'How old is he/she?'"], vi: ['Sử dụng "Tên của anh ấy/cô ấy là gì? Tên của anh ấy/cô ấy là (Ben/Sue)."', 'Sử dụng "Đồ chơi yêu thích của anh ấy/cô ấy là gì?"', 'Sử dụng "Anh ấy/cô ấy bao nhiêu tuổi?"'] } }
+                        { title: { en: 'Prepositions of place', vi: 'Giới từ chỉ nơi chốn' }, explanation: { en: ["Use 'in', 'on', 'under' to describe location.", "Example: The lizard is in the bag."], vi: ['Sử dụng "in", "on", "under" để mô tả vị trí.', 'Ví dụ: Con thằn lằn ở trong túi.'] } }
                     ],
                     activities: [
-                        { type: 'Practice', description: { en: ['Play a guessing game with toys.', 'Draw and describe your favorite toy.'], vi: ['Chơi trò đoán đồ chơi.', 'Vẽ và mô tả đồ chơi yêu thích của bạn.'] } }
+                        { type: 'Practice', description: { en: ['Play the description game.', 'Count the animals in the picture.'], vi: ['Chơi trò chơi mô tả.', 'Đếm số động vật trong tranh.'] } }
+                    ]
+                },
+                {
+                    id: 302,
+                    title: { en: 'Likes and Dislikes', vi: 'Thích và không thích' },
+                    aims: {
+                        en: ['Talk about likes and dislikes.'],
+                        vi: ['Nói về những điều thích và không thích.']
+                    },
+                    vocabulary: [],
+                    grammar: [
+                        { title: { en: 'Likes and dislikes', vi: 'Thích và không thích' }, explanation: { en: ["Use 'I like (cats).' and 'I don't like (spiders).'", "Ask 'I like... What about you?'"], vi: ['Sử dụng "Tôi thích (mèo)." và "Tôi không thích (nhện)."', 'Hỏi "Tôi thích... Còn bạn thì sao?"'] } }
+                    ],
+                    activities: [
+                        { type: 'Practice', description: { en: ['Ask and answer with a partner about what animals you like.'], vi: ['Hỏi và trả lời với bạn cặp về loài động vật bạn thích.'] } }
                     ]
                 }
             ]
         },
         {
             id: 4,
-            title: { en: 'Unit 4: My body', vi: 'Bài 4: Cơ thể của em' },
+            title: { en: 'Lunchtime', vi: 'Giờ ăn trưa' },
             lessons: [
-                {
-                    id: 50401,
-                    title: { en: 'Body parts', vi: 'Các bộ phận cơ thể' },
+                 {
+                    id: 401,
+                    title: { en: 'Food and Possession', vi: 'Thức ăn và Sở hữu' },
                     aims: {
-                        en: ['Identify and name parts of the body.', 'Talk about abilities using "can".'],
-                        vi: ['Nhận biết và gọi tên các bộ phận cơ thể.', 'Nói về khả năng sử dụng "có thể".']
+                        en: ['Identify and name different food items.', "Talk about what you have and don't have."],
+                        vi: ['Nhận biết và gọi tên các loại thức ăn khác nhau.', 'Nói về những gì bạn có và không có.']
                     },
                     vocabulary: [
-                        { term: 'head', pronunciation: '/hɛd/', vietnamese: 'đầu', imageUrl: `${SM_BASE}head.png` },
-                        { term: 'arms', pronunciation: '/ɑrmz/', vietnamese: 'cánh tay', imageUrl: `${SM_BASE}arms.png` },
-                        { term: 'legs', pronunciation: '/lɛɡz/', vietnamese: 'chân', imageUrl: `${SM_BASE}legs.png` },
-                        { term: 'hands', pronunciation: '/hændz/', vietnamese: 'bàn tay', imageUrl: `${SM_BASE}hands.png` },
-                        { term: 'feet', pronunciation: '/fit/', vietnamese: 'bàn chân', imageUrl: `${SM_BASE}feet.png` },
-                        { term: 'eyes', pronunciation: '/aɪz/', vietnamese: 'mắt', imageUrl: `${SM_BASE}eyes.png` },
-                        { term: 'ears', pronunciation: '/ɪərz/', vietnamese: 'tai', imageUrl: `${SM_BASE}ears.png` },
-                        { term: 'nose', pronunciation: '/noʊz/', vietnamese: 'mũi', imageUrl: `${SM_BASE}nose.png` },
-                        { term: 'mouth', pronunciation: '/maʊθ/', vietnamese: 'miệng', imageUrl: `${SM_BASE}mouth.png` }
+                        { term: 'banana', pronunciation: '/bəˈnænə/', vietnamese: 'chuối' },
+                        { term: 'cake', pronunciation: '/keɪk/', vietnamese: 'bánh ngọt' },
+                        { term: 'cheese sandwich', pronunciation: '/tʃiːz ˈsænwɪdʒ/', vietnamese: 'bánh sandwich phô mai' },
+                        { term: 'apple', pronunciation: '/ˈæpəl/', vietnamese: 'táo' },
+                        { term: 'pizza', pronunciation: '/ˈpiːtsə/', vietnamese: 'pizza' },
+                        { term: 'sausage', pronunciation: '/ˈsɒsɪdʒ/', vietnamese: 'xúc xích' },
+                        { term: 'chicken', pronunciation: '/ˈtʃɪkɪn/', vietnamese: 'thịt gà' },
+                        { term: 'steak', pronunciation: '/steɪk/', vietnamese: 'bít tết' },
+                        { term: 'peas', pronunciation: '/piːz/', vietnamese: 'đậu Hà Lan' },
+                        { term: 'carrots', pronunciation: '/ˈkærəts/', vietnamese: 'cà rốt' },
                     ],
                     grammar: [
-                        { title: { en: 'Abilities with "can"', vi: 'Khả năng với "có thể"' }, explanation: { en: ["Use 'Can you (swim)? Yes, I can. / No, I can't.'", "Use 'He/She can (swim). He/She can't (fly).'", "Use 'What can you do?'"], vi: ['Sử dụng "Bạn có thể (bơi) không? Vâng, tôi có thể. / Không, tôi không thể."', 'Sử dụng "Anh ấy/Cô ấy có thể (bơi). Anh ấy/Cô ấy không thể (bay)."', 'Sử dụng "Bạn có thể làm gì?"'] } }
+                        { title: { en: "I've got / I haven't got", vi: 'Tôi có / Tôi không có' }, explanation: { en: ["Use 'I've got a...' to talk about possessions.", "Example: I've got a sandwich and an apple. I haven't got a banana."], vi: ['Sử dụng "Tôi có một..." để nói về sự sở hữu.', 'Ví dụ: Tôi có một cái bánh sandwich và một quả táo. Tôi không có một quả chuối.'] } }
                     ],
                     activities: [
-                        { type: 'Practice', description: { en: ['Sing "Head, Shoulders, Knees, and Toes".', 'Play "Simon Says" with body parts and actions.'], vi: ['Hát bài "Đầu, Vai, Gối, Ngón chân".', 'Chơi trò "Simon Says" với các bộ phận cơ thể và hành động.'] } }
+                        { type: 'Practice', description: { en: ['Read and draw lines to match the food.', 'Choose your lunch and find a friend with the same lunch.'], vi: ['Đọc và kẻ đường nối với đồ ăn.', 'Chọn bữa trưa của bạn và tìm một người bạn có bữa trưa giống bạn.'] } }
+                    ]
+                },
+                {
+                    id: 402,
+                    title: { en: 'Have we got...?', vi: 'Chúng ta có... không?' },
+                    aims: {
+                        en: ['Ask and answer questions about having something.'],
+                        vi: ['Hỏi và trả lời các câu hỏi về việc có thứ gì đó.']
+                    },
+                    vocabulary: [],
+                    grammar: [
+                        { title: { en: 'Have we got any...?', vi: 'Chúng ta có... nào không?' }, explanation: { en: ["Ask with 'Have we got any (cheese)?'", "Answer with 'Yes, we have.' or 'No, we haven't.'"], vi: ['Hỏi với "Chúng ta có (phô mai) nào không?"', 'Trả lời bằng "Có, chúng ta có." hoặc "Không, chúng ta không có."'] } }
+                    ],
+                    activities: [
+                        { type: 'Practice', description: { en: ['Ask and answer about the food in the fridge.'], vi: ['Hỏi và trả lời về đồ ăn trong tủ lạnh.'] } }
                     ]
                 }
             ]
         },
         {
             id: 5,
-            title: { en: 'Unit 5: Animals', vi: 'Bài 5: Động vật' },
+            title: { en: 'Free time', vi: 'Thời gian rảnh' },
             lessons: [
-                {
-                    id: 50501,
-                    title: { en: 'Farm animals', vi: 'Động vật nông trại' },
+                 {
+                    id: 501,
+                    title: { en: 'Days of the Week', vi: 'Các ngày trong tuần' },
                     aims: {
-                        en: ['Identify and name farm animals.', 'Talk about where animals live.'],
-                        vi: ['Nhận biết và gọi tên động vật nông trại.', 'Nói về nơi động vật sống.']
+                        en: ['Identify the days of the week.', 'Talk about weekly activities.'],
+                        vi: ['Nhận biết các ngày trong tuần.', 'Nói về các hoạt động hàng tuần.']
                     },
                     vocabulary: [
-                        { term: 'cow', pronunciation: '/kaʊ/', vietnamese: 'bò', imageUrl: `${SM_BASE}cow.png` },
-                        { term: 'horse', pronunciation: '/hɔrs/', vietnamese: 'ngựa', imageUrl: `${SM_BASE}horse.png` },
-                        { term: 'sheep', pronunciation: '/ʃip/', vietnamese: 'cừu', imageUrl: `${SM_BASE}sheep.png` },
-                        { term: 'chicken', pronunciation: '/ˈtʃɪkɪn/', vietnamese: 'gà', imageUrl: `${SM_BASE}chicken.png` },
-                        { term: 'duck', pronunciation: '/dʌk/', vietnamese: 'vịt', imageUrl: `${SM_BASE}duck.png` },
-                        { term: 'pig', pronunciation: '/pɪɡ/', vietnamese: 'lợn', imageUrl: `${SM_BASE}pig.png` }
+                        { term: 'Monday', pronunciation: '/ˈmʌndeɪ/', vietnamese: 'Thứ Hai' },
+                        { term: 'Tuesday', pronunciation: '/ˈtjuːzdeɪ/', vietnamese: 'Thứ Ba' },
+                        { term: 'Wednesday', pronunciation: '/ˈwɛnzdeɪ/', vietnamese: 'Thứ Tư' },
+                        { term: 'Thursday', pronunciation: '/ˈθɜːzdeɪ/', vietnamese: 'Thứ Năm' },
+                        { term: 'Friday', pronunciation: '/ˈfraɪdeɪ/', vietnamese: 'Thứ Sáu' },
+                        { term: 'Saturday', pronunciation: '/ˈsætədeɪ/', vietnamese: 'Thứ Bảy' },
+                        { term: 'Sunday', pronunciation: '/ˈsʌndeɪ/', vietnamese: 'Chủ Nhật' },
                     ],
                     grammar: [
-                        { title: { en: 'Prepositions of place', vi: 'Giới từ chỉ nơi chốn' }, explanation: { en: ["Use 'in', 'on', 'under' to describe location.", "Example: The cat is on the mat."], vi: ['Sử dụng "in", "on", "under" để mô tả vị trí.', 'Ví dụ: Con mèo ở trên tấm thảm.'] } }
+                        { title: { en: 'Simple Present with days', vi: 'Thì Hiện tại đơn với các ngày' }, explanation: { en: ["Use 'on' with days of the week.", "Example: I go swimming on Mondays. I play football on Saturdays."], vi: ['Sử dụng "on" với các ngày trong tuần.', 'Ví dụ: Tôi đi bơi vào các ngày thứ Hai. Tôi chơi bóng đá vào các ngày thứ Bảy.'] } }
                     ],
                     activities: [
-                        { type: 'Practice', description: { en: ['Listen to animal sounds and guess the animal.', 'Draw a farm scene and describe where the animals are.'], vi: ['Nghe tiếng kêu của động vật và đoán con vật.', 'Vẽ một cảnh nông trại và mô tả vị trí của các con vật.'] } }
+                        { type: 'Practice', description: { en: ['Listen and chant the days of the week.', 'Ask and answer about what you do on different days.'], vi: ['Nghe và đọc theo vần các ngày trong tuần.', 'Hỏi và trả lời về những gì bạn làm vào các ngày khác nhau.'] } }
+                    ]
+                },
+                {
+                    id: 502,
+                    title: { en: 'Weekend Activities', vi: 'Hoạt động cuối tuần' },
+                    aims: {
+                        en: ['Ask and answer about weekend activities.'],
+                        vi: ['Hỏi và trả lời về các hoạt động cuối tuần.']
+                    },
+                    vocabulary: [
+                        { term: 'watch TV', pronunciation: '/wɒtʃ ˌtiːˈviː/', vietnamese: 'xem TV' },
+                        { term: 'play computer games', pronunciation: '/pleɪ kəmˈpjuːtər ɡeɪmz/', vietnamese: 'chơi game trên máy tính' },
+                    ],
+                    grammar: [
+                        { title: { en: 'Questions with "Do you...?"', vi: 'Câu hỏi với "Bạn có...?"' }, explanation: { en: ["Ask with 'Do you (watch TV) at the weekend?'", "Answer with 'Yes, I do.' or 'No, I don't.'"], vi: ['Hỏi với "Bạn có (xem TV) vào cuối tuần không?"', 'Trả lời bằng "Có, tôi có." hoặc "Không, tôi không."'] } }
+                    ],
+                    activities: [
+                        { type: 'Practice', description: { en: ['Play the question game about weekend activities.'], vi: ['Chơi trò chơi hỏi về các hoạt động cuối tuần.'] } }
                     ]
                 }
             ]
         },
         {
             id: 6,
-            title: { en: 'Unit 6: Food', vi: 'Bài 6: Thức ăn' },
+            title: { en: 'The old house', vi: 'Ngôi nhà cũ' },
             lessons: [
                 {
-                    id: 50601,
-                    title: { en: 'Fruits and vegetables', vi: 'Trái cây và rau củ' },
+                    id: 601,
+                    title: { en: 'Parts of a House', vi: 'Các bộ phận của ngôi nhà' },
                     aims: {
-                        en: ['Identify and name different fruits and vegetables.', 'Talk about food likes and dislikes.'],
-                        vi: ['Nhận biết và gọi tên các loại trái cây và rau củ khác nhau.', 'Nói về thức ăn yêu thích và không thích.']
+                        en: ['Identify parts of a house.', "Use 'There's' and 'There are'."],
+                        vi: ['Nhận biết các bộ phận của một ngôi nhà.', 'Sử dụng "Có một" và "Có nhiều".']
                     },
                     vocabulary: [
-                        { term: 'apple', pronunciation: '/ˈæpəl/', vietnamese: 'táo', imageUrl: `${SM_BASE}apples.png` },
-                        { term: 'banana', pronunciation: '/bəˈnænə/', vietnamese: 'chuối', imageUrl: `${SM_BASE}banana.png` },
-                        { term: 'orange', pronunciation: '/ˈɔrɪndʒ/', vietnamese: 'cam', imageUrl: `${SM_BASE}orange.png` },
-                        { term: 'carrot', pronunciation: '/ˈkærət/', vietnamese: 'cà rốt', imageUrl: `${SM_BASE}carrots.png` },
-                        { term: 'tomato', pronunciation: '/təˈmeɪtoʊ/', vietnamese: 'cà chua', imageUrl: `${SM_BASE}tomato.png` },
-                        { term: 'potato', pronunciation: '/pəˈteɪtoʊ/', vietnamese: 'khoai tây', imageUrl: `${SM_BASE}potato.png` }
+                        { term: 'bathroom', pronunciation: '/ˈbæθruːm/', vietnamese: 'phòng tắm' },
+                        { term: 'bedroom', pronunciation: '/ˈbɛdruːm/', vietnamese: 'phòng ngủ' },
+                        { term: 'living room', pronunciation: '/ˈlɪvɪŋ ruːm/', vietnamese: 'phòng khách' },
+                        { term: 'hall', pronunciation: '/hɔːl/', vietnamese: 'hành lang' },
+                        { term: 'dining room', pronunciation: '/ˈdaɪnɪŋ ruːm/', vietnamese: 'phòng ăn' },
+                        { term: 'kitchen', pronunciation: '/ˈkɪtʃɪn/', vietnamese: 'nhà bếp' },
+                        { term: 'stairs', pronunciation: '/stɛərz/', vietnamese: 'cầu thang' },
+                        { term: 'cellar', pronunciation: '/ˈsɛlər/', vietnamese: 'hầm' },
                     ],
                     grammar: [
-                        { title: { en: 'Likes and dislikes', vi: 'Thích và không thích' }, explanation: { en: ["Use 'I like (apples).' and 'I don't like (carrots).'", "Ask 'Do you like (bananas)? Yes, I do. / No, I don't.'"], vi: ['Sử dụng "Tôi thích (táo)." và "Tôi không thích (cà rốt)."', 'Hỏi "Bạn có thích (chuối) không? Vâng, tôi có. / Không, tôi không."'] } }
+                        { title: { en: "There's / There are", vi: 'Có một / Có nhiều' }, explanation: { en: ["Use 'There's a...' for singular nouns.", "Use 'There are...' for plural nouns.", "Example: There's a monster. There are four cats."], vi: ['Sử dụng "Có một..." cho danh từ số ít.', 'Sử dụng "Có nhiều..." cho danh từ số nhiều.', 'Ví dụ: Có một con quái vật. Có bốn con mèo.'] } }
                     ],
                     activities: [
-                        { type: 'Practice', description: { en: ['Sort fruits and vegetables.', 'Create a healthy meal plan.'], vi: ['Phân loại trái cây và rau củ.', 'Tạo một kế hoạch bữa ăn lành mạnh.'] } }
+                        { type: 'Practice', description: { en: ['Listen and match the monsters with their bedrooms.', 'Play the description game about rooms.'], vi: ['Nghe và nối các con quái vật với phòng ngủ của chúng.', 'Chơi trò chơi mô tả về các căn phòng.'] } }
+                    ]
+                },
+                 {
+                    id: 602,
+                    title: { en: 'Questions with There is/are', vi: 'Câu hỏi với Có/Không' },
+                    aims: {
+                        en: ['Ask and answer questions using "Is there...?" and "Are there...?"'],
+                        vi: ['Hỏi và trả lời câu hỏi sử dụng "Có... không?"']
+                    },
+                    vocabulary: [],
+                    grammar: [
+                        { title: { en: 'Questions with There is/are', vi: 'Câu hỏi với Có/Không' }, explanation: { en: ["Ask with 'Is there a (plane)?'", "Answer with 'Yes, there is.' / 'No, there isn't.'", "Ask with 'Are there any (rats)?'", "Answer with 'Yes, there are.' / 'No, there aren't.'", "Ask with 'How many (cars) are there?'"], vi: ['Hỏi với "Có một (cái máy bay) không?"', 'Trả lời "Vâng, có." / "Không, không có."', 'Hỏi với "Có con chuột nào không?"', 'Trả lời "Vâng, có." / "Không, không có."', 'Hỏi với "Có bao nhiêu (chiếc ô tô)?"'] } }
+                    ],
+                    activities: [
+                        { type: 'Practice', description: { en: ['Look at the picture and ask/answer questions.'], vi: ['Nhìn vào tranh và hỏi/trả lời câu hỏi.'] } }
                     ]
                 }
             ]
         },
         {
             id: 7,
-            title: { en: 'Unit 7: My house', vi: 'Bài 7: Nhà của em' },
+            title: { en: 'Get dressed!', vi: 'Mặc quần áo vào!' },
             lessons: [
-                {
-                    id: 50701,
-                    title: { en: 'Rooms and furniture', vi: 'Các phòng và đồ nội thất' },
+                 {
+                    id: 701,
+                    title: { en: 'Clothes', vi: 'Quần áo' },
                     aims: {
-                        en: ['Identify and name rooms in a house.', 'Identify and name common furniture.', 'Describe where things are.'],
-                        vi: ['Nhận biết và gọi tên các phòng trong nhà.', 'Nhận biết và gọi tên đồ nội thất thông thường.', 'Mô tả vị trí của đồ vật.']
+                        en: ['Identify and name different items of clothing.', 'Use "this" and "these" with clothes.'],
+                        vi: ['Nhận biết và gọi tên các loại quần áo khác nhau.', 'Sử dụng "cái này" và "những cái này" với quần áo.']
                     },
                     vocabulary: [
-                        { term: 'bedroom', pronunciation: '/ˈbɛdruːm/', vietnamese: 'phòng ngủ', imageUrl: `${SM_BASE}bedroom.png` },
-                        { term: 'bathroom', pronunciation: '/ˈbæθruːm/', vietnamese: 'phòng tắm', imageUrl: `${SM_BASE}bathroom.png` },
-                        { term: 'kitchen', pronunciation: '/ˈkɪtʃɪn/', vietnamese: 'nhà bếp', imageUrl: `${SM_BASE}kitchen.png` },
-                        { term: 'living room', pronunciation: '/ˈlɪvɪŋ ruːm/', vietnamese: 'phòng khách', imageUrl: `${SM_BASE}living_room.png` },
-                        { term: 'bed', pronunciation: '/bɛd/', vietnamese: 'giường', imageUrl: `${SM_BASE}bed.png` },
-                        { term: 'table', pronunciation: '/ˈteɪbəl/', vietnamese: 'bàn', imageUrl: `${SM_BASE}table.png` },
-                        { term: 'chair', pronunciation: '/tʃɛər/', vietnamese: 'ghế', imageUrl: `${SM_BASE}chair.png` },
-                        { term: 'sofa', pronunciation: '/ˈsoʊfə/', vietnamese: 'ghế sofa', imageUrl: `${SM_BASE}sofa.png` }
+                        { term: 'jeans', pronunciation: '/dʒiːnz/', vietnamese: 'quần jean' },
+                        { term: 'sweater', pronunciation: '/ˈswɛtər/', vietnamese: 'áo len' },
+                        { term: 'jacket', pronunciation: '/ˈdʒækɪt/', vietnamese: 'áo khoác' },
+                        { term: 'skirt', pronunciation: '/skɜːrt/', vietnamese: 'chân váy' },
+                        { term: 'shorts', pronunciation: '/ʃɔːrts/', vietnamese: 'quần soóc' },
+                        { term: 'cap', pronunciation: '/kæp/', vietnamese: 'mũ lưỡi trai' },
+                        { term: 'shoes', pronunciation: '/ʃuːz/', vietnamese: 'giày' },
+                        { term: 'socks', pronunciation: '/sɒks/', vietnamese: 'tất' },
+                        { term: 'T-shirt', pronunciation: '/ˈtiː ʃɜːrt/', vietnamese: 'áo phông' },
+                        { term: 'trousers', pronunciation: '/ˈtraʊzərz/', vietnamese: 'quần dài' },
                     ],
                     grammar: [
-                        { title: { en: 'Prepositions of place', vi: 'Giới từ chỉ nơi chốn' }, explanation: { en: ["Use 'in', 'on', 'under', 'next to' to describe location.", "Example: The book is on the table."], vi: ['Sử dụng "in", "on", "under", "next to" để mô tả vị trí.', 'Ví dụ: Cuốn sách ở trên bàn.'] } }
+                        { title: { en: 'Demonstratives this/these', vi: 'Đại từ chỉ định này/những cái này' }, explanation: { en: ["Use 'this' for singular items.", "Use 'these' for plural items (like shoes, trousers).", "Example: Do you like this hat? Do you like these shoes?"], vi: ['Sử dụng "this" cho đồ vật số ít.', 'Sử dụng "these" cho đồ vật số nhiều (như giày, quần).', 'Ví dụ: Bạn có thích cái mũ này không? Bạn có thích đôi giày này không?'] } }
                     ],
                     activities: [
-                        { type: 'Practice', description: { en: ['Draw your dream house and label the rooms and furniture.', 'Describe your room to a partner.'], vi: ['Vẽ ngôi nhà mơ ước của bạn và dán nhãn các phòng và đồ nội thất.', 'Mô tả phòng của bạn cho bạn cặp.'] } }
+                        { type: 'Practice', description: { en: ['Look at the clothes and ask/answer questions.'], vi: ['Nhìn vào quần áo và hỏi/trả lời câu hỏi.'] } }
+                    ]
+                },
+                 {
+                    id: 702,
+                    title: { en: 'Present Continuous (Wearing)', vi: 'Thì Hiện tại tiếp diễn (Mặc)' },
+                    aims: {
+                        en: ["Talk about what people are wearing using Present Continuous."],
+                        vi: ["Nói về những gì mọi người đang mặc bằng thì Hiện tại tiếp diễn."]
+                    },
+                    vocabulary: [],
+                    grammar: [
+                        { title: { en: 'Present Continuous for clothes', vi: 'Thì Hiện tại tiếp diễn cho quần áo' }, explanation: { en: ["Use 'is/are wearing' to describe what someone has on.", "Example: Olivia's wearing a red sweater.", "Ask with 'Is he/she wearing...?'", "Answer with 'Yes, he/she is.' / 'No, he/she isn't.'"], vi: ['Sử dụng "đang mặc" để mô tả ai đó đang mặc gì.', 'Ví dụ: Olivia đang mặc một chiếc áo len màu đỏ.', 'Hỏi với "Anh ấy/cô ấy có đang mặc... không?"', 'Trả lời với "Vâng, đúng vậy." / "Không, không phải."'] } }
+                    ],
+                    activities: [
+                        { type: 'Practice', description: { en: ['Listen and write the names.', 'Play the guessing game about clothes.'], vi: ['Nghe và viết tên.', 'Chơi trò chơi đoán về quần áo.'] } }
                     ]
                 }
             ]
         },
         {
             id: 8,
-            title: { en: 'Unit 8: On holiday', vi: 'Bài 8: Đi nghỉ mát' },
+            title: { en: 'The robot', vi: 'Người máy' },
             lessons: [
                 {
-                    id: 50801,
-                    title: { en: 'Holiday activities', vi: 'Các hoạt động kỳ nghỉ' },
+                    id: 801,
+                    title: { en: 'Body Parts and Ability', vi: 'Các bộ phận cơ thể và Khả năng' },
                     aims: {
-                        en: ['Talk about holiday activities.', 'Ask and answer about what people are doing.'],
-                        vi: ['Nói về các hoạt động kỳ nghỉ.', 'Hỏi và trả lời về những gì mọi người đang làm.']
+                        en: ['Identify parts of the body.', 'Talk about abilities using "can" and "can\'t".'],
+                        vi: ['Nhận biết các bộ phận của cơ thể.', 'Nói về khả năng sử dụng "có thể" và "không thể".']
                     },
                     vocabulary: [
-                        { term: 'swim', pronunciation: '/swɪm/', vietnamese: 'bơi', imageUrl: `${SM_BASE}swim.png` },
-                        { term: 'play', pronunciation: '/pleɪ/', vietnamese: 'chơi', imageUrl: `${SM_BASE}play.png` },
-                        { term: 'eat', pronunciation: '/it/', vietnamese: 'ăn', imageUrl: `${SM_BASE}eat.png` },
-                        { term: 'sleep', pronunciation: '/slip/', vietnamese: 'ngủ', imageUrl: `${SM_BASE}sleep.png` },
-                        { term: 'take photos', pronunciation: '/teɪk ˈfoʊtoʊz/', vietnamese: 'chụp ảnh', imageUrl: `${SM_BASE}take_photos.png` },
-                        { term: 'read', pronunciation: '/rid/', vietnamese: 'đọc', imageUrl: `${SM_BASE}read.png` }
+                        { term: 'head', pronunciation: '/hɛd/', vietnamese: 'đầu' },
+                        { term: 'arm', pronunciation: '/ɑːrm/', vietnamese: 'cánh tay' },
+                        { term: 'fingers', pronunciation: '/ˈfɪŋɡərz/', vietnamese: 'ngón tay' },
+                        { term: 'hand', pronunciation: '/hænd/', vietnamese: 'bàn tay' },
+                        { term: 'knee', pronunciation: '/niː/', vietnamese: 'đầu gối' },
+                        { term: 'leg', pronunciation: '/lɛɡ/', vietnamese: 'chân' },
+                        { term: 'toes', pronunciation: '/toʊz/', vietnamese: 'ngón chân' },
+                        { term: 'foot', pronunciation: '/fʊt/', vietnamese: 'bàn chân' },
                     ],
                     grammar: [
-                        { title: { en: 'Present Continuous for actions now', vi: 'Thì Hiện tại tiếp diễn cho hành động đang diễn ra' }, explanation: { en: ["Use 'What are you doing? I'm (swimming).'", "Use 'He/She is (eating). They are (playing).'", "Use 'Are you (reading)? Yes, I am. / No, I'm not.'"], vi: ['Sử dụng "Bạn đang làm gì? Tôi đang (bơi)."', 'Sử dụng "Anh ấy/Cô ấy đang (ăn). Họ đang (chơi)."', 'Sử dụng "Bạn có đang (đọc sách) không? Vâng, tôi có. / Không, tôi không."'] } }
+                        { title: { en: 'Abilities with can/can\'t', vi: 'Khả năng với có thể/không thể' }, explanation: { en: ["Use 'can' for ability and 'can't' for inability.", "Example: I can stand on one leg. He can't skip."], vi: ['Sử dụng "can" cho khả năng và "can\'t" cho việc không có khả năng.', 'Ví dụ: Tôi có thể đứng bằng một chân. Anh ấy không thể nhảy dây.'] } }
                     ],
                     activities: [
-                        { type: 'Practice', description: { en: ['Describe pictures of people doing holiday activities.', 'Role-play asking and answering about holiday plans.'], vi: ['Mô tả các bức tranh về những người đang làm các hoạt động kỳ nghỉ.', 'Đóng vai hỏi và trả lời về kế hoạch kỳ nghỉ.'] } }
+                        { type: 'Practice', description: { en: ['Listen and chant about body parts.', 'Make sentences about what Anna and Pete can do.'], vi: ['Nghe và đọc theo vần về các bộ phận cơ thể.', 'Đặt câu về những gì Anna và Pete có thể làm.'] } }
+                    ]
+                },
+                {
+                    id: 802,
+                    title: { en: 'Asking about Ability', vi: 'Hỏi về Khả năng' },
+                    aims: {
+                        en: ['Ask and answer questions about ability.'],
+                        vi: ['Hỏi và trả lời các câu hỏi về khả năng.']
+                    },
+                    vocabulary: [
+                        { term: 'swim', pronunciation: '/swɪm/', vietnamese: 'bơi' },
+                        { term: 'ride a horse', pronunciation: '/raɪd ə hɔːrs/', vietnamese: 'cưỡi ngựa' },
+                        { term: 'ride a bike', pronunciation: '/raɪd ə baɪk/', vietnamese: 'đi xe đạp' },
+                        { term: 'play tennis', pronunciation: '/pleɪ ˈtɛnɪs/', vietnamese: 'chơi quần vợt' },
+                        { term: 'dance', pronunciation: '/dæns/', vietnamese: 'nhảy' },
+                    ],
+                    grammar: [
+                        { title: { en: 'Questions with "Can you...?"', vi: 'Câu hỏi với "Bạn có thể...?"' }, explanation: { en: ["Ask with 'Can you (swim)?'", "Answer with 'Yes, I can.' or 'No, I can't.'"], vi: ['Hỏi với "Bạn có thể (bơi) không?"', 'Trả lời với "Vâng, tôi có thể." hoặc "Không, tôi không thể."'] } }
+                    ],
+                    activities: [
+                        { type: 'Practice', description: { en: ['Look and say, then tick or cross the box.', 'Play the action game.'], vi: ['Nhìn và nói, sau đó đánh dấu tick hoặc chéo vào ô.', 'Chơi trò chơi hành động.'] } }
                     ]
                 }
             ]
         },
         {
             id: 9,
-            title: { en: 'Unit 9: Party clothes', vi: 'Bài 9: Quần áo dự tiệc' },
+            title: { en: 'At the beach', vi: 'Ở bãi biển' },
             lessons: [
                 {
-                    id: 50901,
-                    title: { en: 'Clothes', vi: 'Quần áo' },
+                    id: 901,
+                    title: { en: 'Holiday Activities and Suggestions', vi: 'Hoạt động kỳ nghỉ và Gợi ý' },
                     aims: {
-                        en: ['Identify and name different items of clothing.', 'Talk about what people are wearing.'],
-                        vi: ['Nhận biết và gọi tên các loại quần áo khác nhau.', 'Nói về những gì mọi người đang mặc.']
+                        en: ['Talk about holiday activities.', 'Make suggestions and respond to them.'],
+                        vi: ['Nói về các hoạt động trong kỳ nghỉ.', 'Đưa ra gợi ý và phản hồi lại.']
                     },
                     vocabulary: [
-                        { term: 'hat', pronunciation: '/hæt/', vietnamese: 'mũ', imageUrl: `${SM_BASE}hat.png` },
-                        { term: 'shirt', pronunciation: '/ʃɜrt/', vietnamese: 'áo sơ mi', imageUrl: `${SM_BASE}shirt.png` },
-                        { term: 'dress', pronunciation: '/drɛs/', vietnamese: 'váy', imageUrl: `${SM_BASE}dress.png` },
-                        { term: 'trousers', pronunciation: '/ˈtraʊzərz/', vietnamese: 'quần dài', imageUrl: `${SM_BASE}trousers.png` },
-                        { term: 'shoes', pronunciation: '/ʃuz/', vietnamese: 'giày', imageUrl: `${SM_BASE}shoes.png` },
-                        { term: 'socks', pronunciation: '/sɑks/', vietnamese: 'tất', imageUrl: `${SM_BASE}socks.png` }
+                        { term: 'catch a fish', pronunciation: '/kætʃ ə fɪʃ/', vietnamese: 'bắt cá' },
+                        { term: 'paint a picture', pronunciation: '/peɪnt ə ˈpɪktʃər/', vietnamese: 'vẽ một bức tranh' },
+                        { term: 'eat ice cream', pronunciation: '/iːt aɪs kriːm/', vietnamese: 'ăn kem' },
+                        { term: 'take a photo', pronunciation: '/teɪk ə ˈfoʊtoʊ/', vietnamese: 'chụp ảnh' },
+                        { term: 'listen to music', pronunciation: '/ˈlɪsən tu ˈmjuːzɪk/', vietnamese: 'nghe nhạc' },
+                        { term: 'look for shells', pronunciation: '/lʊk fər ʃɛlz/', vietnamese: 'tìm vỏ sò' },
+                        { term: 'read a book', pronunciation: '/riːd ə bʊk/', vietnamese: 'đọc sách' },
+                        { term: 'make a sandcastle', pronunciation: '/meɪk ə ˈsændˌkæsəl/', vietnamese: 'xây lâu đài cát' },
                     ],
                     grammar: [
-                        { title: { en: 'Describing clothes', vi: 'Mô tả quần áo' }, explanation: { en: ["Use 'He/She is wearing a (red shirt).'", "Use 'They are wearing (blue shoes).'", "Ask 'What is he/she wearing?'"], vi: ['Sử dụng "Anh ấy/Cô ấy đang mặc một (áo sơ mi đỏ)."', 'Sử dụng "Họ đang mặc (giày xanh)."', 'Hỏi "Anh ấy/Cô ấy đang mặc gì?"'] } }
+                        { title: { en: 'Suggestions with Let\'s', vi: 'Gợi ý với "Hãy cùng..."' }, explanation: { en: ["Use 'Let's...' to make a suggestion.", "Respond with 'Good idea.', 'I'm not sure.', or 'Sorry, I don't want to.'", "Example: Let's play the guitar."], vi: ['Sử dụng "Let\'s..." để đưa ra gợi ý.', 'Phản hồi bằng "Ý kiến hay.", "Tôi không chắc.", hoặc "Xin lỗi, tôi không muốn."', 'Ví dụ: Hãy chơi đàn guitar nào.'] } }
                     ],
                     activities: [
-                        { type: 'Practice', description: { en: ['Describe what classmates are wearing.', 'Design an outfit for a party.'], vi: ['Mô tả những gì bạn học đang mặc.', 'Thiết kế một bộ trang phục cho bữa tiệc.'] } }
+                        { type: 'Practice', description: { en: ['Listen and chant about beach activities.', 'Look and act out making suggestions.'], vi: ['Nghe và đọc theo vần về các hoạt động ở bãi biển.', 'Nhìn và diễn tả việc đưa ra gợi ý.'] } }
+                    ]
+                },
+                {
+                    id: 902,
+                    title: { en: 'Asking for Location', vi: 'Hỏi vị trí' },
+                    aims: {
+                        en: ["Ask and answer where things are using 'Where's...?' and 'Where are...?'"],
+                        vi: ["Hỏi và trả lời về vị trí của đồ vật bằng cách sử dụng '... ở đâu?'"]
+                    },
+                    vocabulary: [
+                         { term: 'shell', pronunciation: '/ʃɛl/', vietnamese: 'vỏ sò' },
+                         { term: 'sandcastle', pronunciation: '/ˈsændˌkæsəl/', vietnamese: 'lâu đài cát' },
+                         { term: 'kites', pronunciation: '/kaɪts/', vietnamese: 'những cái diều' },
+                         { term: 'toy box', pronunciation: '/tɔɪ bɒks/', vietnamese: 'hộp đồ chơi' },
+                    ],
+                    grammar: [
+                        { title: { en: "Where's / Where are...?", vi: '... ở đâu?' }, explanation: { en: ["Use 'Where's...?' for singular items.", "Use 'Where are...?' for plural items.", "Example: Where's the blue book? It's in the green bag.", "Example: Where are the orange books? They're in the black bag."], vi: ['Sử dụng "Where\'s...?" cho đồ vật số ít.', 'Sử dụng "Where are...?" cho đồ vật số nhiều.', 'Ví dụ: Quyển sách màu xanh ở đâu? Nó ở trong cái túi màu xanh lá.', 'Ví dụ: Những quyển sách màu cam ở đâu? Chúng ở trong cái túi màu đen.'] } }
+                    ],
+                    activities: [
+                        { type: 'Practice', description: { en: ['Play the question game about where things are.'], vi: ['Chơi trò chơi hỏi về vị trí của đồ vật.'] } }
                     ]
                 }
             ]

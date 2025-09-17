@@ -1,3 +1,0 @@
-// assets/logo.ts
-// Inlined the logo as a data URI to fix the broken asset path.
-export const ivsLogoSrc = `data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3e%3ccircle cx='50' cy='50' r='50' fill='%231e293b'/%3e%3ctext x='50' y='50' font-family='Inter, sans-serif' font-size='40' dy='.3em' font-weight='bold' fill='white' text-anchor='middle'%3eIVS%3c/text%3e%3c/svg%3e`;

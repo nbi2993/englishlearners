@@ -1,8 +1,5 @@
 {
-  "name": "IVS English Learners Platform",
-  "description": "An English learning platform for young learners, with curricula for preschool (Goaldigger) and primary school (Super Minds).",
-  "requestFramePermissions": [
-    "microphone"
-  ],
-  "prompt": ""
+  "name": "English K-12 App",
+  "description": "An integrated English learning platform for K-12 students, featuring interactive ebooks, AI-powered practice tools, gamification, and comprehensive teacher management features, covering both international and Vietnamese standard curricula.",
+  "requestFramePermissions": []
 }

@@ -1,68 +1,86 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>IVS English Learners Platform</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-      /* A soft, motivational gradient for a modern learning platform */
-      .main-content-bg {
-        background-color: #f0f9ff; /* sky-50, fallback */
-        background-image: linear-gradient(170deg, hsl(206, 100%, 97%) 0%, hsl(190, 100%, 96%) 50%, hsl(215, 25%, 97%) 100%);
-      }
-      .dark .main-content-bg {
-        background-color: #0f172a; /* slate-900, fallback */
-        background-image: linear-gradient(170deg, hsl(215, 28%, 12%) 0%, hsl(215, 28%, 10%) 50%, hsl(215, 28%, 14%) 100%);
-      }
-    </style>
-    <script>
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ['Inter', 'sans-serif'],
-            },
-            colors: {
-              primary: {
-                DEFAULT: '#14b8a6', // teal-500
-                hover: '#0d9488'  // teal-600
-              },
-              secondary: '#64748b', // slate-500
-              light: '#f1f5f9',     // slate-100
-              dark: '#1e293b',      // slate-800
-              accent: {
-                DEFAULT: '#f59e0b', // amber-500
-                hover: '#d97706'  // amber-600
-              }
-            },
-            boxShadow: {
-              'soft': '0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07)',
-              'soft-md': '0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.07)',
-            }
-          }
-        }
-      }
-    </script>
-  <script type="importmap">
-{
-  "imports": {
-    "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
-    "react/": "https://esm.sh/react@^19.1.0/",
-    "react": "https://esm.sh/react@^19.1.0",
-    "@google/genai": "https://esm.sh/@google/genai@^1.10.0",
-    "@heroicons/react/": "https://esm.sh/@heroicons/react@^2.2.0/"
-  }
-}
-</script>
-<link rel="stylesheet" href="/index.css">
+<html lang="vi" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>IVS English K-12 Learning App</title>
+
+  <!-- Preconnect to CDNs for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="preconnect" href="https://aistudiocdn.com" crossorigin>
+
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome for icons -->
+  <link 
+    rel="stylesheet" 
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" 
+    integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" 
+    crossorigin="anonymous" 
+    referrerpolicy="no-referrer" 
+  />
+
+  <!-- Tailwind CSS for modern UI -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="index.css">
+
+  <!-- Custom configuration for Tailwind dark mode -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+    }
+  </script>
 </head>
-  <body class="bg-slate-100 dark:bg-slate-900 font-sans">
-    <div id="root"></div>
+<body class="h-full bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 antialiased">
+  
+  <!-- Aurora Background -->
+  <div class="aurora-background"></div>
+
+  <!-- Root app container -->
+  <div id="root" class="h-full relative z-10">
+    <!-- Optimized Initial Loader with Tailwind CSS -->
+    <div class="initial-loader flex flex-col items-center justify-center h-full w-full bg-slate-50 dark:bg-slate-900 transition-opacity duration-300" role="status" aria-live="polite">
+      <div class="spinner h-12 w-12 animate-spin rounded-full border-4 border-slate-200 dark:border-slate-700 border-t-blue-600 dark:border-t-blue-500" aria-hidden="true"></div>
+      <p class="mt-4 text-lg font-medium text-slate-600 dark:text-slate-300 tracking-wide">
+        Đang tải IVS English...
+      </p>
+    </div>
+  </div>
+
+  <!-- Import map for React (ESM) -->
+  <script type="importmap">
+    {
+      "imports": {
+        "react": "https://aistudiocdn.com/react@^19.1.1",
+        "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
+        "react/": "https://aistudiocdn.com/react@^19.1.1/",
+        "@google/genai": "https://aistudiocdn.com/@google/genai@^1.19.0",
+        "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.2/package/xlsx.mjs"
+      }
+    }
+  </script>
+
+  <!-- Instantly apply dark mode to prevent flash of light theme -->
+  <script>
+    (() => {
+      try {
+        const theme = localStorage.getItem('ivs-theme');
+        // Default to dark if theme is 'dark' or if no theme is set.
+        if (theme === 'dark' || !theme) {
+          document.documentElement.classList.add('dark');
+        }
+      } catch (e) {
+        console.error("Failed to apply theme:", e);
+      }
+    })();
+  </script>
+
+  <!-- Main React app entry point -->
   <script type="module" src="/index.tsx"></script>
 </body>
 </html>

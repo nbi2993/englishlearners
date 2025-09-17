@@ -1,234 +1,174 @@
+import React, { useState, useEffect } from 'react';
+import type { View, User, Course, Classes } from './types';
+import { MOCK_USER, MOCK_CLASSES } from './constants';
+import { auth } from './firebaseConfig';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 
-import React, { useState, useCallback, useEffect } from 'react';
-import { curriculumData } from './data/curriculum';
-import { Lesson, Unit, CurriculumLevel } from './types';
 import Sidebar from './components/Sidebar';
-import LessonView from './components/LessonView';
-import AIAssistant, { AIAction } from './components/AIAssistant';
-import HomeScreen from './components/HomeScreen';
+import Header from './components/Header';
+import Home from './components/Home';
 import Dashboard from './components/Dashboard';
-import { SparklesIcon } from './components/Icons';
-import { useTranslation } from './contexts/i18n';
-import EBookReader from './components/EBookReader';
-import OtherPrograms from './components/OtherPrograms';
-import CurriculumDisplay from './components/CurriculumDisplay';
-import SettingsModal from './components/SettingsModal';
+import CourseDetail from './components/CourseDetail';
+import TeacherDashboard from './components/TeacherDashboard';
+import WritingGrader from './components/WritingGrader';
+import SpeakingPartner from './components/SpeakingPartner';
+import Settings from './components/Settings';
+import UserGuide from './components/UserGuide';
+import Login from './components/Login';
+import AssistiveTouch from './components/AssistiveTouch';
 
-type Screen = 'home' | 'dashboard' | 'curriculum' | 'other-programs' | 'lesson';
-type Theme = 'light' | 'dark';
+function App() {
+  const [user, setUser] = useState<User | null>(null);
+  const [classes, setClasses] = useState<Classes>(() => {
+    try {
+      const savedClasses = localStorage.getItem('ivs-classes');
+      return savedClasses ? JSON.parse(savedClasses) : MOCK_CLASSES;
+    } catch (error) {
+      return MOCK_CLASSES;
+    }
+  });
+  const [currentView, setCurrentView] = useState<View>('home');
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-const App: React.FC = () => {
-  const [activeScreen, setActiveScreen] = useState<Screen>('home');
-  const [activeLevel, setActiveLevel] = useState<CurriculumLevel | null>(null);
-  const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
-  const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
-  const [completedLessons, setCompletedLessons] = useState<Set<number>>(new Set());
-  const [aiAssistantState, setAIAssistantState] = useState<{isOpen: boolean; action: AIAction | null}>({isOpen: false, action: null});
-  const [ebookLevel, setEbookLevel] = useState<CurriculumLevel | null>(null);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [theme, setTheme] = useState<Theme>('light');
-
-  const { t } = useTranslation();
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    const savedTheme = localStorage.getItem('ivs-theme') as 'light' | 'dark';
+    return savedTheme || 'dark';
+  });
+  const [language, setLanguage] = useState<'en' | 'vi'>(() => {
+    const savedLang = localStorage.getItem('ivs-language') as 'en' | 'vi';
+    return savedLang || 'en';
+  });
+  const [fontSize, setFontSize] = useState<string>(() => {
+    return localStorage.getItem('ivs-fontSize') || '16px';
+  });
+  const [fontWeight, setFontWeight] = useState<number>(() => {
+    return parseInt(localStorage.getItem('ivs-fontWeight') || '400', 10);
+  });
 
   useEffect(() => {
-    // Load theme from local storage
-    const savedTheme = localStorage.getItem('ivs-theme') as Theme | null;
-    if (savedTheme) {
-      setTheme(savedTheme);
-    } else {
-        // Or from user's OS preference
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        setTheme(prefersDark ? 'dark' : 'light');
-    }
-    
-    // Load completed lessons
-    try {
-      const savedCompleted = localStorage.getItem('swCompletedLessons');
-      if (savedCompleted) {
-        setCompletedLessons(new Set(JSON.parse(savedCompleted)));
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        // For now, we'll use a mock user structure and enhance it later
+        const newUser: User = {
+          ...MOCK_USER, // Spread mock user to get default fields
+          uid: firebaseUser.uid,
+          email: firebaseUser.email || 'No email',
+          displayName: firebaseUser.displayName || 'No name',
+          photoURL: firebaseUser.photoURL || MOCK_USER.photoURL,
+          role: 'student', // Default role, can be changed later
+        };
+        setUser(newUser);
+      } else {
+        setUser(null);
       }
-    } catch (e) {
-      console.error("Failed to parse completed lessons from localStorage", e);
-      setCompletedLessons(new Set());
-    }
+    });
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
-    // Apply theme to HTML element
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    localStorage.setItem('ivs-classes', JSON.stringify(classes));
+  }, [classes]);
+  
+  useEffect(() => {
     localStorage.setItem('ivs-theme', theme);
+    document.documentElement.classList.toggle('dark', theme === 'dark');
   }, [theme]);
   
-  const handleToggleTheme = useCallback(() => {
-      setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
-  }, []);
-
-  const handleResetProgress = useCallback(() => {
-    setCompletedLessons(new Set());
-    localStorage.removeItem('swCompletedLessons');
-  }, []);
-
-  const handleToggleComplete = useCallback((lessonId: number) => {
-    setCompletedLessons(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(lessonId)) {
-        newSet.delete(lessonId);
-      } else {
-        newSet.add(lessonId);
-      }
-      localStorage.setItem('swCompletedLessons', JSON.stringify(Array.from(newSet)));
-      return newSet;
-    });
-  }, []);
-
-  const handleMarkLessonComplete = useCallback((lessonId: number) => {
-    setCompletedLessons(prev => {
-        if (prev.has(lessonId)) return prev;
-        const newSet = new Set(prev);
-        newSet.add(lessonId);
-        localStorage.setItem('swCompletedLessons', JSON.stringify(Array.from(newSet)));
-        return newSet;
-    });
-  }, []);
-
-  const handleLessonClick = useCallback((lesson: Lesson, unit: Unit, level: CurriculumLevel) => {
-    setActiveLevel(level);
-    setSelectedLesson(lesson);
-    setSelectedUnit(unit);
-    setActiveScreen('lesson');
-  }, []);
-
-  const handleSelectLevel = useCallback((level: CurriculumLevel) => {
-    setActiveLevel(level);
-    setSelectedLesson(null);
-    setSelectedUnit(null);
-    setActiveScreen('dashboard');
-  }, []);
+  useEffect(() => {
+    localStorage.setItem('ivs-language', language);
+  }, [language]);
   
-  const handleNavigate = (screen: Screen) => {
-    if (screen === 'home') {
-      setActiveLevel(null);
-      setSelectedLesson(null);
-      setSelectedUnit(null);
+  useEffect(() => {
+    document.documentElement.style.fontSize = fontSize;
+    localStorage.setItem('ivs-fontSize', fontSize);
+  }, [fontSize]);
+
+  useEffect(() => {
+    document.documentElement.style.fontWeight = fontWeight.toString();
+    localStorage.setItem('ivs-fontWeight', fontWeight.toString());
+  }, [fontWeight]);
+
+  const handleLogout = () => {
+    signOut(auth).catch((error) => console.error('Logout failed', error));
+  };
+
+  const handleSetView = (view: View) => {
+    setSelectedCourse(null);
+    setCurrentView(view);
+    setIsSidebarOpen(false);
+  };
+  
+  const handleSelectCourse = (course: Course) => {
+    setSelectedCourse(course);
+  };
+  
+  const handleUpdateUser = (updatedUser: User) => {
+    setUser(updatedUser);
+  };
+
+  const renderView = () => {
+    if (selectedCourse) {
+      return <CourseDetail course={selectedCourse} onBack={() => setSelectedCourse(null)} language={language} setView={handleSetView} />;
     }
-    
-    if (screen === 'dashboard' && !activeLevel) {
-        return; 
+
+    switch (currentView) {
+      case 'home':
+        return <Home user={user!} onSelectCourse={handleSelectCourse} language={language} setView={handleSetView} classes={classes}/>;
+      case 'curriculum':
+        return <Dashboard onSelectCourse={handleSelectCourse} user={user!} onUpdateUser={handleUpdateUser} language={language}/>;
+      case 'teacher-dashboard':
+        return <TeacherDashboard classes={classes} setClasses={setClasses} language={language} />;
+      case 'writing-grader':
+        return <WritingGrader language={language} setView={handleSetView} />;
+      case 'speaking-partner':
+        return <SpeakingPartner language={language} setView={handleSetView} />;
+      case 'settings':
+        return <Settings 
+                    user={user!} 
+                    onUpdateUser={handleUpdateUser} 
+                    classes={classes}
+                    onUpdateClasses={setClasses}
+                    theme={theme}
+                    setTheme={setTheme}
+                    language={language}
+                    setLanguage={setLanguage}
+                    fontSize={fontSize}
+                    setFontSize={setFontSize}
+                    fontWeight={fontWeight}
+                    setFontWeight={setFontWeight}
+                />;
+      case 'user-guide':
+        return <UserGuide language={language} />;
+      default:
+        return <Home user={user!} onSelectCourse={handleSelectCourse} language={language} setView={handleSetView} classes={classes}/>;
     }
-
-    setActiveScreen(screen);
-  }
-
-  const handleGoHome = useCallback(() => {
-    handleNavigate('home');
-  }, []);
-
-  const handleOpenQuiz = useCallback(() => {
-    setAIAssistantState({isOpen: true, action: 'quiz'});
-  }, []);
-
-  const handleOpenAIAssistant = useCallback(() => {
-      setAIAssistantState({isOpen: true, action: null});
-  }, []);
-
-  const handleOpenEbook = useCallback((level: CurriculumLevel) => {
-    setEbookLevel(level);
-  }, []);
-
-  const handleCloseEbook = useCallback(() => {
-    setEbookLevel(null);
-  }, []);
-
-  const renderScreen = () => {
-    switch (activeScreen) {
-        case 'home':
-            return <HomeScreen curriculum={curriculumData} onSelectLevel={handleSelectLevel} onShowOtherPrograms={() => handleNavigate('other-programs')} onOpenEbook={handleOpenEbook} />;
-        case 'dashboard':
-            if (activeLevel) {
-                return <Dashboard
-                    level={activeLevel}
-                    completedLessons={completedLessons}
-                    onLessonClick={(lesson, unit) => handleLessonClick(lesson, unit, activeLevel)}
-                    onOpenEbook={handleOpenEbook}
-                  />;
-            }
-            break;
-        case 'lesson':
-            if (selectedLesson && activeLevel && selectedUnit) {
-                return <LessonView 
-                    lesson={selectedLesson} 
-                    unit={selectedUnit}
-                    level={activeLevel}
-                    completedLessons={completedLessons}
-                    onToggleComplete={handleToggleComplete}
-                    onOpenQuiz={handleOpenQuiz}
-                    onGoBack={() => handleNavigate('dashboard')}
-                    onLessonClick={(lesson, unit) => handleLessonClick(lesson, unit, activeLevel)}
-                    />;
-            }
-            break;
-        case 'curriculum':
-            return <CurriculumDisplay onLessonClick={handleLessonClick} />;
-        case 'other-programs':
-            return <OtherPrograms
-                onGoBack={handleGoHome}
-                onViewProgram={(url) => setEbookLevel({
-                    level: 'external',
-                    title: { en: 'Program Viewer', vi: 'Trình xem chương trình' },
-                    units: [],
-                    ebookPdfUrl: url,
-                })}
-            />;
-    }
-    // Fallback to home
-    return <HomeScreen curriculum={curriculumData} onSelectLevel={handleSelectLevel} onShowOtherPrograms={() => handleNavigate('other-programs')} onOpenEbook={handleOpenEbook} />;
+  };
+  
+  if (!user) {
+    return <Login language={language} />;
   }
 
   return (
-    <>
-      <div className="flex h-screen bg-slate-50 text-gray-800 dark:bg-slate-900 dark:text-slate-200">
-          <Sidebar onNavigate={handleNavigate} activeScreen={activeScreen} activeLevel={activeLevel} onOpenSettings={() => setIsSettingsOpen(true)} />
-          <main className="flex-1 flex flex-col overflow-hidden">
-              <div className="flex-1 overflow-y-auto main-content-bg">
-                {renderScreen()}
-              </div>
-          </main>
-          {selectedLesson && activeLevel && (
-              <>
-                  <button
-                      onClick={handleOpenAIAssistant}
-                      className="fixed bottom-6 right-6 bg-primary text-white p-4 rounded-full shadow-lg hover:bg-primary-hover transition-transform transform hover:scale-110 z-40"
-                      aria-label={t('aiAssistant')}
-                  >
-                      <SparklesIcon className="h-8 w-8" />
-                  </button>
-                  <AIAssistant 
-                      lesson={selectedLesson}
-                      level={activeLevel}
-                      isOpen={aiAssistantState.isOpen}
-                      initialAction={aiAssistantState.action}
-                      onClose={() => setAIAssistantState({isOpen: false, action: null})}
-                      onQuizComplete={() => handleMarkLessonComplete(selectedLesson.id)}
-                  />
-              </>
-          )}
-      </div>
-      {ebookLevel && ebookLevel.ebookPdfUrl && (
-          <EBookReader onClose={handleCloseEbook} pdfUrl={ebookLevel.ebookPdfUrl} />
-      )}
-       <SettingsModal 
-          isOpen={isSettingsOpen}
-          onClose={() => setIsSettingsOpen(false)}
-          currentTheme={theme}
-          onToggleTheme={handleToggleTheme}
-          onResetProgress={handleResetProgress}
+    <div className="flex h-screen bg-slate-100 dark:bg-slate-900 font-sans text-slate-800 dark:text-slate-200">
+      <Sidebar 
+        user={user} 
+        currentView={currentView} 
+        setView={handleSetView} 
+        language={language} 
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        onLogout={handleLogout} // Pass logout handler to Sidebar
       />
-    </>
+      <div className="flex-1 flex flex-col h-screen">
+        <Header currentView={currentView} language={language} onMenuClick={() => setIsSidebarOpen(true)} />
+        <main className="flex-1 overflow-y-auto custom-scrollbar relative">
+          {renderView()}
+          <AssistiveTouch setView={handleSetView} language={language} />
+        </main>
+      </div>
+    </div>
   );
-};
+}
 
 export default App;

@@ -1,219 +1,200 @@
+// FIX: Refactored API key management to comply with guidelines.
+// The API key must be sourced from environment variables, not user input/localStorage.
+import { GoogleGenAI, Type, Chat } from "@google/genai";
+import type { WritingFeedback, CurriculumLesson, QuizQuestion, GeneratedSentence } from '../types';
 
-import { GoogleGenAI, Type, Part } from "@google/genai";
-import { Lesson, Quiz, VocabularyItem, CurriculumLevel, PronunciationFeedback } from '../types';
-import { Language } from "../contexts/i18n";
+let aiInstance: GoogleGenAI | null = null;
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+/**
+ * Lazily initializes and returns the GoogleGenAI instance using the key from environment variables.
+ * Throws an error if the API key is not available when an AI feature is used.
+ */
+function getAiInstance(): GoogleGenAI {
+  if (!process.env.API_KEY) {
+    throw new Error("AI features are not available. Please contact the administrator to configure the API key.");
+  }
+  
+  // Initialize only once.
+  if (!aiInstance) {
+    aiInstance = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  }
 
-const languageMap = {
-    en: 'English',
-    vi: 'Vietnamese',
+  return aiInstance;
+}
+
+export const isAiConfigured = (): boolean => {
+  // FIX: Check for API key in environment variables, not localStorage.
+  return !!process.env.API_KEY;
 };
 
-const quizSchema = {
-    type: Type.OBJECT,
-    properties: {
-        questions: {
-            type: Type.ARRAY,
-            items: {
-                type: Type.OBJECT,
-                properties: {
-                    question: {
-                        type: Type.STRING,
-                        description: 'The question text, in the requested language (English or Vietnamese).'
-                    },
-                    options: {
-                        type: Type.OBJECT,
-                        properties: {
-                            A: { type: Type.STRING },
-                            B: { type: Type.STRING },
-                            C: { type: Type.STRING },
-                            D: { type: Type.STRING },
-                        },
-                        required: ['A', 'B', 'C', 'D'],
-                        description: 'An object containing four possible answers in English.'
-                    },
-                    answer: {
-                        type: Type.STRING,
-                        description: 'The key of the correct option (e.g., "A").'
+export const gradeWriting = async (topic: string, text: string): Promise<WritingFeedback> => {
+  const ai = getAiInstance();
+  const prompt = `Topic: "${topic}"\n\nEssay: "${text}"\n\nPlease grade this essay for a K-12 English learner. Provide feedback on grammar, vocabulary, and coherence. Give an overall score out of 100.`;
+
+  const response = await ai.models.generateContent({
+    model: 'gemini-2.5-flash',
+    contents: prompt,
+    config: {
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: Type.OBJECT,
+        properties: {
+          overall: { type: Type.STRING, description: 'Overall feedback on the essay.' },
+          grammar: { type: Type.STRING, description: 'Specific feedback on grammar.' },
+          vocabulary: { type: Type.STRING, description: 'Specific feedback on vocabulary usage.' },
+          coherence: { type: Type.STRING, description: 'Specific feedback on the structure and flow.' },
+          score: { type: Type.INTEGER, description: 'A score from 0 to 100.' },
+        },
+      },
+      temperature: 0.2
+    },
+  });
+
+  try {
+    const jsonString = response.text.trim();
+    return JSON.parse(jsonString) as WritingFeedback;
+  } catch (e) {
+    console.error("Failed to parse Gemini JSON response:", e);
+    throw new Error("Could not get feedback from AI. Please try again.");
+  }
+};
+
+
+export const createChat = (): Chat => {
+    const ai = getAiInstance();
+    return ai.chats.create({
+        model: 'gemini-2.5-flash',
+        config: {
+            systemInstruction: "You are a friendly and encouraging English tutor for K-12 students. Your name is Sparky. Keep your answers concise and helpful. Use simple language and emojis to make learning fun. Your goal is to help students practice their English conversation skills.",
+            temperature: 0.8
+        },
+    });
+};
+
+export const translateToVietnamese = async (text: string): Promise<string> => {
+  const ai = getAiInstance();
+  const prompt = `Translate the following English text to Vietnamese for a K-12 student. Return only the translated text.\n\nEnglish: "${text}"`;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
+        temperature: 0.1,
+      },
+    });
+    return response.text.trim();
+  } catch (error) {
+    console.error("Error translating text:", error);
+    throw new Error("Failed to translate text.");
+  }
+};
+
+export const generateQuiz = async (lesson: CurriculumLesson, language: 'en' | 'vi'): Promise<QuizQuestion[]> => {
+    const ai = getAiInstance();
+    const vocabList = lesson.vocabulary.map(v => v.term).join(', ');
+    const grammarList = lesson.grammar.map(g => g.title[language]).join('; ');
+    const langName = language === 'en' ? 'English' : 'Vietnamese';
+
+    const prompt = `Based on the following K-12 English lesson content, generate a 5-question multiple-choice quiz in ${langName}. The quiz should test understanding of the vocabulary and grammar.
+      Lesson Title: "${lesson.title[language]}"
+      Vocabulary: ${vocabList}
+      Grammar: ${grammarList}
+      For each question, provide a 'question' text, an array of 4 string 'options', and the correct 'answer' string which must exactly match one of the options.`;
+    
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: {
+                    type: Type.OBJECT,
+                    properties: {
+                        quiz: {
+                            type: Type.ARRAY,
+                            items: {
+                                type: Type.OBJECT,
+                                properties: {
+                                    question: { type: Type.STRING },
+                                    options: { type: Type.ARRAY, items: { type: Type.STRING } },
+                                    answer: { type: Type.STRING }
+                                }
+                            }
+                        }
                     }
                 },
-                required: ['question', 'options', 'answer']
-            }
-        }
-    },
-    required: ['questions']
-};
-
-export const generateQuiz = async (lesson: Lesson, level: CurriculumLevel, language: Language): Promise<Quiz> => {
-    const targetLanguage = languageMap[language] || 'English';
-    const vocabularyList = lesson.vocabulary.map(v => `${v.term}: ${v.vietnamese}`).join(', ');
-    const grammarList = lesson.grammar.map(g => typeof g.title === 'string' ? g.title : g.title.en).join(', ');
-    const bookTitle = typeof level.title === 'string' ? level.title : level.title.en;
-
-    const prompt = `You are an English teacher creating a quiz for Vietnamese students based on the "${bookTitle}" textbook.
-    The lesson is titled "${typeof lesson.title === 'string' ? lesson.title : lesson.title.en}".
-    The vocabulary for this lesson is: ${vocabularyList}.
-    The grammar points are: ${grammarList}.
-
-    Generate a 5-question multiple-choice quiz. The questions should test understanding of the vocabulary and grammar in context. The questions and options should be in English.
-    The quiz should be appropriate for a ${level.level}th-grade student's level.
-    Ensure the JSON output is valid and strictly follows the provided schema. The 'question' and 'options' fields must be in English.`;
-
-    const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
-        config: {
-            responseMimeType: "application/json",
-            responseSchema: quizSchema,
-        }
-    });
-    
-    const jsonStr = response.text.trim();
-    const quizData = JSON.parse(jsonStr) as Quiz;
-    
-    if (!quizData || !Array.isArray(quizData.questions) || quizData.questions.length === 0) {
-        throw new Error("Received invalid quiz data from API.");
-    }
-
-    return quizData;
-};
-
-export const generateExplanation = async (grammarTopic: string, lessonContext: string, level: CurriculumLevel, language: Language): Promise<string> => {
-    const targetLanguage = languageMap[language] || 'English';
-
-    const prompt = `As a friendly English teacher, explain the following English grammar point in simple terms for a ${level.level}th-grade Vietnamese student. The explanation should be in ${targetLanguage}.
-    
-    Grammar Topic: "${grammarTopic}"
-    Lesson Context: "${lessonContext}"
-    
-    Provide a clear definition, 2-3 simple example sentences in English with a ${targetLanguage} translation. Keep the explanation concise and easy to understand. Format the output with clear headings.`;
-
-    const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
-        config: {
-            temperature: 0.5,
-        }
-    });
-
-    return response.text;
-};
-
-export const generateDialogue = async (lessonTitle: string, vocabulary: VocabularyItem[], level: CurriculumLevel, language: Language): Promise<string> => {
-    const targetLanguage = languageMap[language] || 'English';
-    const vocabList = vocabulary.map(v => v.term).join(', ');
-
-    const prompt = `Create a short, simple dialogue in English suitable for a ${level.level}th-grade Vietnamese learner. The dialogue should be based on the lesson "${lessonTitle}" and must use some of the following vocabulary: ${vocabList}.
-
-    Provide the dialogue in this format:
-    Person A: [English Text]
-    Person B: [English Text]
-    
-    Also, provide the full ${targetLanguage} translation of the dialogue at the end.`;
-
-    const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
-        config: {
-            temperature: 0.7,
-        }
-    });
-
-    return response.text;
-};
-
-const pronunciationFeedbackSchema = {
-    type: Type.OBJECT,
-    properties: {
-        score: {
-            type: Type.NUMBER,
-            description: 'A score from 1 (poor) to 5 (excellent) on the pronunciation accuracy. The score should be an integer.'
-        },
-        feedback: {
-            type: Type.STRING,
-            description: 'A single paragraph of overall feedback on the pronunciation, mentioning clarity, rhythm, and accuracy of sounds. This should be encouraging.'
-        },
-        improvementTips: {
-            type: Type.ARRAY,
-            items: {
-                type: Type.STRING,
-            },
-            description: 'A list of 1-3 specific, actionable tips for improvement. Focus on the most important errors. If pronunciation is excellent, this can be an empty array or contain praise.'
-        }
-    },
-    required: ['score', 'feedback', 'improvementTips']
-};
-
-export const getPronunciationFeedback = async (targetText: string, audioBase64: string, level: CurriculumLevel, language: Language): Promise<PronunciationFeedback> => {
-    const targetLanguage = languageMap[language] || 'English';
-    const levelTitle = typeof level.title === 'string' ? level.title : level.title.en;
-
-    const prompt = `You are an expert English pronunciation coach for Vietnamese learners. The student is practicing for the curriculum level "${levelTitle}".
-    The user is trying to pronounce the word/phrase: "${targetText}".
-    
-    Analyze the user's provided audio recording. Compare it to the correct pronunciation of the target text.
-    Provide constructive and encouraging feedback in ${targetLanguage}.
-    
-    Evaluate the pronunciation based on clarity, accuracy of sounds, and rhythm.
-    Provide a score from 1 to 5, where 1 is poor and 5 is excellent.
-    Provide overall feedback and specific, actionable tips for improvement. 
-    Keep feedback concise and appropriate for the student's level.
-    
-    Structure your response in JSON format according to the schema.`;
-    
-    const audioPart: Part = {
-        inlineData: {
-            mimeType: 'audio/webm', 
-            data: audioBase64,
-        },
-    };
-
-    const textPart: Part = {
-        text: prompt
-    };
-
-    const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: { parts: [textPart, audioPart] },
-        config: {
-            responseMimeType: "application/json",
-            responseSchema: pronunciationFeedbackSchema,
-            temperature: 0.3,
-        }
-    });
-
-    const jsonStr = response.text.trim();
-    const feedbackData = JSON.parse(jsonStr) as PronunciationFeedback;
-
-    if (!feedbackData || typeof feedbackData.score !== 'number' || !feedbackData.feedback) {
-        throw new Error("Received invalid pronunciation feedback from API.");
-    }
-    
-    return feedbackData;
-};
-
-export const generateImageForTerm = async (term: string): Promise<string> => {
-    try {
-        const prompt = `A simple, clear, child-friendly educational flashcard illustration of "${term}" for young language learners. The image should be in a flat vector style with vibrant colors, featuring the object clearly on a plain white background. The illustration must not contain any text or letters.`;
-        const response = await ai.models.generateImages({
-            model: 'imagen-3.0-generate-002',
-            prompt: prompt,
-            config: {
-                numberOfImages: 1,
-                outputMimeType: 'image/jpeg',
-                aspectRatio: '1:1',
+                temperature: 0.4
             },
         });
+        const data = JSON.parse(response.text.trim());
+        return data.quiz || [];
+    } catch (e) {
+        console.error("Failed to parse Gemini JSON for quiz:", e);
+        throw new Error("Could not generate a quiz from the AI. Please try again.");
+    }
+};
 
-        if (response.generatedImages && response.generatedImages.length > 0) {
-            const base64ImageBytes: string = response.generatedImages[0].image.imageBytes;
-            return `data:image/jpeg;base64,${base64ImageBytes}`;
-        } else {
-            throw new Error("No image was generated.");
-        }
+export const generateSampleSentences = async (lesson: CurriculumLesson, language: 'en' | 'vi'): Promise<GeneratedSentence[]> => {
+    const ai = getAiInstance();
+    const vocabList = lesson.vocabulary.map(v => v.term).join(', ');
+    const grammarList = lesson.grammar.map(g => g.title[language]).join('; ');
+    const langName = language === 'en' ? 'English' : 'Vietnamese';
+
+    const prompt = `Based on the following K-12 English lesson, generate 5 sample sentences in ${langName}. Each sentence should clearly use one of the key vocabulary terms or grammar points.
+      Lesson Title: "${lesson.title[language]}"
+      Vocabulary: ${vocabList}
+      Grammar: ${grammarList}
+      For each generated item, provide the 'sentence' and a 'focus' string indicating the vocabulary or grammar point used.`;
+    
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: {
+                    type: Type.OBJECT,
+                    properties: {
+                        sentences: {
+                            type: Type.ARRAY,
+                            items: {
+                                type: Type.OBJECT,
+                                properties: {
+                                    sentence: { type: Type.STRING },
+                                    focus: { type: Type.STRING }
+                                }
+                            }
+                        }
+                    }
+                },
+                temperature: 0.7
+            },
+        });
+        const data = JSON.parse(response.text.trim());
+        return data.sentences || [];
+    } catch (e) {
+        console.error("Failed to parse Gemini JSON for sentences:", e);
+        throw new Error("Could not generate sample sentences from the AI. Please try again.");
+    }
+};
+
+export const generateStoryStarter = async (lesson: CurriculumLesson, language: 'en' | 'vi'): Promise<string> => {
+    const ai = getAiInstance();
+    const vocabList = lesson.vocabulary.map(v => v.term).slice(0, 5).join(', '); // Use first 5 for brevity
+    const langName = language === 'en' ? 'English' : 'Vietnamese';
+    
+    const prompt = `Create a short, fun, and creative story starter (1-3 sentences) for a K-12 student in ${langName}. The story starter should be inspired by the lesson topic "${lesson.title[language]}" and should include at least two words from this list: ${vocabList}. Return only the story starter text, with no extra formatting or labels.`;
+
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: { temperature: 0.9 }
+        });
+        return response.text.trim();
     } catch (error) {
-        console.error("Error generating image:", error);
-        throw new Error("Failed to generate image.");
+        console.error("Error generating story starter:", error);
+        throw new Error("Failed to generate a story starter.");
     }
 };
