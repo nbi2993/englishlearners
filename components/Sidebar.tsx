@@ -9,7 +9,7 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ user, currentView, setView, language }) => {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false); // Default to collapsed
   
   const translations = {
     en: {
@@ -55,16 +55,9 @@ const Sidebar: React.FC<SidebarProps> = ({ user, currentView, setView, language 
   ];
 
   return (
-    <nav className={`flex flex-col bg-white/70 dark:bg-slate-800/50 shadow-lg transition-all duration-300 ease-in-out sidebar-glass ${isExpanded ? 'w-64' : 'w-20'}`}>
+    <nav className={`flex flex-col bg-white/70 dark:bg-slate-800/50 shadow-lg transition-all duration-300 ease-in-out sidebar-glass ${isExpanded ? 'w-64' : 'w-16'}`}>
       <div className={`p-4 flex items-center border-b border-slate-200/80 dark:border-slate-700/80 ${isExpanded ? 'justify-between' : 'justify-center'}`}>
-        {isExpanded ? (
-          <div className="flex items-center gap-2">
-            <img src="/assets/logo.png" alt="IVS Logo" className="h-9 w-9 object-contain rounded-md"/>
-            <span className="text-xl font-bold text-blue-600 dark:text-blue-400">IVS English</span>
-          </div>
-        ) : (
-           <img src="/assets/logo.png" alt="IVS Logo" className="h-9 w-9 object-contain rounded-md"/>
-        )}
+        {isExpanded && <span className="text-xl font-bold text-blue-600 dark:text-blue-400">IVS English</span>}
         <button onClick={() => setIsExpanded(!isExpanded)} className="btn btn-secondary h-8 w-8 !p-0">
           <i className={`fa-solid ${isExpanded ? 'fa-chevron-left' : 'fa-chevron-right'}`}></i>
         </button>
