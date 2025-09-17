@@ -11,58 +11,60 @@ const AssistiveTouch: React.FC<AssistiveTouchProps> = ({ setView, language }) =>
 
   const t = {
     en: {
+      home: 'Home',
       writingGrader: 'Writing Grader',
       speakingPartner: 'Speaking Partner',
-      aiTools: 'AI Tools',
+      toggleMenu: 'Toggle Menu'
     },
     vi: {
+      home: 'Trang chủ',
       writingGrader: 'Chấm bài viết',
       speakingPartner: 'Luyện nói',
-      aiTools: 'Công cụ AI',
+      toggleMenu: 'Mở/Đóng Menu'
     }
-  };
+  }[language];
 
-  const menuItems: { view: View; icon: string; label: keyof typeof t.en; color: string }[] = [
-    { view: 'writing-grader', icon: 'fa-pen-ruler', label: 'writingGrader', color: 'bg-blue-500' },
-    { view: 'speaking-partner', icon: 'fa-comments', label: 'speakingPartner', color: 'bg-green-500' },
+  const menuItems: { view: View; icon: string; label: keyof typeof t.en }[] = [
+    { view: 'home', icon: 'fa-home', label: 'home' },
+    { view: 'writing-grader', icon: 'fa-pen-ruler', label: 'writingGrader' },
+    { view: 'speaking-partner', icon: 'fa-comments', label: 'speakingPartner' },
   ];
-  
-  const handleToggle = () => {
-      setIsOpen(prev => !prev);
-  };
-  
-  const handleItemClick = (view: View) => {
-      setView(view);
-      setIsOpen(false);
+
+  const handleNavigation = (view: View) => {
+    setView(view);
+    setIsOpen(false);
   };
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30">
-        <div className="relative flex flex-col-reverse items-center gap-3">
-             {menuItems.map((item, index) => (
-                <div 
-                    key={item.view}
-                    className={`transition-all duration-300 flex items-center gap-3 ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}
-                    style={{ transitionDelay: `${isOpen ? index * 50 : 0}ms` }}
-                >
-                    <span className="text-sm bg-slate-800 text-white px-2 py-1 rounded-md whitespace-nowrap">{t[language][item.label]}</span>
-                     <button
-                        onClick={() => handleItemClick(item.view)}
-                        className={`w-12 h-12 rounded-full flex items-center justify-center text-white text-xl shadow-lg ${item.color} hover:scale-110 transition-transform`}
-                     >
-                        <i className={`fa-solid ${item.icon}`}></i>
-                    </button>
-                </div>
-             ))}
-            
-            <button
-                onClick={handleToggle}
-                className={`w-14 h-14 rounded-full flex items-center justify-center text-white text-2xl shadow-xl transition-all duration-300 ${isOpen ? 'bg-red-500 rotate-45' : 'bg-blue-600'}`}
-                title={t[language].aiTools}
-            >
-                <i className="fa-solid fa-plus"></i>
-            </button>
-        </div>
+    <div className="fixed bottom-6 right-6 z-50">
+      {/* Menu items, shown when open */}
+      <div
+        className={`transition-all duration-300 ease-in-out flex flex-col items-center gap-4 mb-4 ${
+          isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
+        }`}
+      >
+        {menuItems.map((item) => (
+          <button
+            key={item.view}
+            onClick={() => handleNavigation(item.view)}
+            className="w-14 h-14 rounded-full bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-200 shadow-lg flex items-center justify-center transition-transform hover:scale-110"
+            title={t[item.label]}
+          >
+            <i className={`fa-solid ${item.icon} text-xl`}></i>
+          </button>
+        ))}
+      </div>
+
+      {/* Main toggle button */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-16 h-16 rounded-full bg-blue-500 text-white shadow-xl flex items-center justify-center transition-transform duration-300 hover:scale-110 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        title={t.toggleMenu}
+      >
+        <i
+          className={`fa-solid ${isOpen ? 'fa-times' : 'fa-wand-magic-sparkles'} text-2xl transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+        ></i>
+      </button>
     </div>
   );
 };
