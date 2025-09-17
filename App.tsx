@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import type { View, User, Course, Classes } from './types';
 import { MOCK_USER, MOCK_CLASSES } from './constants';
 import { auth } from './firebaseConfig';
@@ -6,16 +6,18 @@ import { onAuthStateChanged, signOut } from 'firebase/auth';
 
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
-import Home from './components/Home';
-import Dashboard from './components/Dashboard';
-import CourseDetail from './components/CourseDetail';
-import TeacherDashboard from './components/TeacherDashboard';
-import WritingGrader from './components/WritingGrader';
-import SpeakingPartner from './components/SpeakingPartner';
-import Settings from './components/Settings';
-import UserGuide from './components/UserGuide';
 import Login from './components/Login';
 import AssistiveTouch from './components/AssistiveTouch';
+import FeedbackSkeleton from './components/FeedbackSkeleton';
+
+const Home = lazy(() => import('./components/Home'));
+const Dashboard = lazy(() => import('./components/Dashboard'));
+const CourseDetail = lazy(() => import('./components/CourseDetail'));
+const TeacherDashboard = lazy(() => import('./components/TeacherDashboard'));
+const WritingGrader = lazy(() => import('./components/WritingGrader'));
+const SpeakingPartner = lazy(() => import('./components/SpeakingPartner'));
+const Settings = lazy(() => import('./components/Settings'));
+const UserGuide = lazy(() => import('./components/UserGuide'));
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -163,7 +165,9 @@ function App() {
       <div className="flex-1 flex flex-col h-screen">
         <Header currentView={currentView} language={language} onMenuClick={() => setIsSidebarOpen(true)} />
         <main className="flex-1 overflow-y-auto custom-scrollbar relative">
-          {renderView()}
+          <Suspense fallback={<FeedbackSkeleton />}>
+            {renderView()}
+          </Suspense>
           <AssistiveTouch setView={handleSetView} language={language} />
         </main>
       </div>
