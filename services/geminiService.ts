@@ -1,60 +1,30 @@
+// FIX: Refactored API key management to comply with guidelines.
+// The API key must be sourced from environment variables, not user input/localStorage.
 import { GoogleGenAI, Type, Chat } from "@google/genai";
 import type { WritingFeedback, CurriculumLesson, QuizQuestion, GeneratedSentence } from '../types';
 
 let aiInstance: GoogleGenAI | null = null;
-let currentApiKey: string | null = null;
-
-const API_KEY_STORAGE_KEY = 'ivs-gemini-api-key';
-
-const getApiKey = (): string | null => {
-  try {
-    return localStorage.getItem(API_KEY_STORAGE_KEY);
-  } catch (e) {
-    console.error("Could not access localStorage:", e);
-    return null;
-  }
-};
-
-export const setApiKey = (key: string): void => {
-  try {
-    localStorage.setItem(API_KEY_STORAGE_KEY, key);
-    aiInstance = null; // Force re-initialization on next use
-  } catch (e) {
-    console.error("Could not save API key to localStorage:", e);
-  }
-};
-
-export const clearApiKey = (): void => {
-  try {
-    localStorage.removeItem(API_KEY_STORAGE_KEY);
-    aiInstance = null; // Clear the instance
-  } catch (e) {
-    console.error("Could not clear API key from localStorage:", e);
-  }
-};
 
 /**
- * Lazily initializes and returns the GoogleGenAI instance using the key from localStorage.
+ * Lazily initializes and returns the GoogleGenAI instance using the key from environment variables.
  * Throws an error if the API key is not available when an AI feature is used.
  */
 function getAiInstance(): GoogleGenAI {
-  const storedApiKey = getApiKey();
-
-  if (!storedApiKey) {
-    throw new Error("API key is not configured. Please set it in the AI Settings.");
+  if (!process.env.API_KEY) {
+    throw new Error("AI features are not available. Please contact the administrator to configure the API key.");
   }
   
-  // Re-initialize if the key has changed or instance doesn't exist
-  if (!aiInstance || storedApiKey !== currentApiKey) {
-    currentApiKey = storedApiKey;
-    aiInstance = new GoogleGenAI({ apiKey: currentApiKey });
+  // Initialize only once.
+  if (!aiInstance) {
+    aiInstance = new GoogleGenAI({ apiKey: process.env.API_KEY });
   }
 
   return aiInstance;
 }
 
 export const isAiConfigured = (): boolean => {
-  return !!getApiKey();
+  // FIX: Check for API key in environment variables, not localStorage.
+  return !!process.env.API_KEY;
 };
 
 export const gradeWriting = async (topic: string, text: string): Promise<WritingFeedback> => {

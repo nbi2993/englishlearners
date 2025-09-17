@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import App from './App';
+// FIX: Explicitly adding the .tsx extension can help resolve module issues in some environments.
+import App from './App.tsx';
 import './index.css';
 
 const container = document.getElementById('root');

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import type { User, View } from '../types';
 
 interface SidebarProps {
@@ -11,8 +11,6 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ user, currentView, setView, language, isOpen, onClose }) => {
-  const [isExpanded, setIsExpanded] = useState(false); // Default to collapsed for desktop
-  
   const translations = {
     en: {
       home: 'Home',
@@ -56,9 +54,6 @@ const Sidebar: React.FC<SidebarProps> = ({ user, currentView, setView, language,
     ]
   ];
   
-  // For mobile, the sidebar is always "expanded" visually when it's open
-  const showLabels = isExpanded || isOpen;
-
   return (
     <>
       {/* Overlay for mobile */}
@@ -68,19 +63,22 @@ const Sidebar: React.FC<SidebarProps> = ({ user, currentView, setView, language,
         aria-hidden="true"
       ></div>
 
-      <nav className={`sidebar-glass flex flex-col shadow-lg fixed inset-y-0 left-0 z-40 transform transition-transform duration-300 md:relative md:transform-none ${isExpanded ? 'w-64' : 'w-16'} ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className={`p-4 flex items-center border-b border-slate-200/80 dark:border-slate-700/80 ${showLabels ? 'justify-between' : 'justify-center'}`}>
-          {showLabels && <span className="text-xl font-bold text-blue-600 dark:text-blue-400">IVS English</span>}
-          {/* Desktop expand/collapse button */}
-          <button onClick={() => setIsExpanded(!isExpanded)} className="hidden md:flex btn btn-secondary h-8 w-8 !p-0">
-            <i className={`fa-solid ${isExpanded ? 'fa-chevron-left' : 'fa-chevron-right'}`}></i>
-          </button>
-          {/* Mobile close button */}
-           <button onClick={onClose} className="md:hidden btn btn-secondary h-8 w-8 !p-0">
+      {/* Sidebar navigation with hover-to-expand on desktop */}
+      <nav className={`sidebar-glass group flex flex-col shadow-lg fixed inset-y-0 left-0 z-40 transform transition-all duration-300
+        md:relative md:transform-none md:w-16 md:hover:w-64
+        ${isOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64'}`}>
+        
+        {/* Sidebar Header */}
+        <div className="p-4 flex items-center justify-between border-b border-slate-200/80 dark:border-slate-700/80 md:justify-center md:group-hover:justify-between">
+          <span className="text-xl font-bold text-blue-600 dark:text-blue-400 transition-opacity md:opacity-0 md:group-hover:opacity-100">
+            IVS English
+          </span>
+          <button onClick={onClose} className="md:hidden btn btn-secondary h-8 w-8 !p-0">
             <i className="fa-solid fa-times"></i>
           </button>
         </div>
         
+        {/* Navigation Links */}
         <ul className="flex-1 px-2 py-4 custom-scrollbar overflow-y-auto">
           {navGroups.map((group, groupIndex) => (
             <React.Fragment key={`group-${groupIndex}`}>
@@ -88,15 +86,17 @@ const Sidebar: React.FC<SidebarProps> = ({ user, currentView, setView, language,
                 <li key={item.id}>
                   <button
                     onClick={() => setView(item.id as View)}
-                    className={`w-full flex items-center p-3 my-1 rounded-lg transition-colors duration-200 ${
-                      currentView === item.id 
+                    className={`w-full flex items-center p-3 my-1 rounded-lg transition-colors duration-200 justify-start md:justify-center md:group-hover:justify-start
+                      ${currentView === item.id 
                         ? 'bg-blue-500 text-white shadow-md' 
-                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200/80 dark:hover:bg-slate-700/80'
-                    } ${showLabels ? '' : 'justify-center'}`}
+                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200/80 dark:hover:bg-slate-700/80'}`
+                    }
                     title={item.label}
                   >
-                    <i className={`fa-solid ${item.icon} text-lg ${showLabels ? 'mr-4 w-6 text-center' : ''}`}></i>
-                    {showLabels && <span className="font-medium">{item.label}</span>}
+                    <i className={`fa-solid ${item.icon} text-lg w-6 text-center mr-4 transition-all md:mr-0 md:group-hover:mr-4`}></i>
+                    <span className="font-medium transition-opacity duration-200 md:opacity-0 md:group-hover:opacity-100">
+                      {item.label}
+                    </span>
                   </button>
                 </li>
               ))}
@@ -109,12 +109,12 @@ const Sidebar: React.FC<SidebarProps> = ({ user, currentView, setView, language,
           ))}
         </ul>
         
-        <div className="p-4 mt-auto border-t border-slate-200/80 dark:border-slate-700/80 text-center">
-          {showLabels ? (
-            <p className="text-xs text-slate-500 dark:text-slate-400">© 2025 IVS JSC</p>
-          ) : (
-            <i className="fa-solid fa-copyright text-slate-500 dark:text-slate-400"></i>
-          )}
+        {/* Sidebar Footer */}
+        <div className="p-4 mt-auto border-t border-slate-200/80 dark:border-slate-700/80 text-center relative h-10 flex items-center justify-center">
+            <p className="text-xs text-slate-500 dark:text-slate-400 transition-opacity md:opacity-0 md:group-hover:opacity-100">
+              © 2025 IVS JSC
+            </p>
+            <i className="fa-solid fa-copyright text-slate-500 dark:text-slate-400 absolute transition-opacity opacity-0 md:opacity-100 md:group-hover:opacity-0"></i>
         </div>
       </nav>
     </>

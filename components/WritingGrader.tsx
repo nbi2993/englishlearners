@@ -20,11 +20,12 @@ const WritingGrader: React.FC<WritingGraderProps> = ({ language, setView }) => {
     setAiConfigured(isAiConfigured());
   }, []);
 
+  // FIX: Updated translations to reflect new API key policy.
   const t = {
     en: {
       title: "AI Writing Grader",
       subtitle: "Get instant feedback on your writing.",
-      goToAiSettings: "Go to AI Settings",
+      goToAiSettings: "Check AI Status",
       topicLabel: "Topic",
       topicPlaceholder: "e.g., My Summer Vacation",
       textLabel: "Your Text",
@@ -40,12 +41,12 @@ const WritingGrader: React.FC<WritingGraderProps> = ({ language, setView }) => {
       placeholder: "Your feedback will appear here once you submit your text.",
       errorEmpty: "Please enter both a topic and your text.",
       aiWarningTitle: "AI Service Inactive",
-      aiWarningBody: "AI features are not working because the API key is not configured. Please set it up in settings.",
+      aiWarningBody: "AI features are not available because an API key has not been configured by the administrator.",
     },
     vi: {
       title: "AI Chấm bài viết",
       subtitle: "Nhận phản hồi tức thì về bài viết của bạn.",
-      goToAiSettings: "Đi đến Cài đặt AI",
+      goToAiSettings: "Kiểm tra Trạng thái AI",
       topicLabel: "Chủ đề",
       topicPlaceholder: "VD: Kỳ nghỉ hè của tôi",
       textLabel: "Bài viết của bạn",
@@ -61,7 +62,7 @@ const WritingGrader: React.FC<WritingGraderProps> = ({ language, setView }) => {
       placeholder: "Phản hồi của bạn sẽ xuất hiện ở đây sau khi bạn nộp bài.",
       errorEmpty: "Vui lòng nhập cả chủ đề và bài viết.",
       aiWarningTitle: "Dịch vụ AI không hoạt động",
-      aiWarningBody: "Các tính năng AI không hoạt động vì khóa API chưa được định cấu hình. Vui lòng thiết lập trong phần cài đặt.",
+      aiWarningBody: "Các tính năng AI không khả dụng vì khóa API chưa được quản trị viên định cấu hình.",
     }
   }[language];
 

@@ -6,6 +6,7 @@
   
   --brand-blue: #3b82f6;
   --brand-red: #ef4444;
+  --header-height: 64px; /* 4rem */
 }
 
 /* Base Styles */
@@ -112,9 +113,17 @@ a:focus-visible {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
+@keyframes pulse {
+  50% { opacity: .5; }
+}
+@keyframes typing-dot {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
 
 .animate-fade-in { animation: fade-in 0.5s ease-out forwards; }
 .animate-slide-in-up { animation: slide-in-up 0.5s ease-out forwards; }
+.animate-pulse-slow { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
 
 /* Reusable Component Styles */
 .card-glass {
@@ -130,7 +139,7 @@ a:focus-visible {
   -webkit-backdrop-filter: blur(12px);
 }
 .sidebar-glass {
-  transition: width 300ms ease-in-out;
+  transition: width 300ms ease-in-out, transform 300ms ease-in-out;
 }
 .dark .sidebar-glass {
   background-color: rgba(15, 23, 42, 0.5);
@@ -173,4 +182,45 @@ a:focus-visible {
 .form-input:focus, .form-textarea:focus, .form-select:focus {
   border-color: var(--brand-blue);
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
+/* Chat Typing Indicator */
+.typing-indicator span {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #94a3b8; /* slate-400 */
+  margin: 0 1px;
+  animation: typing-dot 1.2s infinite ease-in-out;
+}
+.dark .typing-indicator span {
+  background-color: #64748b; /* slate-500 */
+}
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* Virtual Home Button */
+.virtual-home-btn {
+  @apply fixed bottom-6 right-6 h-14 w-14 rounded-full bg-blue-600 text-white shadow-lg flex items-center justify-center text-2xl z-40 transition-all duration-300;
+}
+.virtual-home-btn:hover {
+  @apply bg-blue-700 scale-110 shadow-xl;
+}
+.virtual-home-btn:active {
+  @apply scale-100 bg-blue-800;
+}
+
+/* Responsive Main Content Padding */
+main {
+  padding-top: var(--header-height);
+}
+@media (min-width: 768px) { /* md breakpoint */
+  main {
+    padding-top: 0;
+  }
 }

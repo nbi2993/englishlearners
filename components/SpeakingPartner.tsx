@@ -1,7 +1,7 @@
   import React, { useState, useEffect, useRef } from 'react';
   import { createChat, isAiConfigured } from '../services/geminiService';
   import type { ChatMessage, View } from '../types';
-  import type { Chat, GenerateContentResponse } from '@google/ai';
+  import type { Chat, GenerateContentResponse } from '@google/genai';
 
   interface SpeakingPartnerProps {
     language: 'en' | 'vi';
@@ -18,6 +18,7 @@
     const isMounted = useRef(true);
     const [aiConfigured, setAiConfigured] = useState(true);
 
+    // FIX: Updated translations to reflect new API key policy.
     const t = {
       en: {
         initialMessage: "Hello! I'm Sparky, your friendly English tutor. What would you like to talk about today? 😊",
@@ -26,9 +27,9 @@
         title: "Speaking Partner",
         subtitle: "Practice your English with Sparky the AI tutor!",
         placeholder: "Type your message...",
-        goToAiSettings: "Go to AI Settings",
+        goToAiSettings: "Check AI Status",
         aiWarningTitle: "AI Service Inactive",
-        aiWarningBody: "AI features are not working because the API key is not configured. Please set it up in settings.",
+        aiWarningBody: "AI features are not available because an API key has not been configured by the administrator.",
         typing: "Sparky is typing"
       },
       vi: {
@@ -38,9 +39,9 @@
         title: "Luyện nói",
         subtitle: "Luyện tập tiếng Anh của bạn với gia sư AI Sparky!",
         placeholder: "Nhập tin nhắn của bạn...",
-        goToAiSettings: "Đi đến Cài đặt AI",
+        goToAiSettings: "Kiểm tra Trạng thái AI",
         aiWarningTitle: "Dịch vụ AI không hoạt động",
-        aiWarningBody: "Các tính năng AI không hoạt động vì khóa API chưa được định cấu hình. Vui lòng thiết lập trong phần cài đặt.",
+        aiWarningBody: "Các tính năng AI không khả dụng vì khóa API chưa được quản trị viên định cấu hình.",
         typing: "Sparky đang nhập"
       }
     }[language];
@@ -81,8 +82,6 @@
       setError(null);
 
       try {
-        let response: GenerateContentResponse;
-        if (chat.sendMessageStream) {
           const stream = await chat.sendMessageStream({ message: userMessage.text });
           let fullResponseText = '';
           let modelMessage: ChatMessage = { role: 'model', text: '' };
@@ -102,12 +101,6 @@
               newMessages[newMessages.length - 1] = { role: 'model', text: fullResponseText };
               return newMessages;
           });
-
-        } else { // Fallback for non-streaming
-          response = await chat.sendMessage({ message: userMessage.text });
-          const modelMessage: ChatMessage = { role: 'model', text: response.text };
-          setMessages(prev => [...prev, modelMessage]);
-        }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
         setError(errorMessage);

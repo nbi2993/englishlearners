@@ -31,7 +31,8 @@ const LessonView: React.FC<LessonViewProps> = ({ lesson, language, setView }) =>
 
   const handleTranslate = async (term: string) => {
     if (!aiConfigured) {
-        alert("Please configure your API key in Settings to use translation.");
+        // FIX: Updated alert message according to new API key policy.
+        alert("AI features are not available. Please contact your administrator.");
         return;
     }
     if (translation[term]) return; // Already translated
@@ -139,21 +140,22 @@ const LessonView: React.FC<LessonViewProps> = ({ lesson, language, setView }) =>
       <span>{label}</span>
     </button>
   );
-
+  
+  // FIX: Updated AI warning messages to align with new API key policy.
   const TABS = {
     en: [
       { id: 'aims', icon: 'fa-bullseye-arrow', label: 'Lesson Aims' },
       { id: 'vocabulary', icon: 'fa-book-sparkles', label: 'Vocabulary' },
       { id: 'grammar', icon: 'fa-spell-check', label: 'Grammar' },
       { id: 'activities', icon: 'fa-pencil-ruler', label: 'Activities' },
-      { id: 'ai-tools', icon: 'fa-robot', label: 'AI Tools', aiWarningBody: "AI features need an API key. Please set it in Settings." },
+      { id: 'ai-tools', icon: 'fa-robot', label: 'AI Tools', aiWarningBody: "AI features are not available. Please contact your administrator to enable them." },
     ],
     vi: [
       { id: 'aims', icon: 'fa-bullseye-arrow', label: 'Mục tiêu' },
       { id: 'vocabulary', icon: 'fa-book-sparkles', label: 'Từ vựng' },
       { id: 'grammar', icon: 'fa-spell-check', label: 'Ngữ pháp' },
       { id: 'activities', icon: 'fa-pencil-ruler', label: 'Hoạt động' },
-      { id: 'ai-tools', icon: 'fa-robot', label: 'Công cụ AI', aiWarningBody: "Tính năng AI cần có khóa API. Vui lòng thiết lập trong Cài đặt." },
+      { id: 'ai-tools', icon: 'fa-robot', label: 'Công cụ AI', aiWarningBody: "Các tính năng AI không khả dụng. Vui lòng liên hệ quản trị viên để kích hoạt." },
     ]
   };
   const t = TABS[language];
@@ -166,7 +168,7 @@ const LessonView: React.FC<LessonViewProps> = ({ lesson, language, setView }) =>
                 <h3 className="text-xl font-bold text-amber-800 dark:text-amber-200">{t.find(tab => tab.id === 'ai-tools')?.label}</h3>
                 <p className="text-amber-700 dark:text-amber-300 mt-2 mb-4">{t.find(tab => tab.id === 'ai-tools')?.aiWarningBody}</p>
                 <button onClick={() => setView('settings')} className="btn bg-amber-500 hover:bg-amber-600 text-white">
-                    <i className="fa-solid fa-cogs mr-2"></i> {language === 'vi' ? 'Đi đến Cài đặt' : 'Go to Settings'}
+                    <i className="fa-solid fa-cogs mr-2"></i> {language === 'vi' ? 'Xem trạng thái AI' : 'Check AI Status'}
                 </button>
             </div>
         );

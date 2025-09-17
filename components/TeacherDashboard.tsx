@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import * as XLSX from 'xlsx';
+import * as XLSX from 'https://cdn.sheetjs.com/xlsx-0.20.2/package/xlsx.mjs';
 import type { Classes, Student, ClassData, ClassScheduleItem, Grade } from '../types';
 import StudentCard from './StudentCard';
 import StudentRow from './StudentRow';

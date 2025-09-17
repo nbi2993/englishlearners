@@ -17,6 +17,7 @@ const GuideSection: React.FC<{ title: string; children: React.ReactNode; }> = ({
 const UserGuide: React.FC<UserGuideProps> = ({ language }) => {
     const isVietnamese = language === 'vi';
 
+    // FIX: Updated content to remove user-facing API key configuration instructions.
     const content = {
         title: isVietnamese ? 'Hướng dẫn sử dụng' : 'User Guide',
         intro_title: isVietnamese ? 'Chào mừng đến với IVS English!' : 'Welcome to IVS English!',
@@ -57,16 +58,13 @@ const UserGuide: React.FC<UserGuideProps> = ({ language }) => {
             ? '**Quản lý Dữ liệu (Data Management):** Sử dụng nút **Sao lưu (Backup)** để tải xuống tất cả dữ liệu ứng dụng của bạn (hồ sơ, lớp học, cài đặt) vào một tệp JSON. Sử dụng **Khôi phục (Restore)** để tải lên tệp này và khôi phục trạng thái của bạn. Điều này rất hữu ích khi chuyển đổi thiết bị hoặc trình duyệt.'
             : '**Data Management:** Use the **Backup** button to download all your app data (profile, classes, settings) to a JSON file. Use **Restore** to upload this file and restore your state. This is very useful when switching devices or browsers.',
         
-        features_ai_config_title: isVietnamese ? 'Cấu hình Cài đặt AI' : 'AI Settings Configuration',
+        features_ai_config_title: isVietnamese ? 'Về các tính năng AI' : 'About AI Features',
         features_ai_config_p1: isVietnamese
-            ? 'Để sử dụng các tính năng AI mạnh mẽ như **Chấm bài viết** và **Luyện nói**, bạn cần có một khóa API Google Gemini. Ứng dụng này không đi kèm với khóa có sẵn.'
-            : 'To use powerful AI features like the **Writing Grader** and **Speaking Partner**, you need a Google Gemini API key. This application does not come with a pre-configured key.',
+            ? 'Các tính năng AI mạnh mẽ như **Chấm bài viết** và **Luyện nói** được cung cấp bởi Google Gemini. Các tính năng này yêu cầu cấu hình API từ phía quản trị viên.'
+            : 'Powerful AI features like the **Writing Grader** and **Speaking Partner** are powered by Google Gemini. These features require an API key to be configured by the administrator.',
         features_ai_config_p2: isVietnamese
-            ? 'Đi đến trang **Cài đặt** và tìm mục "Cài đặt AI". Tại đây, bạn có thể dán khóa API của mình vào ô nhập liệu và nhấp vào **"Lưu khóa"**. Trạng thái dịch vụ AI sẽ chuyển thành "Hoạt động".'
-            : 'Navigate to the **Settings** page and find the "AI Settings" section. Here, you can paste your API key into the input field and click **"Save Key"**. The AI services status will then turn to "Active".',
-        features_ai_config_p3: isVietnamese
-            ? 'Nếu bạn chưa có khóa, bạn có thể nhấp vào nút **"Liên hệ mua Key API"** trong phần Cài đặt để được hỗ trợ.'
-            : 'If you do not have a key, you can click the **"Contact to Buy API Key"** button in the Settings section for assistance.',
+            ? 'Bạn có thể kiểm tra trạng thái của các dịch vụ AI trong trang **Cài đặt**. Nếu chúng không hoạt động, vui lòng liên hệ với quản trị viên hoặc bộ phận hỗ trợ của bạn.'
+            : 'You can check the status of the AI services in the **Settings** page. If they are inactive, please contact your administrator or support.',
 
         teacher_title: isVietnamese ? 'Dành cho Giáo viên' : 'For Teachers',
         teacher_p1: isVietnamese
@@ -153,7 +151,6 @@ const UserGuide: React.FC<UserGuideProps> = ({ language }) => {
             <GuideSection title={content.features_ai_config_title}>
                 <p>{content.features_ai_config_p1}</p>
                 <p>{content.features_ai_config_p2}</p>
-                <p>{content.features_ai_config_p3}</p>
             </GuideSection>
             
             <GuideSection title={curriculumContent.title}>
