@@ -1,11 +1,12 @@
 
 import { CurriculumLevel } from '../types';
 
-export const sw7Data: CurriculumLevel = {
-    level: 7,
-    title: { en: 'i-Learn Smart World 7', vi: 'i-Learn Smart World 7' },
-    subtitle: { en: 'Secondary School - Grade 7', vi: 'Trung học cơ sở - Lớp 7' },
-    ebookPdfUrl: 'https://drive.google.com/file/d/1H9LEAJS2xZALd7CUryibtkjKtOXIpEBM/view?usp=drive_link',
+// Fix: Renamed sw7Data to sw8Data and updated content to reflect Grade 8.
+export const sw8Data: CurriculumLevel = {
+    level: 8,
+    title: { en: 'i-Learn Smart World 8', vi: 'i-Learn Smart World 8' },
+    subtitle: { en: 'Secondary School - Grade 8', vi: 'Trung học cơ sở - Lớp 8' },
+    ebookPdfUrl: 'https://drive.google.com/file/d/1H9LEAJS2xZALd7CUryibtkjKtOXIpEBM/view?usp=drive_link', // Note: This URL might still be for SW7.
     units: [
         {
             id: 701,

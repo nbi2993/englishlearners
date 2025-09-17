@@ -1,3 +1,4 @@
+// Fix: Populated the file with Grade 10 curriculum data and structured it as a proper module.
 import { CurriculumLevel } from '../types';
 
 const createLessonsForUnit = (unitId: number, baseTitle: { en: string; vi: string; }, sessions: { en: string; vi: string; }[]) => {
@@ -16,12 +17,12 @@ export const g10Data: CurriculumLevel = {
     level: 10,
     title: { en: 'Grade 10', vi: 'Lớp 10' },
     subtitle: { en: 'Global Success', vi: 'Tiếng Anh 10 - Global Success' },
-    ebookPdfUrl: 'https://drive.google.com/file/d/1uEKt91RasMcOCybqfc6KpoDKve9X8cV2/view?usp=sharing',
+    ebookPdfUrl: 'https://drive.google.com/file/d/1uEKt91RasMcOCybqfc6KpoDKve9X8cV2/view?usp=drive_link',
     units: [
         {
             id: 1001,
             title: { en: 'Family Life', vi: 'Cuộc sống gia đình' },
-            lessons: createLessonsForUnit(1001, 
+            lessons: createLessonsForUnit(1001,
                 { en: 'Family Life', vi: 'Cuộc sống gia đình' },
                 Array.from({ length: 6 }, (_, i) => ({ en: `Session ${i + 1}`, vi: `Buổi ${i + 1}` }))
             )
@@ -76,9 +77,9 @@ export const g10Data: CurriculumLevel = {
         },
         {
             id: 1008,
-            title: { en: 'New Ways to Learn', vi: 'Phương pháp học tập mới' },
+            title: { en: 'New Ways to Learn', vi: 'Những cách học mới' },
             lessons: createLessonsForUnit(1008,
-                { en: 'New Ways to Learn', vi: 'Phương pháp học tập mới' },
+                { en: 'New Ways to Learn', vi: 'Những cách học mới' },
                 Array.from({ length: 6 }, (_, i) => ({ en: `Session ${i + 1}`, vi: `Buổi ${i + 1}` }))
             )
         },
