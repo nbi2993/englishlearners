@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { curriculumData } from '../data/curriculum';
 import CourseCard from './CourseCard';
 import type { Course, User } from '../types';
@@ -54,6 +54,20 @@ const Dashboard: React.FC<DashboardProps> = ({ onSelectCourse, user, onUpdateUse
     }, {} as Record<string, MappedCourse[]>);
   }, [courses]);
 
+  const [expandedSeries, setExpandedSeries] = useState<string | null>(null);
+
+  // Set the first category to be expanded by default
+  useEffect(() => {
+    const seriesKeys = Object.keys(groupedCourses);
+    if (seriesKeys.length > 0) {
+      setExpandedSeries(seriesKeys[0]);
+    }
+  }, [groupedCourses]);
+
+  const handleToggleSeries = (series: string) => {
+    setExpandedSeries(prev => (prev === series ? null : series));
+  };
+  
   const handlePinToggle = (courseId: string) => {
     const pinnedCourses = user.pinnedCourses || [];
     const newPinnedCourses = pinnedCourses.includes(courseId)
@@ -74,23 +88,44 @@ const Dashboard: React.FC<DashboardProps> = ({ onSelectCourse, user, onUpdateUse
         </p>
       </div>
 
-      {Object.entries(groupedCourses).map(([series, coursesInSeries]) => (
-        <div key={series} className="mb-10">
-          <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-4 pb-2 border-b-2 border-blue-500">{series}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {coursesInSeries.map(course => (
-              <CourseCard
-                key={course.id}
-                course={course}
-                onSelect={() => onSelectCourse(course)}
-                isPinned={user.pinnedCourses?.includes(course.id) || false}
-                onPinToggle={() => handlePinToggle(course.id)}
-                language={language}
-              />
-            ))}
-          </div>
-        </div>
-      ))}
+      <div className="space-y-4">
+        {Object.entries(groupedCourses).map(([series, coursesInSeries]) => {
+          const isExpanded = expandedSeries === series;
+          return (
+            <div key={series} className="card-glass overflow-hidden transition-all duration-300">
+              <button
+                onClick={() => handleToggleSeries(series)}
+                className="w-full text-left p-4 flex justify-between items-center hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+                aria-expanded={isExpanded}
+                aria-controls={`series-content-${series.replace(/\s/g, '-')}`}
+              >
+                <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200">{series}</h2>
+                <i className={`fa-solid fa-chevron-down text-slate-500 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}></i>
+              </button>
+              
+              {isExpanded && (
+                <div 
+                  id={`series-content-${series.replace(/\s/g, '-')}`}
+                  className="p-4 sm:p-6 border-t border-slate-200 dark:border-slate-700 animate-fade-in"
+                >
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {coursesInSeries.map(course => (
+                      <CourseCard
+                        key={course.id}
+                        course={course}
+                        onSelect={() => onSelectCourse(course)}
+                        isPinned={user.pinnedCourses?.includes(course.id) || false}
+                        onPinToggle={() => handlePinToggle(course.id)}
+                        language={language}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };

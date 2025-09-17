@@ -23,7 +23,6 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ onSelectRole, language })
 
   return (
     <div className="flex flex-col items-center justify-center h-full text-center p-8 animate-fade-in">
-      <img src="/assets/logo.png" alt="IVS English Logo" className="h-24 w-24 mb-6 object-contain" />
       <h1 className="text-4xl font-bold mb-2 text-slate-900 dark:text-white">{t.welcome}</h1>
       <p className="text-lg text-slate-600 dark:text-slate-400 mb-10">{t.prompt}</p>
       

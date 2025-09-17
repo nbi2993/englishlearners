@@ -18,7 +18,9 @@ const App: React.FC = () => {
   const [view, setView] = useState<View>('home');
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [language, setLanguage] = useState<'en' | 'vi'>('vi');
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [fontSize, setFontSize] = useState('16px');
+  const [fontWeight, setFontWeight] = useState(400);
 
   useEffect(() => {
     // Load saved data from localStorage
@@ -26,20 +28,20 @@ const App: React.FC = () => {
       const savedUser = localStorage.getItem('ivs-user');
       const savedClasses = localStorage.getItem('ivs-classes');
       const savedLanguage = localStorage.getItem('ivs-language');
+      const savedFontSize = localStorage.getItem('ivs-fontSize');
+      const savedFontWeight = localStorage.getItem('ivs-fontWeight');
       
-      if (savedUser) {
-        setUser(JSON.parse(savedUser));
-      }
-      if (savedClasses) {
-        setClasses(JSON.parse(savedClasses));
-      }
-       if (savedLanguage === 'vi' || savedLanguage === 'en') {
+      if (savedUser) setUser(JSON.parse(savedUser));
+      if (savedClasses) setClasses(JSON.parse(savedClasses));
+      if (savedLanguage === 'vi' || savedLanguage === 'en') {
         setLanguage(savedLanguage);
       } else {
-        // Default to Vietnamese if no language is set
         setLanguage('vi');
         localStorage.setItem('ivs-language', 'vi');
       }
+      if (savedFontSize) setFontSize(savedFontSize);
+      if (savedFontWeight) setFontWeight(parseInt(savedFontWeight, 10));
+
     } catch (error) {
       console.error("Failed to parse data from localStorage", error);
       localStorage.clear(); // Clear corrupted data
@@ -54,6 +56,13 @@ const App: React.FC = () => {
         document.documentElement.classList.remove('dark');
     }
   }, []);
+
+  useEffect(() => {
+    document.documentElement.style.fontSize = fontSize;
+    document.documentElement.style.fontWeight = fontWeight.toString();
+    localStorage.setItem('ivs-fontSize', fontSize);
+    localStorage.setItem('ivs-fontWeight', fontWeight.toString());
+  }, [fontSize, fontWeight]);
   
   const handleSetLanguage = (lang: 'en' | 'vi') => {
     setLanguage(lang);
@@ -126,7 +135,7 @@ const App: React.FC = () => {
       case 'speaking-partner':
         return <SpeakingPartner language={language} setView={setView} />;
       case 'settings':
-        return <Settings user={user!} onUpdateUser={handleUpdateUser} classes={classes} onUpdateClasses={handleUpdateClasses} theme={theme} setTheme={setTheme} language={language} setLanguage={handleSetLanguage}/>;
+        return <Settings user={user!} onUpdateUser={handleUpdateUser} classes={classes} onUpdateClasses={handleUpdateClasses} theme={theme} setTheme={setTheme} language={language} setLanguage={handleSetLanguage} fontSize={fontSize} setFontSize={setFontSize} fontWeight={fontWeight} setFontWeight={setFontWeight} />;
       case 'user-guide':
         return <UserGuide language={language} />;
       default:
@@ -134,11 +143,9 @@ const App: React.FC = () => {
     }
   };
 
-  const currentTheme = theme === 'dark' ? 'dark' : '';
-
   if (!user) {
       return (
-        <div className={`app-container ${currentTheme}`}>
+        <div className={`app-container h-full`}>
             <div className="flex h-screen bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200">
                 <main className="flex-1 overflow-y-auto">
                     <RoleSelection onSelectRole={handleSetRole} language={language} />
@@ -149,8 +156,8 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className={`app-container ${currentTheme}`}>
-      <div className="flex h-screen bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200">
+    <div className={`app-container h-full`}>
+      <div className="flex h-screen bg-transparent">
         <Sidebar user={user} currentView={view} setView={setView} language={language} />
         <main className="flex-1 overflow-y-auto custom-scrollbar">
             {renderContent()}

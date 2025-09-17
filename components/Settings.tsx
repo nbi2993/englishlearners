@@ -12,9 +12,13 @@ interface SettingsProps {
   setTheme: (theme: 'light' | 'dark') => void;
   language: 'en' | 'vi';
   setLanguage: (language: 'en' | 'vi') => void;
+  fontSize: string;
+  setFontSize: (size: string) => void;
+  fontWeight: number;
+  setFontWeight: (weight: number) => void;
 }
 
-const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpdateClasses, theme, setTheme, language, setLanguage }) => {
+const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpdateClasses, theme, setTheme, language, setLanguage, fontSize, setFontSize, fontWeight, setFontWeight }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [aiStatus, setAiStatus] = useState(false);
   const [apiKeyInput, setApiKeyInput] = useState('');
@@ -43,6 +47,14 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
         light: "Light",
         dark: "Dark",
         languageTitle: "Language",
+        fontSettingsTitle: "Font Settings",
+        fontSize: "Font Size",
+        fontSmall: "Small",
+        fontNormal: "Normal",
+        fontLarge: "Large",
+        fontWeight: "Font Weight",
+        fontLight: "Light",
+        fontRegular: "Normal",
         dataTitle: "Data Management",
         backup: "Backup Data",
         restore: "Restore Data",
@@ -76,10 +88,18 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
         roleDesc: "Chuyển đổi vai trò sẽ thay đổi giao diện và các tính năng có sẵn của ứng dụng để phù hợp hơn với nhu cầu của bạn.",
         roleConfirm: (role: string) => `Bạn có chắc chắn muốn chuyển sang vai trò ${role} không? Điều này sẽ thay đổi bảng điều khiển và các tính năng có sẵn của bạn.`,
         appearanceTitle: "Giao diện & Ngôn ngữ",
-        themeTitle: "Giao diện",
+        themeTitle: "Chủ đề",
         light: "Sáng",
         dark: "Tối",
         languageTitle: "Ngôn ngữ",
+        fontSettingsTitle: "Cài đặt Font chữ",
+        fontSize: "Cỡ chữ",
+        fontSmall: "Nhỏ",
+        fontNormal: "Vừa",
+        fontLarge: "Lớn",
+        fontWeight: "Độ đậm",
+        fontLight: "Nhạt",
+        fontRegular: "Thường",
         dataTitle: "Quản lý Dữ liệu",
         backup: "Sao lưu Dữ liệu",
         restore: "Phục hồi Dữ liệu",
@@ -92,7 +112,7 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
         aiStatusActive: "Hoạt động",
         aiStatusInactive: "Không hoạt động",
         aiDesc: "Các tính năng AI yêu cầu khóa API của Google Gemini. Nhập khóa của bạn vào bên dưới, hoặc liên hệ với chúng tôi để mua khóa và kích hoạt Chấm bài viết và Luyện nói.",
-        apiKeyLabel: "Khóa API Google Gemini của bạn",
+        apiKeyLabel: "Nhập KEY-API",
         saveKey: "Lưu khóa",
         clearKey: "Xóa khóa",
         contactBuyKey: "Liên hệ mua Key API",
@@ -170,7 +190,9 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
         classes,
         settings: {
             theme,
-            language
+            language,
+            fontSize,
+            fontWeight,
         }
     };
     const jsonString = JSON.stringify(dataToBackup, null, 2);
@@ -200,6 +222,8 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
                     onUpdateClasses(data.classes);
                     handleThemeChange(data.settings.theme || 'light');
                     setLanguage(data.settings.language || 'en');
+                    setFontSize(data.settings.fontSize || '16px');
+                    setFontWeight(data.settings.fontWeight || 400);
                     alert(t.restoreSuccess);
                 } else {
                     alert(t.restoreInvalid);
@@ -280,6 +304,27 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
                 </div>
             </section>
 
+            <section className="card-glass p-6">
+                <h2 className="text-2xl font-bold mb-4">{t.fontSettingsTitle}</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                     <div>
+                        <h3 className="text-lg font-semibold mb-2">{t.fontSize}</h3>
+                        <div className="flex gap-2">
+                            <button onClick={() => setFontSize('14px')} className={`btn flex-1 ${fontSize === '14px' ? 'btn-primary' : 'btn-secondary-outline'}`}>{t.fontSmall}</button>
+                            <button onClick={() => setFontSize('16px')} className={`btn flex-1 ${fontSize === '16px' ? 'btn-primary' : 'btn-secondary-outline'}`}>{t.fontNormal}</button>
+                            <button onClick={() => setFontSize('18px')} className={`btn flex-1 ${fontSize === '18px' ? 'btn-primary' : 'btn-secondary-outline'}`}>{t.fontLarge}</button>
+                        </div>
+                    </div>
+                     <div>
+                        <h3 className="text-lg font-semibold mb-2">{t.fontWeight}</h3>
+                        <div className="flex gap-2">
+                            <button onClick={() => setFontWeight(300)} className={`btn flex-1 ${fontWeight === 300 ? 'btn-primary' : 'btn-secondary-outline'}`}>{t.fontLight}</button>
+                            <button onClick={() => setFontWeight(400)} className={`btn flex-1 ${fontWeight === 400 ? 'btn-primary' : 'btn-secondary-outline'}`}>{t.fontRegular}</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
              <section className="card-glass p-6">
                 <h2 className="text-2xl font-bold mb-4">{t.aiSettingsTitle}</h2>
                  <div className="flex items-center gap-3 mb-3">
@@ -317,7 +362,7 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
                 <div className="flex flex-wrap gap-2 mt-3">
                     <button onClick={handleSaveKey} className="btn btn-primary flex-grow"><i className="fa-solid fa-save mr-2"></i>{t.saveKey}</button>
                     <button onClick={handleClearKey} className="btn btn-secondary flex-grow"><i className="fa-solid fa-trash mr-2"></i>{t.clearKey}</button>
-                     <a href="https://zalo.me/0795555789" target="_blank" rel="noopener noreferrer" className="btn btn-secondary-outline flex-grow">
+                     <a href="https://zalo.me/0795555789" target="_blank" rel="noopener noreferrer" className="btn btn-secondary-outline flex-grow text-center">
                         <i className="fa-solid fa-key mr-2"></i>{t.contactBuyKey}
                     </a>
                 </div>

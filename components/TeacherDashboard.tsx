@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import * as XLSX from 'https://cdn.sheetjs.com/xlsx-0.20.2/package/xlsx.mjs';
+import * as XLSX from 'xlsx';
 import type { Classes, Student, ClassData, ClassScheduleItem, Grade } from '../types';
 import StudentCard from './StudentCard';
-import StudentRow from './StudentRow'; // Import the new component
+import StudentRow from './StudentRow';
 import StudentReportModal from './StudentReportModal';
 import CreateTestModal from './CreateTestModal';
 import AssignHomeworkModal from './AssignHomeworkModal';
@@ -402,9 +402,9 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
-                    <button onClick={() => { setClassToEdit({ id: classId, data: classData }); setIsAddEditClassModalOpen(true); }} className="btn-icon text-blue-500" title={t.editClass}><i className="fa-solid fa-pencil"></i></button>
-                    <button onClick={() => { setClassToDelete({ id: classId, data: classData }); setIsDeleteClassModalOpen(true); }} className="btn-icon text-red-500" title={t.deleteClass}><i className="fa-solid fa-trash"></i></button>
-                    <button onClick={() => setExpandedClassId(isExpanded ? null : classId)} className="btn-icon text-slate-500" title={isExpanded ? t.collapse : t.expand}>
+                    <button onClick={() => { setClassToEdit({ id: classId, data: classData }); setIsAddEditClassModalOpen(true); }} className="btn btn-icon text-blue-500" title={t.editClass}><i className="fa-solid fa-pencil"></i></button>
+                    <button onClick={() => { setClassToDelete({ id: classId, data: classData }); setIsDeleteClassModalOpen(true); }} className="btn btn-icon text-red-500" title={t.deleteClass}><i className="fa-solid fa-trash"></i></button>
+                    <button onClick={() => setExpandedClassId(isExpanded ? null : classId)} className="btn btn-icon text-slate-500" title={isExpanded ? t.collapse : t.expand}>
                       <i className={`fa-solid fa-chevron-down transition-transform ${isExpanded ? 'rotate-180' : ''}`}></i>
                     </button>
                 </div>
