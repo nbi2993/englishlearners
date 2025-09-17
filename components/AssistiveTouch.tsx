@@ -9,7 +9,8 @@ interface AssistiveTouchProps {
 const AssistiveTouch: React.FC<AssistiveTouchProps> = ({ setView, language }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const t = {
+  // FIX: Defined the full translations object first to allow TypeScript to correctly infer types for keys.
+  const translations = {
     en: {
       home: 'Home',
       writingGrader: 'Writing Grader',
@@ -22,9 +23,11 @@ const AssistiveTouch: React.FC<AssistiveTouchProps> = ({ setView, language }) =>
       speakingPartner: 'Luyện nói',
       toggleMenu: 'Mở/Đóng Menu'
     }
-  }[language];
+  };
 
-  const menuItems: { view: View; icon: string; label: keyof typeof t.en }[] = [
+  const t = translations[language];
+
+  const menuItems: { view: View; icon: string; label: keyof typeof translations.en }[] = [
     { view: 'home', icon: 'fa-home', label: 'home' },
     { view: 'writing-grader', icon: 'fa-pen-ruler', label: 'writingGrader' },
     { view: 'speaking-partner', icon: 'fa-comments', label: 'speakingPartner' },
