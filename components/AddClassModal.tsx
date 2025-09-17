@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
-import type { ClassScheduleItem } from '../types';
+import React, { useState, useEffect } from 'react';
+import type { ClassScheduleItem, ClassData } from '../types';
 
 interface AddClassModalProps {
   onClose: () => void;
-  onAddClass: (classData: { name: string, schedule: ClassScheduleItem[] }) => void;
+  onSave: (classData: { name: string, schedule: ClassScheduleItem[] }, classId?: string) => void;
   language: 'en' | 'vi';
+  classToEdit?: { id: string, data: ClassData } | null;
 }
 
-const AddClassModal: React.FC<AddClassModalProps> = ({ onClose, onAddClass, language }) => {
+const AddClassModal: React.FC<AddClassModalProps> = ({ onClose, onSave, language, classToEdit }) => {
   const [className, setClassName] = useState('');
   const [schedule, setSchedule] = useState<ClassScheduleItem[]>([]);
   const [itemToAdd, setItemToAdd] = useState({
@@ -17,9 +18,19 @@ const AddClassModal: React.FC<AddClassModalProps> = ({ onClose, onAddClass, lang
     endTime: ''
   });
 
+  const isEditing = !!classToEdit;
+
+  useEffect(() => {
+    if (isEditing) {
+      setClassName(classToEdit.data.name);
+      setSchedule(classToEdit.data.schedule || []);
+    }
+  }, [classToEdit, isEditing]);
+
   const t = {
     en: {
-      title: "Create New Class",
+      createTitle: "Create New Class",
+      editTitle: "Edit Class",
       label: "Class Name",
       placeholder: "e.g., Grade 6A, Advanced English",
       scheduleTitle: "Class Schedule",
@@ -31,10 +42,12 @@ const AddClassModal: React.FC<AddClassModalProps> = ({ onClose, onAddClass, lang
       addedSessions: "Added Sessions",
       noSessions: "No sessions added yet.",
       cancel: "Cancel",
-      create: "Create Class"
+      create: "Create Class",
+      save: "Save Changes",
     },
     vi: {
-      title: "Tạo Lớp Mới",
+      createTitle: "Tạo Lớp Mới",
+      editTitle: "Chỉnh sửa Lớp học",
       label: "Tên Lớp",
       placeholder: "VD: Lớp 6A, Tiếng Anh Nâng cao",
       scheduleTitle: "Lịch học",
@@ -46,7 +59,8 @@ const AddClassModal: React.FC<AddClassModalProps> = ({ onClose, onAddClass, lang
       addedSessions: "Các buổi đã thêm",
       noSessions: "Chưa có buổi học nào được thêm.",
       cancel: "Hủy",
-      create: "Tạo Lớp"
+      create: "Tạo Lớp",
+      save: "Lưu thay đổi",
     }
   }[language];
   
@@ -71,7 +85,7 @@ const AddClassModal: React.FC<AddClassModalProps> = ({ onClose, onAddClass, lang
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (className.trim()) {
-      onAddClass({ name: className.trim(), schedule });
+      onSave({ name: className.trim(), schedule }, classToEdit?.id);
     }
   };
 
@@ -79,7 +93,7 @@ const AddClassModal: React.FC<AddClassModalProps> = ({ onClose, onAddClass, lang
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 transition-opacity animate-fade-in p-4">
       <form onSubmit={handleSubmit} className="modal-content p-6 w-full max-w-lg m-4 transform transition-all animate-slide-in-up max-h-[90vh] flex flex-col">
         <div className="flex justify-between items-center border-b pb-3 dark:border-slate-700">
-          <h3 className="text-xl font-bold text-slate-900 dark:text-white">{t.title}</h3>
+          <h3 className="text-xl font-bold text-slate-900 dark:text-white">{isEditing ? t.editTitle : t.createTitle}</h3>
           <button type="button" onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-2xl">&times;</button>
         </div>
         
@@ -137,7 +151,7 @@ const AddClassModal: React.FC<AddClassModalProps> = ({ onClose, onAddClass, lang
             {t.cancel}
           </button>
           <button type="submit" className="btn btn-primary">
-            {t.create}
+            {isEditing ? t.save : t.create}
           </button>
         </div>
       </form>

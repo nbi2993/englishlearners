@@ -22,6 +22,15 @@ function getAiInstance(): GoogleGenAI {
   return aiInstance;
 }
 
+export const isAiConfigured = (): boolean => {
+  try {
+    getAiInstance();
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
 export const gradeWriting = async (topic: string, text: string): Promise<WritingFeedback> => {
   const ai = getAiInstance();
   const prompt = `Topic: "${topic}"\n\nEssay: "${text}"\n\nPlease grade this essay for a K-12 English learner. Provide feedback on grammar, vocabulary, and coherence. Give an overall score out of 100.`;

@@ -122,9 +122,9 @@ const App: React.FC = () => {
       case 'teacher-dashboard':
         return <TeacherDashboard classes={classes} setClasses={handleUpdateClasses} language={language} />;
       case 'writing-grader':
-        return <WritingGrader language={language} />;
+        return <WritingGrader language={language} setView={setView} />;
       case 'speaking-partner':
-        return <SpeakingPartner language={language} />;
+        return <SpeakingPartner language={language} setView={setView} />;
       case 'settings':
         return <Settings user={user!} onUpdateUser={handleUpdateUser} classes={classes} onUpdateClasses={handleUpdateClasses} theme={theme} setTheme={setTheme} language={language} setLanguage={handleSetLanguage}/>;
       case 'user-guide':

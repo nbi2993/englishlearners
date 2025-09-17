@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { gradeWriting } from '../services/geminiService';
-import type { WritingFeedback } from '../types';
+import type { WritingFeedback, View } from '../types';
 
 interface WritingGraderProps {
   language: 'en' | 'vi';
+  setView: (view: View) => void;
 }
 
-const WritingGrader: React.FC<WritingGraderProps> = ({ language }) => {
+const WritingGrader: React.FC<WritingGraderProps> = ({ language, setView }) => {
   const [topic, setTopic] = useState('');
   const [text, setText] = useState('');
   const [feedback, setFeedback] = useState<WritingFeedback | null>(null);
@@ -17,6 +18,7 @@ const WritingGrader: React.FC<WritingGraderProps> = ({ language }) => {
     en: {
       title: "AI Writing Grader",
       subtitle: "Get instant feedback on your writing.",
+      goToAiSettings: "Go to AI Settings",
       topicLabel: "Topic",
       topicPlaceholder: "e.g., My Summer Vacation",
       textLabel: "Your Text",
@@ -36,6 +38,7 @@ const WritingGrader: React.FC<WritingGraderProps> = ({ language }) => {
     vi: {
       title: "AI Chấm bài viết",
       subtitle: "Nhận phản hồi tức thì về bài viết của bạn.",
+      goToAiSettings: "Đi đến Cài đặt AI",
       topicLabel: "Chủ đề",
       topicPlaceholder: "VD: Kỳ nghỉ hè của tôi",
       textLabel: "Bài viết của bạn",
@@ -81,10 +84,14 @@ const WritingGrader: React.FC<WritingGraderProps> = ({ language }) => {
 
   return (
     <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 animate-fade-in">
-      <div className="text-center mb-8">
+      <div className="text-center mb-8 relative">
         <i className="fa-solid fa-pen-ruler text-5xl text-blue-500 mb-4"></i>
         <h1 className="text-4xl font-bold">{t.title}</h1>
         <p className="mt-2 text-lg text-slate-600 dark:text-slate-400">{t.subtitle}</p>
+        <button onClick={() => setView('settings')} className="absolute top-0 right-0 btn btn-secondary-outline text-sm">
+            <i className="fa-solid fa-cogs mr-2"></i>
+            {t.goToAiSettings}
+        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

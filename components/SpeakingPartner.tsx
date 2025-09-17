@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createChat } from '../services/geminiService';
-import type { ChatMessage } from '../types';
-import type { Chat, GenerateContentResponse } from '@google/genai';
+import type { ChatMessage, View } from '../types';
+import type { Chat, GenerateContentResponse } from '@google/ai';
 
 interface SpeakingPartnerProps {
   language: 'en' | 'vi';
+  setView: (view: View) => void;
 }
 
-const SpeakingPartner: React.FC<SpeakingPartnerProps> = ({ language }) => {
+const SpeakingPartner: React.FC<SpeakingPartnerProps> = ({ language, setView }) => {
   const [chat, setChat] = useState<Chat | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
@@ -24,6 +25,7 @@ const SpeakingPartner: React.FC<SpeakingPartnerProps> = ({ language }) => {
       title: "Speaking Partner",
       subtitle: "Practice your English with Sparky the AI tutor!",
       placeholder: "Type your message...",
+      goToAiSettings: "Go to AI Settings",
     },
     vi: {
       initialMessage: "Xin chào! Tôi là Sparky, gia sư tiếng Anh thân thiện của bạn. Hôm nay bạn muốn nói về chủ đề gì? 😊",
@@ -32,6 +34,7 @@ const SpeakingPartner: React.FC<SpeakingPartnerProps> = ({ language }) => {
       title: "Luyện nói",
       subtitle: "Luyện tập tiếng Anh của bạn với gia sư AI Sparky!",
       placeholder: "Nhập tin nhắn của bạn...",
+      goToAiSettings: "Đi đến Cài đặt AI",
     }
   }[language];
 
@@ -104,10 +107,14 @@ const SpeakingPartner: React.FC<SpeakingPartnerProps> = ({ language }) => {
 
   return (
     <div className="h-full flex flex-col max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 animate-fade-in">
-        <div className="text-center mb-6">
+        <div className="text-center mb-6 relative">
             <i className="fa-solid fa-comments text-5xl text-blue-500 mb-4"></i>
             <h1 className="text-4xl font-bold">{t.title}</h1>
             <p className="mt-2 text-lg text-slate-600 dark:text-slate-400">{t.subtitle}</p>
+            <button onClick={() => setView('settings')} className="absolute top-0 right-0 btn btn-secondary-outline text-sm">
+                <i className="fa-solid fa-cogs mr-2"></i>
+                {t.goToAiSettings}
+            </button>
         </div>
         <div className="card-glass flex-grow flex flex-col p-0">
             <div className="flex-grow p-6 overflow-y-auto space-y-4 custom-scrollbar">
@@ -150,4 +157,4 @@ const SpeakingPartner: React.FC<SpeakingPartnerProps> = ({ language }) => {
   );
 };
 
-export default SpeakingPartner;
+export default SpeakingPartner; 

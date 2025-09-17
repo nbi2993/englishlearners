@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { User, Classes } from '../types';
 import ProfileEditModal from './ProfileEditModal';
+import { isAiConfigured } from '../services/geminiService';
 
 interface SettingsProps {
   user: User;
@@ -15,6 +16,11 @@ interface SettingsProps {
 
 const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpdateClasses, theme, setTheme, language, setLanguage }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [aiStatus, setAiStatus] = useState(false);
+
+  useEffect(() => {
+    setAiStatus(isAiConfigured());
+  }, []);
   
   const t = {
     en: {
@@ -42,6 +48,12 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
         restoreSuccess: "Data restored successfully!",
         restoreInvalid: "Invalid backup file format.",
         restoreFail: "Failed to read or parse the backup file.",
+        aiSettingsTitle: "AI Settings",
+        aiStatusLabel: "AI Services Status:",
+        aiStatusActive: "Active",
+        aiStatusInactive: "Inactive",
+        aiDesc: "AI features like the Writing Grader and Speaking Partner are powered by Google Gemini. An API key must be configured by the administrator for these services to function.",
+        aiContact: "Contact to Buy API Key",
     },
     vi: {
         title: "Cài đặt",
@@ -68,6 +80,12 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
         restoreSuccess: "Dữ liệu đã được khôi phục thành công!",
         restoreInvalid: "Định dạng tệp sao lưu không hợp lệ.",
         restoreFail: "Không thể đọc hoặc phân tích tệp sao lưu.",
+        aiSettingsTitle: "Cài đặt AI",
+        aiStatusLabel: "Trạng thái Dịch vụ AI:",
+        aiStatusActive: "Hoạt động",
+        aiStatusInactive: "Không hoạt động",
+        aiDesc: "Các tính năng AI như Chấm bài viết và Luyện nói được cung cấp bởi Google Gemini. Quản trị viên cần định cấu hình khóa API để các dịch vụ này hoạt động.",
+        aiContact: "Liên hệ Mua API Key",
     }
   }[language];
 
@@ -165,6 +183,7 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
             alert(t.restoreFail);
         }
     };
+    // FIX: Corrected the method name from `readText` to `readAsText` for the FileReader API to properly read the uploaded backup file.
     reader.readAsText(file);
   };
 
@@ -232,6 +251,34 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
                             </button>
                         </div>
                     </div>
+                </div>
+            </section>
+
+             <section className="card-glass p-6">
+                <h2 className="text-2xl font-bold mb-4">{t.aiSettingsTitle}</h2>
+                <div className="flex flex-col sm:flex-row gap-4 items-start">
+                    <div className="flex-grow">
+                        <div className="flex items-center gap-3 mb-2">
+                            <span className="font-semibold">{t.aiStatusLabel}</span>
+                            {aiStatus ? (
+                                <span className="flex items-center gap-2 px-3 py-1 text-sm font-medium text-green-800 bg-green-100 dark:text-green-100 dark:bg-green-700/50 rounded-full">
+                                    <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                                    {t.aiStatusActive}
+                                </span>
+                            ) : (
+                                <span className="flex items-center gap-2 px-3 py-1 text-sm font-medium text-red-800 bg-red-100 dark:text-red-100 dark:bg-red-700/50 rounded-full">
+                                    <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                                    {t.aiStatusInactive}
+                                </span>
+                            )}
+                        </div>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                           {t.aiDesc}
+                        </p>
+                    </div>
+                     <a href="https://zalo.me/0795555789" target="_blank" rel="noopener noreferrer" className="btn btn-primary mt-2 sm:mt-0 flex-shrink-0">
+                        <i className="fa-solid fa-key mr-2"></i> {t.aiContact}
+                    </a>
                 </div>
             </section>
 

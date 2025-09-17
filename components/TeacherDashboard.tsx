@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import type { Classes, Student, ClassScheduleItem } from '../types';
+import type { Classes, Student, ClassData, ClassScheduleItem } from '../types';
 import StudentCard from './StudentCard';
 import StudentRow from './StudentRow'; // Import the new component
 import StudentReportModal from './StudentReportModal';
@@ -7,6 +7,7 @@ import CreateTestModal from './CreateTestModal';
 import AssignHomeworkModal from './AssignHomeworkModal';
 import AddClassModal from './AddClassModal';
 import AddStudentModal from './AddStudentModal';
+import DeleteClassModal from './DeleteClassModal';
 
 interface TeacherDashboardProps {
   classes: Classes;
@@ -23,8 +24,13 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isTestModalOpen, setIsTestModalOpen] = useState(false);
   const [isHomeworkModalOpen, setIsHomeworkModalOpen] = useState(false);
-  const [isAddClassModalOpen, setIsAddClassModalOpen] = useState(false);
+  const [isAddEditClassModalOpen, setIsAddEditClassModalOpen] = useState(false);
   const [isAddStudentModalOpen, setIsAddStudentModalOpen] = useState(false);
+  const [isDeleteClassModalOpen, setIsDeleteClassModalOpen] = useState(false);
+
+  const [classToEdit, setClassToEdit] = useState<{ id: string; data: ClassData } | null>(null);
+  const [classToDelete, setClassToDelete] = useState<{ id: string; data: ClassData } | null>(null);
+
 
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -46,6 +52,8 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses
       noStudents: "No students in this class yet.",
       expand: "Expand",
       collapse: "Collapse",
+      editClass: "Edit Class",
+      deleteClass: "Delete Class",
     },
     vi: {
       noClassesTitle: "Không tìm thấy Lớp học",
@@ -64,6 +72,8 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses
       noStudents: "Chưa có học sinh nào trong lớp này.",
       expand: "Mở rộng",
       collapse: "Thu gọn",
+      editClass: "Sửa Lớp",
+      deleteClass: "Xóa Lớp",
     }
   }[language];
   
@@ -84,12 +94,26 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses
     setIsReportModalOpen(true);
   };
 
-  const handleAddClass = (classData: { name: string, schedule: ClassScheduleItem[] }) => {
-    const newClassId = `class-${Date.now()}`;
-    const newClasses: Classes = { ...classes, [newClassId]: { name: classData.name, students: [], schedule: classData.schedule } };
-    setClasses(newClasses);
-    setExpandedClassId(newClassId);
-    setIsAddClassModalOpen(false);
+  const handleSaveClass = (classData: { name: string; schedule: ClassScheduleItem[] }, classId?: string) => {
+    if (classId) { // Editing
+      const updatedClasses = { ...classes, [classId]: { ...classes[classId], name: classData.name, schedule: classData.schedule } };
+      setClasses(updatedClasses);
+    } else { // Adding
+      const newClassId = `class-${Date.now()}`;
+      const newClasses: Classes = { ...classes, [newClassId]: { name: classData.name, students: [], schedule: classData.schedule } };
+      setClasses(newClasses);
+      setExpandedClassId(newClassId);
+    }
+    setIsAddEditClassModalOpen(false);
+    setClassToEdit(null);
+  };
+
+  const handleDeleteClass = () => {
+    if (!classToDelete) return;
+    const { [classToDelete.id]: _, ...remainingClasses } = classes;
+    setClasses(remainingClasses);
+    setIsDeleteClassModalOpen(false);
+    setClassToDelete(null);
   };
 
   const handleAddStudent = (studentName: string) => {
@@ -112,10 +136,10 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses
               <i className="fa-solid fa-school-circle-xmark text-6xl text-slate-400 mb-4"></i>
               <h2 className="text-2xl font-bold">{t.noClassesTitle}</h2>
               <p className="text-slate-500 mb-6">{t.noClassesDesc}</p>
-              <button className="btn btn-primary" onClick={() => setIsAddClassModalOpen(true)}>
+              <button className="btn btn-primary" onClick={() => { setClassToEdit(null); setIsAddEditClassModalOpen(true); }}>
                   <i className="fa-solid fa-plus mr-2"></i> {t.createClass}
               </button>
-              {isAddClassModalOpen && <AddClassModal onClose={() => setIsAddClassModalOpen(false)} onAddClass={handleAddClass} language={language} />}
+              {isAddEditClassModalOpen && <AddClassModal onClose={() => setIsAddEditClassModalOpen(false)} onSave={handleSaveClass} language={language} />}
           </div>
       );
   }
@@ -146,7 +170,7 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses
             onChange={e => setSearchTerm(e.target.value)}
           />
         </div>
-        <button onClick={() => setIsAddClassModalOpen(true)} className="btn btn-secondary-outline"><i className="fa-solid fa-plus mr-2"></i> {t.addClass}</button>
+        <button onClick={() => { setClassToEdit(null); setIsAddEditClassModalOpen(true); }} className="btn btn-secondary-outline"><i className="fa-solid fa-plus mr-2"></i> {t.addClass}</button>
       </div>
 
       <div className="space-y-4">
@@ -159,9 +183,8 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses
             <div key={classId} className="card-glass overflow-hidden">
               <div
                 className="flex justify-between items-center p-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50"
-                onClick={() => setExpandedClassId(isExpanded ? null : classId)}
               >
-                <div className="flex-grow">
+                <div className="flex-grow" onClick={() => setExpandedClassId(isExpanded ? null : classId)}>
                   <h2 className="text-xl font-bold">{classData.name}</h2>
                   <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-slate-500 mt-1">
                     <span><i className="fa-solid fa-users mr-1"></i> {classData.students.length} {t.students}</span>
@@ -169,9 +192,13 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses
                     <span className={strugglingCount > 0 ? 'text-amber-500' : ''}><i className="fa-solid fa-triangle-exclamation mr-1"></i> {strugglingCount} {t.struggling}</span>
                   </div>
                 </div>
-                <button className="btn-icon text-slate-500" title={isExpanded ? t.collapse : t.expand}>
-                  <i className={`fa-solid fa-chevron-down transition-transform ${isExpanded ? 'rotate-180' : ''}`}></i>
-                </button>
+                <div className="flex items-center gap-1">
+                    <button onClick={() => { setClassToEdit({ id: classId, data: classData }); setIsAddEditClassModalOpen(true); }} className="btn-icon text-blue-500" title={t.editClass}><i className="fa-solid fa-pencil"></i></button>
+                    <button onClick={() => { setClassToDelete({ id: classId, data: classData }); setIsDeleteClassModalOpen(true); }} className="btn-icon text-red-500" title={t.deleteClass}><i className="fa-solid fa-trash"></i></button>
+                    <button onClick={() => setExpandedClassId(isExpanded ? null : classId)} className="btn-icon text-slate-500" title={isExpanded ? t.collapse : t.expand}>
+                      <i className={`fa-solid fa-chevron-down transition-transform ${isExpanded ? 'rotate-180' : ''}`}></i>
+                    </button>
+                </div>
               </div>
 
               {isExpanded && (
@@ -216,8 +243,9 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses
       )}
       {isTestModalOpen && <CreateTestModal onClose={() => setIsTestModalOpen(false)} language={language} />}
       {isHomeworkModalOpen && <AssignHomeworkModal students={Object.values(classes).flatMap(c => c.students)} onClose={() => setIsHomeworkModalOpen(false)} language={language} />}
-      {isAddClassModalOpen && <AddClassModal onClose={() => setIsAddClassModalOpen(false)} onAddClass={handleAddClass} language={language} />}
+      {isAddEditClassModalOpen && <AddClassModal onClose={() => { setIsAddEditClassModalOpen(false); setClassToEdit(null); }} onSave={handleSaveClass} language={language} classToEdit={classToEdit}/>}
       {isAddStudentModalOpen && <AddStudentModal onClose={() => { setIsAddStudentModalOpen(false); setClassForNewStudent(null); }} onAddStudent={handleAddStudent} language={language} />}
+      {isDeleteClassModalOpen && classToDelete && <DeleteClassModal className={classToDelete.data.name} onClose={() => { setIsDeleteClassModalOpen(false); setClassToDelete(null); }} onConfirm={handleDeleteClass} language={language}/>}
     </div>
   );
 };
