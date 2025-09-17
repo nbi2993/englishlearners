@@ -17,7 +17,6 @@ const GuideSection: React.FC<{ title: string; children: React.ReactNode; }> = ({
 const UserGuide: React.FC<UserGuideProps> = ({ language }) => {
     const isVietnamese = language === 'vi';
 
-    // FIX: Updated content to remove user-facing API key configuration instructions.
     const content = {
         title: isVietnamese ? 'Hướng dẫn sử dụng' : 'User Guide',
         intro_title: isVietnamese ? 'Chào mừng đến với IVS English!' : 'Welcome to IVS English!',
@@ -32,6 +31,43 @@ const UserGuide: React.FC<UserGuideProps> = ({ language }) => {
         getting_started_nav: isVietnamese
             ? 'Sử dụng **thanh điều hướng bên trái (sidebar)** để truy cập các phần khác nhau của ứng dụng như Trang chủ, Chương trình, Công cụ AI và Cài đặt.'
             : 'Use the **sidebar on the left** to navigate to different sections of the app like Home, Curriculum, AI Tools, and Settings.',
+
+        install_title: isVietnamese ? 'Cài đặt Ứng dụng (Truy cập Nhanh)' : 'Installing the App (Quick Access)',
+        install_intro: isVietnamese
+            ? 'Để truy cập nhanh hơn và có trải nghiệm giống như một ứng dụng gốc, bạn có thể cài đặt IVS English trực tiếp lên màn hình chính hoặc máy tính của bạn.'
+            : 'For faster access and a native app-like experience, you can install IVS English directly onto your home screen or desktop.',
+        install_windows_title: isVietnamese ? 'Trên Windows (Sử dụng Chrome)' : 'On Windows (Using Chrome)',
+        install_windows_step1: isVietnamese
+            ? `Nhấp vào biểu tượng ba chấm (<i class="fa-solid fa-ellipsis-vertical mx-1"></i>) ở góc trên bên phải của trình duyệt.`
+            : `Click the three-dots icon (<i class="fa-solid fa-ellipsis-vertical mx-1"></i>) in the top-right corner of the browser.`,
+        install_windows_step2: isVietnamese
+            ? `Chọn <strong>"Cài đặt IVS English App"</strong> hoặc tìm trong "Lưu và chia sẻ" &rarr; "Cài đặt...".`
+            : `Select <strong>"Install IVS English App"</strong> or look under "Save and share" &rarr; "Install...".`,
+        install_windows_step3: isVietnamese
+            ? 'Làm theo hướng dẫn để thêm ứng dụng vào màn hình desktop hoặc menu Start của bạn.'
+            : 'Follow the prompts to add the app to your desktop or Start Menu.',
+
+        install_ios_title: isVietnamese ? 'Trên iPhone / iPad (Sử dụng Safari)' : 'On iPhone / iPad (Using Safari)',
+        install_ios_step1: isVietnamese
+            ? `Nhấn vào biểu tượng Chia sẻ (<i class="fa-solid fa-arrow-up-from-bracket mx-1"></i>) trên thanh công cụ (thường ở dưới cùng).`
+            : `Tap the Share icon (<i class="fa-solid fa-arrow-up-from-bracket mx-1"></i>) in the toolbar (usually at the bottom).`,
+        install_ios_step2: isVietnamese
+            ? 'Cuộn xuống danh sách và nhấn vào <strong>"Thêm vào MH chính"</strong>.'
+            : 'Scroll down the list and tap <strong>"Add to Home Screen"</strong>.',
+        install_ios_step3: isVietnamese
+            ? 'Xác nhận tên cho ứng dụng và nhấn <strong>"Thêm"</strong> ở góc trên bên phải.'
+            : 'Confirm the name for the app and tap <strong>"Add"</strong> in the top-right corner.',
+
+        install_android_title: isVietnamese ? 'Trên Android (Sử dụng Chrome)' : 'On Android (Using Chrome)',
+        install_android_step1: isVietnamese
+            ? `Nhấn vào biểu tượng ba chấm (<i class="fa-solid fa-ellipsis-vertical mx-1"></i>) ở góc trên bên phải của trình duyệt.`
+            : `Tap the three-dots icon (<i class="fa-solid fa-ellipsis-vertical mx-1"></i>) in the top-right corner of the browser.`,
+        install_android_step2: isVietnamese
+            ? 'Từ menu thả xuống, nhấn vào <strong>"Cài đặt ứng dụng"</strong> (hoặc "Thêm vào màn hình chính").'
+            : 'From the dropdown menu, tap <strong>"Install app"</strong> (or "Add to Home screen").',
+        install_android_step3: isVietnamese
+            ? 'Làm theo hướng dẫn trên màn hình để xác nhận và thêm ứng dụng.'
+            : 'Follow the on-screen prompts to confirm and add the app.',
 
         features_title: isVietnamese ? 'Tính năng cho Mọi người' : 'Features for Everyone',
         features_pinning_title: isVietnamese ? 'Chương trình & Ghim Khóa học' : 'Curriculum & Pinning Courses',
@@ -128,6 +164,34 @@ const UserGuide: React.FC<UserGuideProps> = ({ language }) => {
             <GuideSection title={content.getting_started_title}>
                 <p dangerouslySetInnerHTML={{ __html: content.getting_started_role }}></p>
                 <p dangerouslySetInnerHTML={{ __html: content.getting_started_nav }}></p>
+            </GuideSection>
+
+            <GuideSection title={content.install_title}>
+                <p>{content.install_intro}</p>
+                <div className="mt-4">
+                    <h4 className="font-semibold">{content.install_windows_title}</h4>
+                    <ol className="list-decimal list-inside space-y-1">
+                        <li dangerouslySetInnerHTML={{ __html: content.install_windows_step1 }}></li>
+                        <li dangerouslySetInnerHTML={{ __html: content.install_windows_step2 }}></li>
+                        <li>{content.install_windows_step3}</li>
+                    </ol>
+                </div>
+                 <div className="mt-4">
+                    <h4 className="font-semibold">{content.install_ios_title}</h4>
+                    <ol className="list-decimal list-inside space-y-1">
+                        <li dangerouslySetInnerHTML={{ __html: content.install_ios_step1 }}></li>
+                        <li dangerouslySetInnerHTML={{ __html: content.install_ios_step2 }}></li>
+                        <li dangerouslySetInnerHTML={{ __html: content.install_ios_step3 }}></li>
+                    </ol>
+                </div>
+                 <div className="mt-4">
+                    <h4 className="font-semibold">{content.install_android_title}</h4>
+                    <ol className="list-decimal list-inside space-y-1">
+                        <li dangerouslySetInnerHTML={{ __html: content.install_android_step1 }}></li>
+                        <li dangerouslySetInnerHTML={{ __html: content.install_android_step2 }}></li>
+                        <li>{content.install_android_step3}</li>
+                    </ol>
+                </div>
             </GuideSection>
 
             <GuideSection title={content.features_title}>
