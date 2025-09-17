@@ -33,8 +33,9 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses
   const [classToEdit, setClassToEdit] = useState<{ id: string; data: ClassData } | null>(null);
   const [classToDelete, setClassToDelete] = useState<{ id: string; data: ClassData } | null>(null);
 
-
   const [searchTerm, setSearchTerm] = useState('');
+  const [uploadMessage, setUploadMessage] = useState<{classId: string, type: 'success' | 'error', text: string} | null>(null);
+
 
   const t = {
     en: {
@@ -170,6 +171,7 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses
     if (!file) return;
 
     setIsUploading(true);
+    setUploadMessage(null);
     
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -183,7 +185,7 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses
         const studentNames = json.slice(1).map(row => row[0]).filter(name => name && typeof name === 'string' && name.trim() !== '');
 
         if (studentNames.length === 0) {
-          alert(t.alert.noNames);
+          setUploadMessage({ classId, type: 'error', text: t.alert.noNames });
           return;
         }
 
@@ -199,13 +201,14 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses
         updatedClasses[classId].students.push(...newStudents);
         setClasses(updatedClasses);
 
-        alert(t.alert.success(studentNames.length));
+        setUploadMessage({ classId, type: 'success', text: t.alert.success(studentNames.length) });
       } catch (error) {
         console.error("Error processing Excel file:", error);
-        alert(t.alert.fail);
+        setUploadMessage({ classId, type: 'error', text: t.alert.fail });
       } finally {
         setIsUploading(false);
-        event.target.value = '';
+        if (event.target) event.target.value = '';
+        setTimeout(() => setUploadMessage(null), 5000);
       }
     };
     reader.readAsArrayBuffer(file);
@@ -326,6 +329,11 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses
                                       <input type="file" accept=".xlsx, .xls" className="hidden" onChange={(e) => handleFileUpload(e, classId)} disabled={isUploading} />
                                   </label>
                               </div>
+                              {uploadMessage && uploadMessage.classId === classId && (
+                                <p className={`mt-3 text-xs ${uploadMessage.type === 'success' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                                    {uploadMessage.text}
+                                </p>
+                              )}
                           </div>
                       </div>
                   </div>

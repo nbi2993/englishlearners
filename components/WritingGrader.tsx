@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { gradeWriting } from '../services/geminiService';
+import React, { useState, useEffect } from 'react';
+import { gradeWriting, isAiConfigured } from '../services/geminiService';
 import type { WritingFeedback, View } from '../types';
 
 interface WritingGraderProps {
@@ -13,6 +13,11 @@ const WritingGrader: React.FC<WritingGraderProps> = ({ language, setView }) => {
   const [feedback, setFeedback] = useState<WritingFeedback | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [aiConfigured, setAiConfigured] = useState(true);
+
+  useEffect(() => {
+    setAiConfigured(isAiConfigured());
+  }, []);
 
   const t = {
     en: {
@@ -34,6 +39,8 @@ const WritingGrader: React.FC<WritingGraderProps> = ({ language, setView }) => {
       coherenceLabel: "Coherence",
       placeholder: "Your feedback will appear here once you submit your text.",
       errorEmpty: "Please enter both a topic and your text.",
+      aiWarningTitle: "AI Service Inactive",
+      aiWarningBody: "AI features are not working because the API key is not configured. Please set it up in settings.",
     },
     vi: {
       title: "AI Chấm bài viết",
@@ -54,6 +61,8 @@ const WritingGrader: React.FC<WritingGraderProps> = ({ language, setView }) => {
       coherenceLabel: "Mạch lạc",
       placeholder: "Phản hồi của bạn sẽ xuất hiện ở đây sau khi bạn nộp bài.",
       errorEmpty: "Vui lòng nhập cả chủ đề và bài viết.",
+      aiWarningTitle: "Dịch vụ AI không hoạt động",
+      aiWarningBody: "Các tính năng AI không hoạt động vì khóa API chưa được định cấu hình. Vui lòng thiết lập trong phần cài đặt.",
     }
   }[language];
 
@@ -84,15 +93,24 @@ const WritingGrader: React.FC<WritingGraderProps> = ({ language, setView }) => {
 
   return (
     <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 animate-fade-in">
-      <div className="text-center mb-8 relative">
+      <div className="text-center mb-8">
         <i className="fa-solid fa-pen-ruler text-5xl text-blue-500 mb-4"></i>
         <h1 className="text-4xl font-bold">{t.title}</h1>
         <p className="mt-2 text-lg text-slate-600 dark:text-slate-400">{t.subtitle}</p>
-        <button onClick={() => setView('settings')} className="absolute top-0 right-0 btn btn-secondary-outline text-sm">
+      </div>
+
+      {!aiConfigured && (
+        <div className="bg-amber-100 dark:bg-amber-900/50 border-l-4 border-amber-500 text-amber-800 dark:text-amber-200 p-4 rounded-r-lg mb-6 flex items-center justify-between gap-4 animate-fade-in">
+          <div>
+            <h4 className="font-bold">{t.aiWarningTitle}</h4>
+            <p className="text-sm">{t.aiWarningBody}</p>
+          </div>
+          <button onClick={() => setView('settings')} className="btn bg-amber-500 hover:bg-amber-600 text-white flex-shrink-0">
             <i className="fa-solid fa-cogs mr-2"></i>
             {t.goToAiSettings}
-        </button>
-      </div>
+          </button>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="card-glass p-6">
@@ -106,7 +124,7 @@ const WritingGrader: React.FC<WritingGraderProps> = ({ language, setView }) => {
                 onChange={(e) => setTopic(e.target.value)}
                 className="form-input"
                 placeholder={t.topicPlaceholder}
-                disabled={isLoading}
+                disabled={isLoading || !aiConfigured}
               />
             </div>
             <div className="mb-4">
@@ -117,10 +135,10 @@ const WritingGrader: React.FC<WritingGraderProps> = ({ language, setView }) => {
                 onChange={(e) => setText(e.target.value)}
                 className="form-textarea h-64"
                 placeholder={t.textPlaceholder}
-                disabled={isLoading}
+                disabled={isLoading || !aiConfigured}
               ></textarea>
             </div>
-            <button type="submit" className="btn btn-primary w-full" disabled={isLoading}>
+            <button type="submit" className="btn btn-primary w-full" disabled={isLoading || !aiConfigured}>
               {isLoading ? (
                 <>
                   <i className="fa-solid fa-spinner animate-spin mr-2"></i>
