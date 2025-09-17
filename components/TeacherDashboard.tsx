@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import * as XLSX from 'xlsx';
-import type { Classes, Student, ClassData, ClassScheduleItem } from '../types';
+import type { Classes, Student, ClassData, ClassScheduleItem, Grade } from '../types';
 import StudentCard from './StudentCard';
 import StudentRow from './StudentRow'; // Import the new component
 import StudentReportModal from './StudentReportModal';
@@ -61,14 +61,35 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses
       addStudentManually: "Add Manually",
       addStudentManuallyDesc: "Add students one by one by entering their name.",
       importFromExcel: "Import from Excel",
-      importFromExcelDesc: "Download the template, fill in student names, and upload to add in bulk.",
       downloadTemplate: "Download Template",
       uploadFile: "Upload File",
       uploading: "Uploading...",
+      instructionsTitle: "Instructions",
+      instruction1: "Download our template file.",
+      instruction2: "Enter student information and grades in the corresponding columns.",
+      instruction3: "The system will automatically calculate the weighted average score.",
+      instruction4: "Save and upload the file. New students will be added with their grades.",
+      excel: {
+        header_stt: "No.",
+        header_name: "Full Name",
+        header_dob: "Date of Birth",
+        header_gender: "Gender",
+        header_oral: "Oral (x1)",
+        header_15m: "15-minute (x1)",
+        header_midterm: "Mid-term (x2)",
+        header_final: "Final-term (x3)",
+        example_name: "Alex Smith",
+        example_dob: "2010-05-15",
+        example_gender: "Male",
+        example_oral: 9.0,
+        example_15m: 8.0,
+        example_midterm: 8.5,
+        example_final: 9.5,
+      },
       alert: {
-        noNames: "No student names found in the file.",
+        noNames: "No students with valid names found in the file. Please check the 'Full Name' column.",
         success: (count: number) => `${count} students added successfully!`,
-        fail: "Failed to process the Excel file.",
+        fail: "Failed to process the Excel file. Please ensure it follows the template format.",
       }
     },
     vi: {
@@ -93,15 +114,36 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses
       manageStudentsTitle: "Quản lý Học sinh",
       addStudentManually: "Thêm thủ công",
       addStudentManuallyDesc: "Thêm từng học sinh một bằng cách nhập tên.",
-      importFromExcel: "Thêm từ Excel",
-      importFromExcelDesc: "Tải file mẫu, điền tên học sinh và tải lên để thêm hàng loạt.",
+      importFromExcel: "Nhập từ Excel",
       downloadTemplate: "Tải mẫu",
       uploadFile: "Tải file",
       uploading: "Đang tải...",
+      instructionsTitle: "Hướng dẫn",
+      instruction1: "Tải về tệp mẫu của chúng tôi.",
+      instruction2: "Điền thông tin học sinh và điểm số vào các cột tương ứng.",
+      instruction3: "Hệ thống sẽ tự động tính điểm trung bình môn theo hệ số.",
+      instruction4: "Lưu tệp và tải lên. Học sinh mới sẽ được thêm vào lớp cùng với bảng điểm.",
+      excel: {
+        header_stt: "STT",
+        header_name: "Họ và tên",
+        header_dob: "Ngày sinh",
+        header_gender: "Giới tính",
+        header_oral: "Điểm Miệng (x1)",
+        header_15m: "Điểm 15 phút (x1)",
+        header_midterm: "Điểm Giữa kỳ (x2)",
+        header_final: "Điểm Cuối kỳ (x3)",
+        example_name: "Nguyễn Văn An",
+        example_dob: "2010-05-15",
+        example_gender: "Nam",
+        example_oral: 9.0,
+        example_15m: 8.0,
+        example_midterm: 8.5,
+        example_final: 9.5,
+      },
       alert: {
-        noNames: "Không tìm thấy tên học sinh nào trong tệp.",
-        success: (count: number) => `${count} học sinh đã được thêm thành công!`,
-        fail: "Không thể xử lý tệp Excel.",
+        noNames: "Không tìm thấy học sinh có tên hợp lệ trong tệp. Vui lòng kiểm tra cột 'Họ và tên'.",
+        success: (count: number) => `Đã thêm thành công ${count} học sinh!`,
+        fail: "Không thể xử lý tệp Excel. Vui lòng đảm bảo tệp theo đúng định dạng mẫu.",
       }
     }
   }[language];
@@ -160,10 +202,42 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses
   };
 
   const handleDownloadTemplate = () => {
-    const ws = XLSX.utils.json_to_sheet([{ "Student Name": "" }]);
+    const headers = {
+        stt: t.excel.header_stt,
+        name: t.excel.header_name,
+        dob: t.excel.header_dob,
+        gender: t.excel.header_gender,
+        oral: t.excel.header_oral,
+        min15: t.excel.header_15m,
+        midterm: t.excel.header_midterm,
+        final: t.excel.header_final,
+    };
+
+    const exampleData = [
+        {
+            [headers.stt]: 1,
+            [headers.name]: t.excel.example_name,
+            [headers.dob]: t.excel.example_dob,
+            [headers.gender]: t.excel.example_gender,
+            [headers.oral]: t.excel.example_oral,
+            [headers.min15]: t.excel.example_15m,
+            [headers.midterm]: t.excel.example_midterm,
+            [headers.final]: t.excel.example_final,
+        },
+        { [headers.stt]: 2 }
+    ];
+    
+    const ws = XLSX.utils.json_to_sheet(exampleData, {
+        header: Object.values(headers)
+    });
+    ws['!cols'] = [
+        { wch: 5 }, { wch: 30 }, { wch: 20 }, { wch: 15 },
+        { wch: 20 }, { wch: 20 }, { wch: 20 }, { wch: 20 },
+    ];
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Students");
-    XLSX.writeFile(wb, "student_template.xlsx");
+    XLSX.utils.book_append_sheet(wb, ws, "Student List");
+    const fileName = language === 'vi' ? 'mau_nhap_diem_hoc_sinh.xlsx' : 'student_grade_template.xlsx';
+    XLSX.writeFile(wb, fileName);
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>, classId: string) => {
@@ -177,31 +251,82 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses
     reader.onload = (e) => {
       try {
         const data = new Uint8Array(e.target!.result as ArrayBuffer);
-        const workbook = XLSX.read(data, { type: "array" });
+        const workbook = XLSX.read(data, { type: "array", cellDates: true });
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
-        const json: (string[])[] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+        const json: any[] = XLSX.utils.sheet_to_json(worksheet, { raw: false });
         
-        const studentNames = json.slice(1).map(row => row[0]).filter(name => name && typeof name === 'string' && name.trim() !== '');
+        const headers = t.excel;
+        const gradeCols: { header: string; coeff: 1 | 2 | 3, name: string }[] = [
+            { header: headers.header_oral, coeff: 1, name: language === 'vi' ? 'Điểm Miệng' : 'Oral' },
+            { header: headers.header_15m, coeff: 1, name: language === 'vi' ? '15 phút' : '15-min' },
+            { header: headers.header_midterm, coeff: 2, name: language === 'vi' ? 'Giữa kỳ' : 'Mid-term' },
+            { header: headers.header_final, coeff: 3, name: language === 'vi' ? 'Cuối kỳ' : 'Final-term' },
+        ];
 
-        if (studentNames.length === 0) {
+        const newStudents = json
+            .map((row, index) => {
+                const name = row[headers.header_name]?.toString().trim();
+                if (!name) return null;
+
+                let dob: string | undefined;
+                const parsedDob = row[headers.header_dob];
+                if (parsedDob instanceof Date) {
+                    dob = parsedDob.toLocaleDateString('en-CA'); // YYYY-MM-DD
+                } else if (parsedDob) {
+                    dob = parsedDob.toString();
+                }
+
+                const gender = row[headers.header_gender]?.toString().trim();
+                const importDate = new Date().toISOString().split('T')[0];
+                
+                const grades: Grade[] = [];
+                gradeCols.forEach(col => {
+                    const score = parseFloat(row[col.header]);
+                    if (!isNaN(score) && score >= 0 && score <= 10) {
+                        grades.push({
+                            id: `g-${Date.now()}-${index}-${col.coeff}`,
+                            name: col.name,
+                            score: score,
+                            coefficient: col.coeff,
+                            date: importDate,
+                        });
+                    }
+                });
+
+                let averageScore = 0;
+                if (grades.length > 0) {
+                    const totalScore = grades.reduce((sum, g) => sum + g.score * g.coefficient, 0);
+                    const totalCoefficients = grades.reduce((sum, g) => sum + g.coefficient, 0);
+                    if (totalCoefficients > 0) {
+                        averageScore = parseFloat((totalScore / totalCoefficients).toFixed(1));
+                    }
+                }
+                
+                const newStudent: Student = {
+                    id: `s-${Date.now()}-${index}`,
+                    name: name,
+                    avatar: `https://i.pravatar.cc/150?u=${name.replace(/\s/g, '')}`,
+                    lastActivity: 'Just Imported', progress: 0, averageScore, timeSpent: '0h 0m',
+                    isStruggling: averageScore < 5.0, scoreHistory: [], assignments: [],
+                    grades: grades,
+                    dob: dob,
+                    gender: gender,
+                };
+                return newStudent;
+            })
+            .filter((student): student is Student => student !== null);
+
+        if (newStudents.length === 0) {
           setUploadMessage({ classId, type: 'error', text: t.alert.noNames });
           return;
         }
-
-        const newStudents: Student[] = studentNames.map((name, index) => ({
-            id: `s-${Date.now()}-${index}`,
-            name: name.trim(),
-            avatar: `https://i.pravatar.cc/150?u=${name.trim().replace(/\s/g, '')}`,
-            lastActivity: 'Never', progress: 0, averageScore: 0, timeSpent: '0h 0m',
-            isStruggling: false, scoreHistory: [], assignments: [], grades: [],
-        }));
 
         const updatedClasses = { ...classes };
         updatedClasses[classId].students.push(...newStudents);
         setClasses(updatedClasses);
 
-        setUploadMessage({ classId, type: 'success', text: t.alert.success(studentNames.length) });
+        setUploadMessage({ classId, type: 'success', text: t.alert.success(newStudents.length) });
       } catch (error) {
         console.error("Error processing Excel file:", error);
         setUploadMessage({ classId, type: 'error', text: t.alert.fail });
@@ -308,7 +433,7 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses
                   {/* Student Management Section */}
                   <div className="mt-6 pt-6 border-t dark:border-slate-700">
                       <h4 className="font-semibold text-center mb-4">{t.manageStudentsTitle}</h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start max-w-2xl mx-auto">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start max-w-3xl mx-auto">
                           <div className="card-glass p-4 text-center bg-slate-50 dark:bg-slate-800/50">
                               <h5 className="font-medium mb-2">{t.addStudentManually}</h5>
                               <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">{t.addStudentManuallyDesc}</p>
@@ -316,10 +441,9 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses
                                   <i className="fa-solid fa-user-plus mr-2"></i> {t.addStudent}
                               </button>
                           </div>
-                          <div className="card-glass p-4 text-center bg-slate-50 dark:bg-slate-800/50">
-                              <h5 className="font-medium mb-2">{t.importFromExcel}</h5>
-                              <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">{t.importFromExcelDesc}</p>
-                              <div className="flex gap-2 justify-center">
+                          <div className="card-glass p-4 text-left bg-slate-50 dark:bg-slate-800/50">
+                              <h5 className="font-medium mb-2 text-center">{t.importFromExcel}</h5>
+                              <div className="flex gap-2 justify-center mb-4">
                                   <button onClick={handleDownloadTemplate} className="btn btn-secondary-outline text-sm flex-1">
                                       <i className="fa-solid fa-download mr-2"></i> {t.downloadTemplate}
                                   </button>
@@ -329,8 +453,19 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses
                                       <input type="file" accept=".xlsx, .xls" className="hidden" onChange={(e) => handleFileUpload(e, classId)} disabled={isUploading} />
                                   </label>
                               </div>
+
+                              <div className="text-xs text-slate-600 dark:text-slate-400 space-y-2 px-2">
+                                  <p className="font-semibold">{t.instructionsTitle}:</p>
+                                  <ol className="list-decimal list-inside space-y-1">
+                                      <li>{t.instruction1}</li>
+                                      <li>{t.instruction2}</li>
+                                      <li>{t.instruction3}</li>
+                                      <li>{t.instruction4}</li>
+                                  </ol>
+                              </div>
+
                               {uploadMessage && uploadMessage.classId === classId && (
-                                <p className={`mt-3 text-xs ${uploadMessage.type === 'success' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                                <p className={`mt-3 text-xs text-center ${uploadMessage.type === 'success' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                                     {uploadMessage.text}
                                 </p>
                               )}

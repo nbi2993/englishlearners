@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { User, Classes } from '../types';
 import ProfileEditModal from './ProfileEditModal';
-import { isAiConfigured } from '../services/geminiService';
+import { isAiConfigured, setApiKey, clearApiKey } from '../services/geminiService';
 
 interface SettingsProps {
   user: User;
@@ -17,6 +17,8 @@ interface SettingsProps {
 const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpdateClasses, theme, setTheme, language, setLanguage }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [aiStatus, setAiStatus] = useState(false);
+  const [apiKeyInput, setApiKeyInput] = useState('');
+  const [showKey, setShowKey] = useState(false);
 
   useEffect(() => {
     setAiStatus(isAiConfigured());
@@ -52,8 +54,12 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
         aiStatusLabel: "AI Services Status:",
         aiStatusActive: "Active",
         aiStatusInactive: "Inactive",
-        aiDesc: "AI features like the Writing Grader and Speaking Partner are powered by Google Gemini. An API key must be configured by the administrator for these services to function.",
-        aiContact: "Contact to Buy API Key",
+        aiDesc: "AI features require a Google Gemini API key. Enter your key below to enable the Writing Grader and Speaking Partner.",
+        apiKeyLabel: "Your Google Gemini API Key",
+        saveKey: "Save Key",
+        clearKey: "Clear Key",
+        keySaved: "API Key saved successfully!",
+        keyCleared: "API Key cleared.",
     },
     vi: {
         title: "Cài đặt",
@@ -84,10 +90,29 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
         aiStatusLabel: "Trạng thái Dịch vụ AI:",
         aiStatusActive: "Hoạt động",
         aiStatusInactive: "Không hoạt động",
-        aiDesc: "Các tính năng AI như Chấm bài viết và Luyện nói được cung cấp bởi Google Gemini. Quản trị viên cần định cấu hình khóa API để các dịch vụ này hoạt động.",
-        aiContact: "Liên hệ Mua API Key",
+        aiDesc: "Các tính năng AI yêu cầu khóa API của Google Gemini. Nhập khóa của bạn vào bên dưới để kích hoạt Chấm bài viết và Luyện nói.",
+        apiKeyLabel: "Khóa API Google Gemini của bạn",
+        saveKey: "Lưu khóa",
+        clearKey: "Xóa khóa",
+        keySaved: "Đã lưu khóa API thành công!",
+        keyCleared: "Đã xóa khóa API.",
     }
   }[language];
+
+  const handleSaveKey = () => {
+    if (apiKeyInput.trim()) {
+        setApiKey(apiKeyInput.trim());
+        setAiStatus(true);
+        alert(t.keySaved);
+    }
+  };
+
+  const handleClearKey = () => {
+    clearApiKey();
+    setApiKeyInput('');
+    setAiStatus(false);
+    alert(t.keyCleared);
+  };
 
   const handleThemeChange = (newTheme: 'light' | 'dark') => {
     setTheme(newTheme);
@@ -183,7 +208,6 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
             alert(t.restoreFail);
         }
     };
-    // FIX: Corrected the method name from `readText` to `readAsText` for the FileReader API to properly read the uploaded backup file.
     reader.readAsText(file);
   };
 
@@ -256,29 +280,41 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
 
              <section className="card-glass p-6">
                 <h2 className="text-2xl font-bold mb-4">{t.aiSettingsTitle}</h2>
-                <div className="flex flex-col sm:flex-row gap-4 items-start">
-                    <div className="flex-grow">
-                        <div className="flex items-center gap-3 mb-2">
-                            <span className="font-semibold">{t.aiStatusLabel}</span>
-                            {aiStatus ? (
-                                <span className="flex items-center gap-2 px-3 py-1 text-sm font-medium text-green-800 bg-green-100 dark:text-green-100 dark:bg-green-700/50 rounded-full">
-                                    <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                                    {t.aiStatusActive}
-                                </span>
-                            ) : (
-                                <span className="flex items-center gap-2 px-3 py-1 text-sm font-medium text-red-800 bg-red-100 dark:text-red-100 dark:bg-red-700/50 rounded-full">
-                                    <span className="w-2 h-2 bg-red-500 rounded-full"></span>
-                                    {t.aiStatusInactive}
-                                </span>
-                            )}
-                        </div>
-                        <p className="text-sm text-slate-500 dark:text-slate-400">
-                           {t.aiDesc}
-                        </p>
+                 <div className="flex items-center gap-3 mb-3">
+                    <span className="font-semibold">{t.aiStatusLabel}</span>
+                    {aiStatus ? (
+                        <span className="flex items-center gap-2 px-3 py-1 text-sm font-medium text-green-800 bg-green-100 dark:text-green-100 dark:bg-green-700/50 rounded-full">
+                            <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                            {t.aiStatusActive}
+                        </span>
+                    ) : (
+                        <span className="flex items-center gap-2 px-3 py-1 text-sm font-medium text-red-800 bg-red-100 dark:text-red-100 dark:bg-red-700/50 rounded-full">
+                            <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                            {t.aiStatusInactive}
+                        </span>
+                    )}
+                </div>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">{t.aiDesc}</p>
+
+                <div>
+                    <label htmlFor="apiKey" className="block text-sm font-medium text-slate-800 dark:text-slate-300 mb-1">{t.apiKeyLabel}</label>
+                    <div className="relative">
+                        <input
+                            id="apiKey"
+                            type={showKey ? 'text' : 'password'}
+                            value={apiKeyInput}
+                            onChange={(e) => setApiKeyInput(e.target.value)}
+                            className="form-input pr-10"
+                            placeholder="******************"
+                        />
+                        <button type="button" onClick={() => setShowKey(!showKey)} className="absolute inset-y-0 right-0 px-3 flex items-center text-slate-500">
+                            <i className={`fa-solid ${showKey ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                        </button>
                     </div>
-                     <a href="https://zalo.me/0795555789" target="_blank" rel="noopener noreferrer" className="btn btn-primary mt-2 sm:mt-0 flex-shrink-0">
-                        <i className="fa-solid fa-key mr-2"></i> {t.aiContact}
-                    </a>
+                </div>
+                <div className="flex gap-2 mt-3">
+                    <button onClick={handleSaveKey} className="btn btn-primary flex-1"><i className="fa-solid fa-save mr-2"></i>{t.saveKey}</button>
+                    <button onClick={handleClearKey} className="btn btn-secondary flex-1"><i className="fa-solid fa-trash mr-2"></i>{t.clearKey}</button>
                 </div>
             </section>
 

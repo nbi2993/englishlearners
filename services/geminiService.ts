@@ -2,33 +2,59 @@ import { GoogleGenAI, Type, Chat } from "@google/genai";
 import type { WritingFeedback } from '../types';
 
 let aiInstance: GoogleGenAI | null = null;
+let currentApiKey: string | null = null;
+
+const API_KEY_STORAGE_KEY = 'ivs-gemini-api-key';
+
+const getApiKey = (): string | null => {
+  try {
+    return localStorage.getItem(API_KEY_STORAGE_KEY);
+  } catch (e) {
+    console.error("Could not access localStorage:", e);
+    return null;
+  }
+};
+
+export const setApiKey = (key: string): void => {
+  try {
+    localStorage.setItem(API_KEY_STORAGE_KEY, key);
+    aiInstance = null; // Force re-initialization on next use
+  } catch (e) {
+    console.error("Could not save API key to localStorage:", e);
+  }
+};
+
+export const clearApiKey = (): void => {
+  try {
+    localStorage.removeItem(API_KEY_STORAGE_KEY);
+    aiInstance = null; // Clear the instance
+  } catch (e) {
+    console.error("Could not clear API key from localStorage:", e);
+  }
+};
 
 /**
- * Lazily initializes and returns the GoogleGenAI instance.
- * This avoids a startup crash if the API key is not set.
+ * Lazily initializes and returns the GoogleGenAI instance using the key from localStorage.
  * Throws an error if the API key is not available when an AI feature is used.
  */
 function getAiInstance(): GoogleGenAI {
-  if (!aiInstance) {
-    const API_KEY = process.env.API_KEY;
+  const storedApiKey = getApiKey();
 
-    if (!API_KEY) {
-      // This error will be caught by the calling functions in the components.
-      throw new Error("API_KEY is not set in environment variables. Please set it and redeploy.");
-    }
-
-    aiInstance = new GoogleGenAI({ apiKey: API_KEY });
+  if (!storedApiKey) {
+    throw new Error("API key is not configured. Please set it in the AI Settings.");
   }
+  
+  // Re-initialize if the key has changed or instance doesn't exist
+  if (!aiInstance || storedApiKey !== currentApiKey) {
+    currentApiKey = storedApiKey;
+    aiInstance = new GoogleGenAI({ apiKey: currentApiKey });
+  }
+
   return aiInstance;
 }
 
 export const isAiConfigured = (): boolean => {
-  try {
-    getAiInstance();
-    return true;
-  } catch (e) {
-    return false;
-  }
+  return !!getApiKey();
 };
 
 export const gradeWriting = async (topic: string, text: string): Promise<WritingFeedback> => {
@@ -49,7 +75,6 @@ export const gradeWriting = async (topic: string, text: string): Promise<Writing
           coherence: { type: Type.STRING, description: 'Specific feedback on the structure and flow.' },
           score: { type: Type.INTEGER, description: 'A score from 0 to 100.' },
         },
-        // FIX: Removed invalid 'required' property from responseSchema.
       },
       temperature: 0.2
     },
