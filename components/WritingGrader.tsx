@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { gradeWriting, isAiConfigured } from '../services/geminiService';
 import type { WritingFeedback, View } from '../types';
+import FeedbackSkeleton from './FeedbackSkeleton';
 
 interface WritingGraderProps {
   language: 'en' | 'vi';
@@ -31,7 +32,6 @@ const WritingGrader: React.FC<WritingGraderProps> = ({ language, setView }) => {
       buttonGrading: "Grading...",
       buttonGrade: "Grade My Writing",
       feedbackTitle: "Feedback",
-      analyzing: "Our AI is analyzing your text...",
       scoreLabel: "Overall Score",
       overallLabel: "Overall",
       grammarLabel: "Grammar",
@@ -53,7 +53,6 @@ const WritingGrader: React.FC<WritingGraderProps> = ({ language, setView }) => {
       buttonGrading: "Đang chấm...",
       buttonGrade: "Chấm bài của tôi",
       feedbackTitle: "Phản hồi",
-      analyzing: "AI của chúng tôi đang phân tích bài viết của bạn...",
       scoreLabel: "Điểm Tổng thể",
       overallLabel: "Tổng quan",
       grammarLabel: "Ngữ pháp",
@@ -158,12 +157,7 @@ const WritingGrader: React.FC<WritingGraderProps> = ({ language, setView }) => {
           <div className="card-glass p-6 flex-grow">
             <h2 className="text-2xl font-bold mb-4">{t.feedbackTitle}</h2>
             {error && <div className="alert-danger">{error}</div>}
-            {isLoading && (
-              <div className="text-center py-8">
-                <i className="fa-solid fa-robot text-4xl text-blue-500 animate-bounce"></i>
-                <p className="mt-4 text-slate-500 dark:text-slate-400">{t.analyzing}</p>
-              </div>
-            )}
+            {isLoading && <FeedbackSkeleton />}
             {feedback && (
               <div className="space-y-6 animate-fade-in">
                 <div className="text-center p-4 rounded-lg bg-slate-100 dark:bg-slate-700/50">

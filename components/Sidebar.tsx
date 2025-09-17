@@ -6,10 +6,12 @@ interface SidebarProps {
   currentView: View;
   setView: (view: View) => void;
   language: 'en' | 'vi';
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ user, currentView, setView, language }) => {
-  const [isExpanded, setIsExpanded] = useState(false); // Default to collapsed
+const Sidebar: React.FC<SidebarProps> = ({ user, currentView, setView, language, isOpen, onClose }) => {
+  const [isExpanded, setIsExpanded] = useState(false); // Default to collapsed for desktop
   
   const translations = {
     en: {
@@ -53,52 +55,69 @@ const Sidebar: React.FC<SidebarProps> = ({ user, currentView, setView, language 
       { id: 'user-guide', icon: 'fa-circle-question', label: t.userGuide },
     ]
   ];
+  
+  // For mobile, the sidebar is always "expanded" visually when it's open
+  const showLabels = isExpanded || isOpen;
 
   return (
-    <nav className={`sidebar-glass flex flex-col shadow-lg ${isExpanded ? 'w-64' : 'w-16'}`}>
-      <div className={`p-4 flex items-center border-b border-slate-200/80 dark:border-slate-700/80 ${isExpanded ? 'justify-between' : 'justify-center'}`}>
-        {isExpanded && <span className="text-xl font-bold text-blue-600 dark:text-blue-400">IVS English</span>}
-        <button onClick={() => setIsExpanded(!isExpanded)} className="btn btn-secondary h-8 w-8 !p-0">
-          <i className={`fa-solid ${isExpanded ? 'fa-chevron-left' : 'fa-chevron-right'}`}></i>
-        </button>
-      </div>
-      
-      <ul className="flex-1 px-2 py-4 custom-scrollbar overflow-y-auto">
-        {navGroups.map((group, groupIndex) => (
-          <React.Fragment key={`group-${groupIndex}`}>
-            {group.map(item => (
-              <li key={item.id}>
-                <button
-                  onClick={() => setView(item.id as View)}
-                  className={`w-full flex items-center p-3 my-1 rounded-lg transition-colors duration-200 ${
-                    currentView === item.id 
-                      ? 'bg-blue-500 text-white shadow-md' 
-                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200/80 dark:hover:bg-slate-700/80'
-                  } ${isExpanded ? '' : 'justify-center'}`}
-                  title={item.label}
-                >
-                  <i className={`fa-solid ${item.icon} text-lg ${isExpanded ? 'mr-4 w-6 text-center' : ''}`}></i>
-                  {isExpanded && <span className="font-medium">{item.label}</span>}
-                </button>
-              </li>
-            ))}
-            {groupIndex < navGroups.length - 1 && (
-              <li key={`divider-${groupIndex}`}>
-                <hr className="my-2 border-slate-200 dark:border-slate-700 mx-3" />
-              </li>
-            )}
-          </React.Fragment>
-        ))}
-      </ul>
-      
-      <div className="p-4 mt-auto border-t border-slate-200/80 dark:border-slate-700/80 text-center">
-        {isExpanded ? (
-          <p className="text-xs text-slate-500 dark:text-slate-400">© 2025 IVS JSC</p>
-        ) : (
-          <i className="fa-solid fa-copyright text-slate-500 dark:text-slate-400"></i>
-        )}
-      </div>
-    </nav>
+    <>
+      {/* Overlay for mobile */}
+      <div 
+        className={`fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden transition-opacity ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        onClick={onClose}
+        aria-hidden="true"
+      ></div>
+
+      <nav className={`sidebar-glass flex flex-col shadow-lg fixed inset-y-0 left-0 z-40 transform transition-transform duration-300 md:relative md:transform-none ${isExpanded ? 'w-64' : 'w-16'} ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className={`p-4 flex items-center border-b border-slate-200/80 dark:border-slate-700/80 ${showLabels ? 'justify-between' : 'justify-center'}`}>
+          {showLabels && <span className="text-xl font-bold text-blue-600 dark:text-blue-400">IVS English</span>}
+          {/* Desktop expand/collapse button */}
+          <button onClick={() => setIsExpanded(!isExpanded)} className="hidden md:flex btn btn-secondary h-8 w-8 !p-0">
+            <i className={`fa-solid ${isExpanded ? 'fa-chevron-left' : 'fa-chevron-right'}`}></i>
+          </button>
+          {/* Mobile close button */}
+           <button onClick={onClose} className="md:hidden btn btn-secondary h-8 w-8 !p-0">
+            <i className="fa-solid fa-times"></i>
+          </button>
+        </div>
+        
+        <ul className="flex-1 px-2 py-4 custom-scrollbar overflow-y-auto">
+          {navGroups.map((group, groupIndex) => (
+            <React.Fragment key={`group-${groupIndex}`}>
+              {group.map(item => (
+                <li key={item.id}>
+                  <button
+                    onClick={() => setView(item.id as View)}
+                    className={`w-full flex items-center p-3 my-1 rounded-lg transition-colors duration-200 ${
+                      currentView === item.id 
+                        ? 'bg-blue-500 text-white shadow-md' 
+                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200/80 dark:hover:bg-slate-700/80'
+                    } ${showLabels ? '' : 'justify-center'}`}
+                    title={item.label}
+                  >
+                    <i className={`fa-solid ${item.icon} text-lg ${showLabels ? 'mr-4 w-6 text-center' : ''}`}></i>
+                    {showLabels && <span className="font-medium">{item.label}</span>}
+                  </button>
+                </li>
+              ))}
+              {groupIndex < navGroups.length - 1 && (
+                <li key={`divider-${groupIndex}`}>
+                  <hr className="my-2 border-slate-200 dark:border-slate-700 mx-3" />
+                </li>
+              )}
+            </React.Fragment>
+          ))}
+        </ul>
+        
+        <div className="p-4 mt-auto border-t border-slate-200/80 dark:border-slate-700/80 text-center">
+          {showLabels ? (
+            <p className="text-xs text-slate-500 dark:text-slate-400">© 2025 IVS JSC</p>
+          ) : (
+            <i className="fa-solid fa-copyright text-slate-500 dark:text-slate-400"></i>
+          )}
+        </div>
+      </nav>
+    </>
   );
 };
 

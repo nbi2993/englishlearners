@@ -29,6 +29,7 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses
   const [isAddEditClassModalOpen, setIsAddEditClassModalOpen] = useState(false);
   const [isAddStudentModalOpen, setIsAddStudentModalOpen] = useState(false);
   const [isDeleteClassModalOpen, setIsDeleteClassModalOpen] = useState(false);
+  const [isActionMenuOpen, setIsActionMenuOpen] = useState(false);
 
   const [classToEdit, setClassToEdit] = useState<{ id: string; data: ClassData } | null>(null);
   const [classToDelete, setClassToDelete] = useState<{ id: string; data: ClassData } | null>(null);
@@ -39,6 +40,7 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses
 
   const t = {
     en: {
+      actions: "Actions",
       noClassesTitle: "No Classes Found",
       noClassesDesc: "Get started by creating your first class.",
       createClass: "Create Class",
@@ -93,6 +95,7 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses
       }
     },
     vi: {
+      actions: "Hành động",
       noClassesTitle: "Không tìm thấy Lớp học",
       noClassesDesc: "Bắt đầu bằng cách tạo lớp học đầu tiên của bạn.",
       createClass: "Tạo Lớp",
@@ -361,9 +364,22 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses
             <h1 className="text-4xl font-bold text-slate-900 dark:text-white">{t.dashboardTitle}</h1>
             <p className="mt-1 text-lg text-slate-600 dark:text-slate-400">{t.dashboardDesc}</p>
           </div>
-          <div className="flex items-center gap-2">
+          {/* Desktop Buttons */}
+          <div className="hidden sm:flex items-center gap-2">
             <button onClick={() => setIsHomeworkModalOpen(true)} className="btn btn-secondary"><i className="fa-solid fa-file-pen mr-2"></i> {t.assign}</button>
             <button onClick={() => setIsTestModalOpen(true)} className="btn btn-primary"><i className="fa-solid fa-vial-circle-check mr-2"></i> {t.createTest}</button>
+          </div>
+          {/* Mobile Dropdown */}
+          <div className="sm:hidden relative">
+            <button onClick={() => setIsActionMenuOpen(!isActionMenuOpen)} onBlur={() => setTimeout(() => setIsActionMenuOpen(false), 200)} className="btn btn-secondary w-full">
+              {t.actions} <i className="fa-solid fa-chevron-down ml-2 text-xs"></i>
+            </button>
+            {isActionMenuOpen && (
+              <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-slate-700 rounded-lg shadow-xl z-10 animate-fade-in">
+                  <button onClick={() => { setIsHomeworkModalOpen(true); setIsActionMenuOpen(false); }} className="w-full text-left px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-600 rounded-t-lg"><i className="fa-solid fa-file-pen mr-2 w-4"></i> {t.assign}</button>
+                  <button onClick={() => { setIsTestModalOpen(true); setIsActionMenuOpen(false); }} className="w-full text-left px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-600 rounded-b-lg"><i className="fa-solid fa-vial-circle-check mr-2 w-4"></i> {t.createTest}</button>
+              </div>
+            )}
           </div>
         </div>
       </header>

@@ -29,6 +29,7 @@
         goToAiSettings: "Go to AI Settings",
         aiWarningTitle: "AI Service Inactive",
         aiWarningBody: "AI features are not working because the API key is not configured. Please set it up in settings.",
+        typing: "Sparky is typing"
       },
       vi: {
         initialMessage: "Xin chào! Tôi là Sparky, gia sư tiếng Anh thân thiện của bạn. Hôm nay bạn muốn nói về chủ đề gì? 😊",
@@ -40,6 +41,7 @@
         goToAiSettings: "Đi đến Cài đặt AI",
         aiWarningTitle: "Dịch vụ AI không hoạt động",
         aiWarningBody: "Các tính năng AI không hoạt động vì khóa API chưa được định cấu hình. Vui lòng thiết lập trong phần cài đặt.",
+        typing: "Sparky đang nhập"
       }
     }[language];
 
@@ -148,11 +150,16 @@
                           </div>
                       </div>
                   ))}
-                  {isLoading && messages[messages.length-1].role === 'user' && (
+                  {isLoading && (
                       <div className="flex items-end gap-3">
                           <i className="fa-solid fa-robot text-2xl text-blue-500 mb-2"></i>
                           <div className="max-w-md lg:max-w-lg p-3 rounded-2xl bg-slate-200 dark:bg-slate-700 rounded-bl-none">
-                              <p className="text-sm leading-relaxed"><i className="fa-solid fa-spinner animate-spin"></i></p>
+                              <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                                  <span>{t.typing}</span>
+                                  <div className="typing-indicator">
+                                    <span></span><span></span><span></span>
+                                  </div>
+                              </div>
                           </div>
                       </div>
                   )}

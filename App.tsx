@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Sidebar from './components/Sidebar';
+import Header from './components/Header';
 import Home from './components/Home';
 import TeacherDashboard from './components/TeacherDashboard';
 import WritingGrader from './components/WritingGrader';
@@ -21,6 +22,7 @@ const App: React.FC = () => {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [fontSize, setFontSize] = useState('16px');
   const [fontWeight, setFontWeight] = useState(400);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     // Load saved data from localStorage
@@ -117,6 +119,11 @@ const App: React.FC = () => {
   const handleBackToView = () => {
     setSelectedCourse(null);
   }
+
+  const handleSetView = (newView: View) => {
+    setView(newView);
+    setIsSidebarOpen(false); // Close sidebar on navigation
+  }
   
   const renderContent = () => {
     if (selectedCourse) {
@@ -158,10 +165,13 @@ const App: React.FC = () => {
   return (
     <div className={`app-container h-full`}>
       <div className="flex h-screen bg-transparent">
-        <Sidebar user={user} currentView={view} setView={setView} language={language} />
-        <main className="flex-1 overflow-y-auto custom-scrollbar">
-            {renderContent()}
-        </main>
+        <Sidebar user={user} currentView={view} setView={handleSetView} language={language} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+        <div className="flex-1 flex flex-col h-screen">
+          <Header currentView={view} language={language} onMenuClick={() => setIsSidebarOpen(true)} />
+          <main className="flex-1 overflow-y-auto custom-scrollbar">
+              {renderContent()}
+          </main>
+        </div>
       </div>
     </div>
   );

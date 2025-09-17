@@ -67,4 +67,4 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onSelect, isPinned, onP
   );
 };
 
-export default CourseCard;
+export default React.memo(CourseCard);
