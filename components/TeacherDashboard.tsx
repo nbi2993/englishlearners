@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import * as XLSX from 'xlsx';
 import type { Classes, Student, ClassData, ClassScheduleItem } from '../types';
 import StudentCard from './StudentCard';
 import StudentRow from './StudentRow'; // Import the new component
@@ -19,6 +20,7 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses
   const [expandedClassId, setExpandedClassId] = useState<string | null>(Object.keys(classes)[0] || null);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [classForNewStudent, setClassForNewStudent] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   
   // Modal states
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
@@ -54,6 +56,19 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses
       collapse: "Collapse",
       editClass: "Edit Class",
       deleteClass: "Delete Class",
+      manageStudentsTitle: "Manage Students",
+      addStudentManually: "Add Manually",
+      addStudentManuallyDesc: "Add students one by one by entering their name.",
+      importFromExcel: "Import from Excel",
+      importFromExcelDesc: "Download the template, fill in student names, and upload to add in bulk.",
+      downloadTemplate: "Download Template",
+      uploadFile: "Upload File",
+      uploading: "Uploading...",
+      alert: {
+        noNames: "No student names found in the file.",
+        success: (count: number) => `${count} students added successfully!`,
+        fail: "Failed to process the Excel file.",
+      }
     },
     vi: {
       noClassesTitle: "Không tìm thấy Lớp học",
@@ -74,6 +89,19 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses
       collapse: "Thu gọn",
       editClass: "Sửa Lớp",
       deleteClass: "Xóa Lớp",
+      manageStudentsTitle: "Quản lý Học sinh",
+      addStudentManually: "Thêm thủ công",
+      addStudentManuallyDesc: "Thêm từng học sinh một bằng cách nhập tên.",
+      importFromExcel: "Thêm từ Excel",
+      importFromExcelDesc: "Tải file mẫu, điền tên học sinh và tải lên để thêm hàng loạt.",
+      downloadTemplate: "Tải mẫu",
+      uploadFile: "Tải file",
+      uploading: "Đang tải...",
+      alert: {
+        noNames: "Không tìm thấy tên học sinh nào trong tệp.",
+        success: (count: number) => `${count} học sinh đã được thêm thành công!`,
+        fail: "Không thể xử lý tệp Excel.",
+      }
     }
   }[language];
   
@@ -128,6 +156,59 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses
     setClasses(updatedClasses);
     setIsAddStudentModalOpen(false);
     setClassForNewStudent(null);
+  };
+
+  const handleDownloadTemplate = () => {
+    const ws = XLSX.utils.json_to_sheet([{ "Student Name": "" }]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Students");
+    XLSX.writeFile(wb, "student_template.xlsx");
+  };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>, classId: string) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target!.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: "array" });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const json: (string[])[] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+        
+        const studentNames = json.slice(1).map(row => row[0]).filter(name => name && typeof name === 'string' && name.trim() !== '');
+
+        if (studentNames.length === 0) {
+          alert(t.alert.noNames);
+          return;
+        }
+
+        const newStudents: Student[] = studentNames.map((name, index) => ({
+            id: `s-${Date.now()}-${index}`,
+            name: name.trim(),
+            avatar: `https://i.pravatar.cc/150?u=${name.trim().replace(/\s/g, '')}`,
+            lastActivity: 'Never', progress: 0, averageScore: 0, timeSpent: '0h 0m',
+            isStruggling: false, scoreHistory: [], assignments: [], grades: [],
+        }));
+
+        const updatedClasses = { ...classes };
+        updatedClasses[classId].students.push(...newStudents);
+        setClasses(updatedClasses);
+
+        alert(t.alert.success(studentNames.length));
+      } catch (error) {
+        console.error("Error processing Excel file:", error);
+        alert(t.alert.fail);
+      } finally {
+        setIsUploading(false);
+        event.target.value = '';
+      }
+    };
+    reader.readAsArrayBuffer(file);
   };
 
   if (Object.keys(classes).length === 0) {
@@ -204,33 +285,51 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ classes, setClasses
               {isExpanded && (
                 <div className="p-4 border-t dark:border-slate-700 animate-fade-in">
                   {classData.students.length > 0 ? (
-                    <>
-                      {/* Desktop Grid */}
                       <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {classData.students.map(student => (
                           <StudentCard key={student.id} student={student} onReportClick={() => handleOpenReport(student)} language={language} />
                         ))}
                       </div>
-                      {/* Mobile List */}
-                      <div className="md:hidden space-y-3">
-                         {classData.students.map(student => (
-                          <StudentRow key={student.id} student={student} onReportClick={() => handleOpenReport(student)} language={language} />
-                        ))}
-                      </div>
-                      <div className="mt-4 text-center">
-                        <button onClick={() => { setClassForNewStudent(classId); setIsAddStudentModalOpen(true); }} className="btn btn-primary-outline text-sm">
-                            <i className="fa-solid fa-user-plus mr-2"></i> {t.addStudent}
-                        </button>
-                      </div>
-                    </>
                   ) : (
-                    <div className="text-center py-6">
-                      <p className="text-slate-500 mb-4">{t.noStudents}</p>
-                      <button onClick={() => { setClassForNewStudent(classId); setIsAddStudentModalOpen(true); }} className="btn btn-primary">
-                        <i className="fa-solid fa-user-plus mr-2"></i> {t.addStudent}
-                      </button>
+                    <div className="text-center py-6 text-slate-500">{t.noStudents}</div>
+                  )}
+                  {/* Mobile List */}
+                  {classData.students.length > 0 && (
+                    <div className="md:hidden space-y-3">
+                        {classData.students.map(student => (
+                        <StudentRow key={student.id} student={student} onReportClick={() => handleOpenReport(student)} language={language} />
+                      ))}
                     </div>
                   )}
+
+                  {/* Student Management Section */}
+                  <div className="mt-6 pt-6 border-t dark:border-slate-700">
+                      <h4 className="font-semibold text-center mb-4">{t.manageStudentsTitle}</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start max-w-2xl mx-auto">
+                          <div className="card-glass p-4 text-center bg-slate-50 dark:bg-slate-800/50">
+                              <h5 className="font-medium mb-2">{t.addStudentManually}</h5>
+                              <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">{t.addStudentManuallyDesc}</p>
+                              <button onClick={() => { setClassForNewStudent(classId); setIsAddStudentModalOpen(true); }} className="btn btn-secondary w-full text-sm">
+                                  <i className="fa-solid fa-user-plus mr-2"></i> {t.addStudent}
+                              </button>
+                          </div>
+                          <div className="card-glass p-4 text-center bg-slate-50 dark:bg-slate-800/50">
+                              <h5 className="font-medium mb-2">{t.importFromExcel}</h5>
+                              <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">{t.importFromExcelDesc}</p>
+                              <div className="flex gap-2 justify-center">
+                                  <button onClick={handleDownloadTemplate} className="btn btn-secondary-outline text-sm flex-1">
+                                      <i className="fa-solid fa-download mr-2"></i> {t.downloadTemplate}
+                                  </button>
+                                  <label className={`btn btn-secondary-outline text-sm flex-1 cursor-pointer ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                                      <i className={`fa-solid ${isUploading ? 'fa-spinner animate-spin' : 'fa-upload'} mr-2`}></i> 
+                                      {isUploading ? t.uploading : t.uploadFile}
+                                      <input type="file" accept=".xlsx, .xls" className="hidden" onChange={(e) => handleFileUpload(e, classId)} disabled={isUploading} />
+                                  </label>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+
                 </div>
               )}
             </div>
