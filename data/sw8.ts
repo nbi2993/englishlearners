@@ -1,4 +1,5 @@
 
+
 import { CurriculumLevel } from '../types';
 
 // Fix: Renamed sw7Data to sw8Data and updated content to reflect Grade 8.
@@ -9,11 +10,11 @@ export const sw8Data: CurriculumLevel = {
     ebookPdfUrl: 'https://drive.google.com/file/d/1gbl9bh_HnkYwHZeRkP6gGJ0dJ5wn0PUf/view?usp=drive_link', // Note: This URL might still be for SW7.
     units: [
         {
-            id: 701,
+            id: 801,
             title: { en: 'Unit 1: Free Time', vi: 'Bài 1: Thời gian rảnh' },
             lessons: [
                 {
-                    id: 70101,
+                    id: 80101,
                     title: { en: 'Lesson 1: Hobbies', vi: 'Bài học 1: Sở thích' },
                     aims: {
                         en: ['Ask and answer about hobbies', 'Use the Present Simple for habits'],
@@ -33,7 +34,7 @@ export const sw8Data: CurriculumLevel = {
                     activities: [],
                 },
                 {
-                    id: 70102,
+                    id: 80102,
                     title: { en: 'Lesson 2: Making Plans', vi: 'Bài học 2: Lên kế hoạch' },
                     aims: {
                         en: ['Make future plans', 'Use the Present Continuous for future plans and prepositions of place', 'Start a friendly conversation'],
@@ -55,7 +56,7 @@ export const sw8Data: CurriculumLevel = {
                     activities: [],
                 },
                 {
-                    id: 70103,
+                    id: 80103,
                     title: { en: 'Lesson 3: Extreme Sports', vi: 'Bài học 3: Thể thao mạo hiểm' },
                     aims: {
                         en: ['Talk about extreme sports', 'Write emails inviting people to join you in an activity'],
@@ -73,11 +74,11 @@ export const sw8Data: CurriculumLevel = {
             ]
         },
         {
-            id: 702,
+            id: 802,
             title: { en: 'Unit 2: Health', vi: 'Bài 2: Sức khỏe' },
             lessons: [
                  {
-                    id: 70201,
+                    id: 80201,
                     title: { en: 'Lesson 1: Healthy Lifestyle', vi: 'Bài học 1: Lối sống lành mạnh' },
                     aims: {
                         en: ['Talk about what makes a healthy lifestyle', 'Use indefinite quantifiers'],
@@ -98,7 +99,7 @@ export const sw8Data: CurriculumLevel = {
                     activities: []
                 },
                 {
-                    id: 70202,
+                    id: 80202,
                     title: { en: 'Lesson 2: Advice', vi: 'Bài học 2: Lời khuyên' },
                     aims: {
                         en: ['Give advice and persuade someone to have a healthy lifestyle', 'Use "should" and "shouldn\'t"'],
@@ -121,7 +122,7 @@ export const sw8Data: CurriculumLevel = {
                     activities: []
                 },
                 {
-                    id: 70203,
+                    id: 80203,
                     title: { en: 'Lesson 3: Healthy Food', vi: 'Bài học 3: Thực phẩm lành mạnh' },
                     aims: {
                         en: ['Talk about healthy food', 'Write a request letter'],
@@ -134,11 +135,11 @@ export const sw8Data: CurriculumLevel = {
             ]
         },
         {
-            id: 703,
+            id: 803,
             title: { en: 'Unit 3: Music and Arts', vi: 'Bài 3: Âm nhạc và Nghệ thuật' },
             lessons: [
                 {
-                    id: 70301,
+                    id: 80301,
                     title: {en: 'Lesson 1: Music Types', vi: 'Bài học 1: Các loại nhạc'},
                     aims: {
                         en: ['Talk about music that you like', 'Use the Present Simple for facts'],
@@ -159,7 +160,7 @@ export const sw8Data: CurriculumLevel = {
                     activities: []
                 },
                 {
-                    id: 70302,
+                    id: 80302,
                     title: {en: 'Lesson 2: Music Events', vi: 'Bài học 2: Sự kiện âm nhạc'},
                     aims: {
                         en: ['Plan to go to a music event', 'Use prepositions of time and possessive adjectives'],
@@ -180,7 +181,7 @@ export const sw8Data: CurriculumLevel = {
                     activities: []
                 },
                 {
-                    id: 70303,
+                    id: 80303,
                     title: {en: 'Lesson 3: Movies', vi: 'Bài học 3: Phim ảnh'},
                     aims: {
                         en: ['Talk about a movie you like', 'Write a paragraph describing a movie'],
@@ -198,11 +199,11 @@ export const sw8Data: CurriculumLevel = {
             ]
         },
         {
-            id: 704,
+            id: 804,
             title: { en: 'Unit 4: Community Services', vi: 'Bài 4: Dịch vụ Cộng đồng' },
             lessons: [
                 {
-                    id: 70401,
+                    id: 80401,
                     title: {en: 'Lesson 1: Charity Events', vi: 'Bài học 1: Sự kiện từ thiện'},
                     aims: {
                         en: ['Suggest and plan a charity event', 'Use "should," "Let\'s," and "How about" to make suggestions'],
@@ -222,7 +223,7 @@ export const sw8Data: CurriculumLevel = {
                     activities: []
                 },
                 {
-                    id: 70402,
+                    id: 80402,
                     title: {en: 'Lesson 2: Helping the Community', vi: 'Bài học 2: Giúp đỡ cộng đồng'},
                     aims: {
                         en: ['Talk about things we did to help our community', 'Use the Past Simple with regular verbs'],
@@ -242,7 +243,7 @@ export const sw8Data: CurriculumLevel = {
                     activities: []
                 },
                 {
-                    id: 70403,
+                    id: 80403,
                     title: {en: 'Lesson 3: Environmental Clean-up', vi: 'Bài học 3: Dọn dẹp môi trường'},
                     aims: {
                         en: ['Talk about how to help the environment', 'Write an email about an environmental clean-up'],
@@ -255,11 +256,11 @@ export const sw8Data: CurriculumLevel = {
             ]
         },
         {
-            id: 705,
+            id: 805,
             title: { en: 'Unit 5: Food and Drinks', vi: 'Bài 5: Đồ ăn và Thức uống' },
             lessons: [
                 {
-                    id: 70501,
+                    id: 80501,
                     title: {en: 'Lesson 1: Ingredients', vi: 'Bài học 1: Nguyên liệu'},
                     aims: {
                         en: ['Talk about what food you need to buy', 'Use quantifiers and amounts'],
@@ -282,7 +283,7 @@ export const sw8Data: CurriculumLevel = {
                     activities: []
                 },
                 {
-                    id: 70502,
+                    id: 80502,
                     title: {en: 'Lesson 2: Containers', vi: 'Bài học 2: Đồ đựng'},
                     aims: {
                         en: ['Talk about containers and quantities of food and drinks', 'Use indefinite and definite articles'],
@@ -304,7 +305,7 @@ export const sw8Data: CurriculumLevel = {
                     activities: []
                 },
                 {
-                    id: 70503,
+                    id: 80503,
                     title: {en: 'Lesson 3: Unusual Food', vi: 'Bài học 3: Món ăn lạ'},
                     aims: {
                         en: ['Talk about unusual food posts in Vietnam', 'Write a food blog post'],
@@ -317,11 +318,11 @@ export const sw8Data: CurriculumLevel = {
             ]
         },
         {
-            id: 706,
+            id: 806,
             title: { en: 'Unit 6: Education', vi: 'Bài 6: Giáo dục' },
             lessons: [
                 {
-                    id: 70601,
+                    id: 80601,
                     title: {en: 'Lesson 1: School Work', vi: 'Bài học 1: Việc học ở trường'},
                     aims: {
                         en: ['Decline invitations and express obligations', 'Use Present Simple and "have to"'],
@@ -342,7 +343,7 @@ export const sw8Data: CurriculumLevel = {
                     activities: []
                 },
                 {
-                    id: 70602,
+                    id: 80602,
                     title: {en: 'Lesson 2: Feelings about School', vi: 'Bài học 2: Cảm xúc về trường học'},
                     aims: {
                         en: ['Talk about how you feel about school', 'Use intensifiers and "because"'],
@@ -365,7 +366,7 @@ export const sw8Data: CurriculumLevel = {
                     activities: []
                 },
                 {
-                    id: 70603,
+                    id: 80603,
                     title: {en: 'Lesson 3: Studying Abroad', vi: 'Bài học 3: Du học'},
                     aims: {
                         en: ['Talk about studying abroad', 'Write a paragraph about studying abroad'],
@@ -381,11 +382,11 @@ export const sw8Data: CurriculumLevel = {
             ]
         },
         {
-            id: 707,
+            id: 807,
             title: { en: 'Unit 7: Transportation', vi: 'Bài 7: Giao thông' },
             lessons: [
                 {
-                    id: 70701,
+                    id: 80701,
                     title: {en: 'Lesson 1: At the Airport', vi: 'Bài học 1: Ở sân bay'},
                     aims: {
                         en: ['Describe and identify personal belongings', 'Use possessive pronouns and adjectives in order'],
@@ -407,7 +408,7 @@ export const sw8Data: CurriculumLevel = {
                     activities: []
                 },
                 {
-                    id: 70702,
+                    id: 80702,
                     title: {en: 'Lesson 2: Types of Transportation', vi: 'Bài học 2: Các loại phương tiện giao thông'},
                     aims: {
                         en: ['Compare different types of transportation', 'Use "(not) as...as..." to compare things'],
@@ -429,7 +430,7 @@ export const sw8Data: CurriculumLevel = {
                     activities: []
                 },
                 {
-                    id: 70703,
+                    id: 80703,
                     title: {en: 'Lesson 3: Personal Transport', vi: 'Bài học 3: Phương tiện cá nhân'},
                     aims: {
                         en: ['Talk about transportation', 'Write an opinion paragraph about a type of transportation'],
@@ -442,11 +443,11 @@ export const sw8Data: CurriculumLevel = {
             ]
         },
         {
-            id: 708,
+            id: 808,
             title: { en: 'Unit 8: Festivals around the World', vi: 'Bài 8: Các lễ hội trên thế giới' },
             lessons: [
                 {
-                    id: 70801,
+                    id: 80801,
                     title: {en: 'Lesson 1: Festivals', vi: 'Bài học 1: Lễ hội'},
                     aims: {
                         en: ['Talk about the festivals around the world', 'Use the Future Simple'],
@@ -468,7 +469,7 @@ export const sw8Data: CurriculumLevel = {
                     activities: []
                 },
                 {
-                    id: 70802,
+                    id: 80802,
                     title: {en: 'Lesson 2: Traditions', vi: 'Bài học 2: Truyền thống'},
                     aims: {
                         en: ['Compare how different countries celebrate festivals', 'Use "like" and "different from" to compare'],
@@ -489,7 +490,7 @@ export const sw8Data: CurriculumLevel = {
                     activities: []
                 },
                 {
-                    id: 70803,
+                    id: 80803,
                     title: {en: 'Lesson 3: Local Festivals', vi: 'Bài học 3: Lễ hội địa phương'},
                     aims: {
                         en: ['Talk about unusual festivals in Vietnam', 'Write a blog post about your favorite festivals'],
@@ -502,11 +503,11 @@ export const sw8Data: CurriculumLevel = {
             ]
         },
         {
-            id: 709,
+            id: 809,
             title: { en: 'Unit 9: English in the World', vi: 'Bài 9: Tiếng Anh trên thế giới' },
             lessons: [
                 {
-                    id: 70901,
+                    id: 80901,
                     title: {en: 'Lesson 1: Tourist Attractions', vi: 'Bài học 1: Địa điểm du lịch'},
                     aims: {
                         en: ['Talk about tourist attractions and cultures of English-speaking countries', 'Use articles'],
@@ -527,7 +528,7 @@ export const sw8Data: CurriculumLevel = {
                     activities: []
                 },
                 {
-                    id: 70902,
+                    id: 80902,
                     title: {en: 'Lesson 2: Holidays', vi: 'Bài học 2: Kỳ nghỉ'},
                     aims: {
                         en: ['Talk about holidays in English-speaking countries', 'Use the Past Simple with irregular verbs'],
@@ -549,7 +550,7 @@ export const sw8Data: CurriculumLevel = {
                     activities: []
                 },
                 {
-                    id: 70903,
+                    id: 80903,
                     title: {en: 'Lesson 3: Benefits of English', vi: 'Bài học 3: Lợi ích của tiếng Anh'},
                     aims: {
                         en: ['Talk about the benefits of speaking English', 'Write a postcard to a friend'],
@@ -562,11 +563,11 @@ export const sw8Data: CurriculumLevel = {
             ]
         },
         {
-            id: 710,
+            id: 810,
             title: { en: 'Unit 10: Energy Sources', vi: 'Bài 10: Nguồn năng lượng' },
             lessons: [
                 {
-                    id: 71001,
+                    id: 81001,
                     title: {en: 'Lesson 1: Types of Energy', vi: 'Bài học 1: Các loại năng lượng'},
                     aims: {
                         en: ['Talk about types and sources of energy', 'Use "more...than..." and "less...than..." to make comparisons'],
@@ -589,7 +590,7 @@ export const sw8Data: CurriculumLevel = {
                     activities: []
                 },
                 {
-                    id: 71002,
+                    id: 81002,
                     title: {en: 'Lesson 2: Advantages and Disadvantages', vi: 'Bài học 2: Ưu điểm và Nhược điểm'},
                     aims: {
                         en: ['Talk about advantages and disadvantages of energy sources', 'Use "and" and "but"'],
@@ -608,7 +609,7 @@ export const sw8Data: CurriculumLevel = {
                     activities: []
                 },
                 {
-                    id: 71003,
+                    id: 81003,
                     title: {en: 'Lesson 3: City Energy Problems', vi: 'Bài học 3: Vấn đề năng lượng đô thị'},
                     aims: {
                         en: ['Talk about different energy sources', 'Write a formal email'],
