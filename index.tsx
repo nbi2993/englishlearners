@@ -3,6 +3,10 @@ import { createRoot } from 'react-dom/client';
 // FIX: Explicitly adding the .tsx extension can help resolve module issues in some environments.
 import App from './App.tsx';
 import './index.css';
+import '@fortawesome/fontawesome-svg-core/styles.css';
+import { config } from '@fortawesome/fontawesome-svg-core';
+
+config.autoAddCss = false;
 
 const container = document.getElementById('root');
 if (container) {
