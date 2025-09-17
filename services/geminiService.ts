@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type, Chat } from "@google/genai";
-import type { WritingFeedback } from '../types';
+import type { WritingFeedback, CurriculumLesson, QuizQuestion, GeneratedSentence } from '../types';
 
 let aiInstance: GoogleGenAI | null = null;
 let currentApiKey: string | null = null;
@@ -118,4 +118,113 @@ export const translateToVietnamese = async (text: string): Promise<string> => {
     console.error("Error translating text:", error);
     throw new Error("Failed to translate text.");
   }
+};
+
+export const generateQuiz = async (lesson: CurriculumLesson, language: 'en' | 'vi'): Promise<QuizQuestion[]> => {
+    const ai = getAiInstance();
+    const vocabList = lesson.vocabulary.map(v => v.term).join(', ');
+    const grammarList = lesson.grammar.map(g => g.title[language]).join('; ');
+    const langName = language === 'en' ? 'English' : 'Vietnamese';
+
+    const prompt = `Based on the following K-12 English lesson content, generate a 5-question multiple-choice quiz in ${langName}. The quiz should test understanding of the vocabulary and grammar.
+      Lesson Title: "${lesson.title[language]}"
+      Vocabulary: ${vocabList}
+      Grammar: ${grammarList}
+      For each question, provide a 'question' text, an array of 4 string 'options', and the correct 'answer' string which must exactly match one of the options.`;
+    
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: {
+                    type: Type.OBJECT,
+                    properties: {
+                        quiz: {
+                            type: Type.ARRAY,
+                            items: {
+                                type: Type.OBJECT,
+                                properties: {
+                                    question: { type: Type.STRING },
+                                    options: { type: Type.ARRAY, items: { type: Type.STRING } },
+                                    answer: { type: Type.STRING }
+                                }
+                            }
+                        }
+                    }
+                },
+                temperature: 0.4
+            },
+        });
+        const data = JSON.parse(response.text.trim());
+        return data.quiz || [];
+    } catch (e) {
+        console.error("Failed to parse Gemini JSON for quiz:", e);
+        throw new Error("Could not generate a quiz from the AI. Please try again.");
+    }
+};
+
+export const generateSampleSentences = async (lesson: CurriculumLesson, language: 'en' | 'vi'): Promise<GeneratedSentence[]> => {
+    const ai = getAiInstance();
+    const vocabList = lesson.vocabulary.map(v => v.term).join(', ');
+    const grammarList = lesson.grammar.map(g => g.title[language]).join('; ');
+    const langName = language === 'en' ? 'English' : 'Vietnamese';
+
+    const prompt = `Based on the following K-12 English lesson, generate 5 sample sentences in ${langName}. Each sentence should clearly use one of the key vocabulary terms or grammar points.
+      Lesson Title: "${lesson.title[language]}"
+      Vocabulary: ${vocabList}
+      Grammar: ${grammarList}
+      For each generated item, provide the 'sentence' and a 'focus' string indicating the vocabulary or grammar point used.`;
+    
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: {
+                    type: Type.OBJECT,
+                    properties: {
+                        sentences: {
+                            type: Type.ARRAY,
+                            items: {
+                                type: Type.OBJECT,
+                                properties: {
+                                    sentence: { type: Type.STRING },
+                                    focus: { type: Type.STRING }
+                                }
+                            }
+                        }
+                    }
+                },
+                temperature: 0.7
+            },
+        });
+        const data = JSON.parse(response.text.trim());
+        return data.sentences || [];
+    } catch (e) {
+        console.error("Failed to parse Gemini JSON for sentences:", e);
+        throw new Error("Could not generate sample sentences from the AI. Please try again.");
+    }
+};
+
+export const generateStoryStarter = async (lesson: CurriculumLesson, language: 'en' | 'vi'): Promise<string> => {
+    const ai = getAiInstance();
+    const vocabList = lesson.vocabulary.map(v => v.term).slice(0, 5).join(', '); // Use first 5 for brevity
+    const langName = language === 'en' ? 'English' : 'Vietnamese';
+    
+    const prompt = `Create a short, fun, and creative story starter (1-3 sentences) for a K-12 student in ${langName}. The story starter should be inspired by the lesson topic "${lesson.title[language]}" and should include at least two words from this list: ${vocabList}. Return only the story starter text, with no extra formatting or labels.`;
+
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: { temperature: 0.9 }
+        });
+        return response.text.trim();
+    } catch (error) {
+        console.error("Error generating story starter:", error);
+        throw new Error("Failed to generate a story starter.");
+    }
 };

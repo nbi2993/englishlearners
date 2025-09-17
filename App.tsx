@@ -111,7 +111,7 @@ const App: React.FC = () => {
   
   const renderContent = () => {
     if (selectedCourse) {
-        return <CourseDetail course={selectedCourse} onBack={handleBackToView} language={language} />;
+        return <CourseDetail course={selectedCourse} onBack={handleBackToView} language={language} setView={setView} />;
     }
 
     switch (view) {

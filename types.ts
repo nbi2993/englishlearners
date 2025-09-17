@@ -53,6 +53,17 @@ export interface ChatMessage {
   text: string;
 }
 
+export interface QuizQuestion {
+  question: string;
+  options: string[];
+  answer: string;
+}
+
+export interface GeneratedSentence {
+  sentence: string;
+  focus: string;
+}
+
 // Based on data/curriculum.ts and other data files
 
 interface LocalizedString {
@@ -153,6 +164,8 @@ export interface Student {
     assignments: Assignment[];
     grades: Grade[];
     notes?: string;
+    dob?: string; // Date of Birth
+    gender?: string;
 }
 
 export interface ClassScheduleItem {

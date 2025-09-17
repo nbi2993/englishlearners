@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import type { Course, Unit as CurriculumUnit, Lesson } from '../types';
+import type { Course, Unit as CurriculumUnit, Lesson, View } from '../types';
 import LessonView from './LessonView';
 
 interface CourseDetailProps {
   course: Course;
   onBack: () => void;
   language: 'en' | 'vi';
+  setView: (view: View) => void;
 }
 
-const CourseDetail: React.FC<CourseDetailProps> = ({ course, onBack, language }) => {
+const CourseDetail: React.FC<CourseDetailProps> = ({ course, onBack, language, setView }) => {
   const [expandedUnit, setExpandedUnit] = useState<number | null>(course.rawLevel.units[0]?.id || null);
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
 
@@ -22,7 +23,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ course, onBack, language })
             <button onClick={() => setSelectedLesson(null)} className="m-4 btn btn-secondary-outline">
                 <i className="fa-solid fa-arrow-left mr-2"></i> Back to Course
             </button>
-            <LessonView lesson={selectedLesson} language={language} />
+            <LessonView lesson={selectedLesson} language={language} setView={setView} />
         </div>
     );
   }
