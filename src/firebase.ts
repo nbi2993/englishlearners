@@ -1,23 +1,24 @@
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore"; // Import getFirestore
 
-// Your web app's Firebase configuration
-// For security, these values are loaded from environment variables
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { getAnalytics } from "firebase/analytics";
+
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID
+  apiKey: "AIzaSyBcHFYOgJW26hE5m_yB7Uin2kT9nDHrYNs",
+  authDomain: "englishlearners-8df3c.firebaseapp.com",
+  databaseURL: "https://englishlearners-8df3c-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "englishlearners-8df3c",
+  storageBucket: "englishlearners-8df3c.firebasestorage.app",
+  messagingSenderId: "319158527417",
+  appId: "1:319158527417:web:2694120f09af8f33288268",
+  measurementId: "G-261495R2XF"
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+const auth = getAuth(app);
+const db = getFirestore(app);
+const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
 
-// Initialize Firebase Authentication and get a reference to the service
-export const auth = getAuth(app);
-
-// Initialize Cloud Firestore and get a reference to the service
-export const db = getFirestore(app); // Export Firestore instance
+export { auth, db, analytics };
