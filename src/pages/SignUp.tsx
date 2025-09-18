@@ -1,16 +1,18 @@
 
 import React, { useState } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore'; // Import Firestore functions
-import { auth, db } from '../firebase'; // Import auth and db instances
-import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
+import { doc, setDoc } from 'firebase/firestore';
+import { auth, db } from '../firebase';
+import { Link, useNavigate } from 'react-router-dom';
+import { useLanguage } from '../contexts/LanguageContext'; // Import the language hook
 
 const SignUp: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
+  const { t } = useLanguage(); // Use the language hook
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,7 +20,7 @@ const SignUp: React.FC = () => {
     setError(null);
 
     if (password.length < 6) {
-      setError('Password should be at least 6 characters.');
+      setError(t('passwordShouldBe'));
       setLoading(false);
       return;
     }
@@ -27,12 +29,10 @@ const SignUp: React.FC = () => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Create a user document in Firestore
       await setDoc(doc(db, "users", user.uid), {
         uid: user.uid,
         email: user.email,
         createdAt: new Date(),
-        // You can add more default user data here, e.g., learningGoals, appSettings
         learningGoals: {
           level: 'beginner',
           focus: 'speaking',
@@ -43,27 +43,35 @@ const SignUp: React.FC = () => {
         },
       });
 
-      alert('Sign up successful! Welcome!');
-      navigate('/signin'); // Redirect to sign-in page after successful registration
+      alert(t('signUpSuccess'));
+      navigate('/signin');
     } catch (err: any) {
+      // Use translation for common errors if available
+      if (err.code === 'auth/email-already-in-use') {
+        setError('The email address is already in use by another account.'); // This should also be translated
+      } else {
+        setError(err.message);
+      }
       console.error("Error during sign up:", err);
-      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center">
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center p-4">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-2xl shadow-lg">
         <div className="text-center">
           <img src="/assets/logo.png" alt="App Logo" className="mx-auto h-16 w-auto mb-4"/>
-          <h2 className="text-3xl font-bold text-gray-900">Create Your Account</h2>
-          <p className="text-gray-600 mt-2">Join our community and start your learning journey.</p>
+          <h2 className="text-3xl font-bold text-gray-900">{t('createYourAccount')}</h2>
+          {/* Improved Description */}
+          <p className="text-gray-600 mt-2">
+            {t('signUpDescription')}
+          </p>
         </div>
         <form onSubmit={handleSignUp} className="space-y-6">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email Address</label>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">{t('emailAddress')}</label>
             <input
               id="email"
               type="email"
@@ -75,7 +83,7 @@ const SignUp: React.FC = () => {
             />
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">{t('password')}</label>
             <input
               id="password"
               type="password"
@@ -93,15 +101,15 @@ const SignUp: React.FC = () => {
               disabled={loading}
               className="w-full px-4 py-3 text-lg font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-400 transition duration-300"
             >
-              {loading ? 'Creating Account...' : 'Create Account'}
+              {loading ? t('creatingAccount') : t('createAccount')}
             </button>
           </div>
         </form>
         <div className="text-center text-sm text-gray-600">
           <p>
-            Already have an account?{' '}
+            {t('alreadyHaveAccount')}{' '}
             <Link to="/signin" className="font-medium text-indigo-600 hover:text-indigo-500">
-              Sign In
+              {t('signIn')}
             </Link>
           </p>
         </div>

@@ -6,7 +6,8 @@ import App from './App';
 import SignUp from './src/pages/SignUp';
 import SignIn from './src/pages/SignIn';
 import Dashboard from './src/pages/Dashboard';
-import ForgotPassword from './src/pages/ForgotPassword'; // Import ForgotPassword
+import ForgotPassword from './src/pages/ForgotPassword';
+import { LanguageProvider } from './src/contexts/LanguageContext'; // Import LanguageProvider
 import './index.css';
 
 const container = document.getElementById('root');
@@ -15,13 +16,15 @@ if (container) {
   root.render(
     <React.StrictMode>
       <Router>
-        <Routes>
-          <Route path="/" element={<App />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} /> {/* Add ForgotPassword route */}
-        </Routes>
+        <LanguageProvider> {/* Wrap the entire app with LanguageProvider */}
+          <Routes>
+            <Route path="/" element={<App />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+          </Routes>
+        </LanguageProvider>
       </Router>
     </React.StrictMode>
   );
