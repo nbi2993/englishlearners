@@ -1,5 +1,8 @@
-import React from 'react';
+
+import React, { Fragment } from 'react';
 import type { User, View } from '../types';
+import { useAuth } from '../contexts/AuthContext';
+import { Menu, Transition } from '@headlessui/react';
 
 interface SidebarProps {
   user: User;
@@ -11,6 +14,8 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ user, currentView, setView, language, isOpen, onClose }) => {
+  const { logout } = useAuth();
+
   const t = {
     en: {
       home: 'Home',
@@ -20,6 +25,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, currentView, setView, language,
       speakingPartner: 'Speaking Partner',
       settings: 'Settings',
       userGuide: 'User Guide',
+      logout: 'Logout'
     },
     vi: {
       home: 'Trang chủ',
@@ -29,6 +35,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, currentView, setView, language,
       speakingPartner: 'Luyện nói',
       settings: 'Cài đặt',
       userGuide: 'Hướng dẫn',
+      logout: 'Đăng xuất'
     }
   };
 
@@ -49,7 +56,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, currentView, setView, language,
   ];
   
   const bottomNavItems: { view: View; icon: string; label: keyof typeof t.en }[] = [
-      { view: 'settings', icon: 'fa-cog', label: 'settings' },
+      // { view: 'settings', icon: 'fa-cog', label: 'settings' },
       { view: 'user-guide', icon: 'fa-circle-question', label: 'userGuide' },
   ];
 
@@ -71,6 +78,15 @@ const Sidebar: React.FC<SidebarProps> = ({ user, currentView, setView, language,
     </li>
   );
 
+  const handleLogout = async () => {
+    try {
+      await logout();
+      // Redirect or perform other actions after logout
+    } catch (error) {
+      console.error("Failed to log out: ", error);
+    }
+  };
+
   return (
     <>
       {/* Backdrop for mobile */}
@@ -87,15 +103,54 @@ const Sidebar: React.FC<SidebarProps> = ({ user, currentView, setView, language,
         </div>
         
         <div className="p-4 border-b border-slate-200 dark:border-slate-700">
-          <div className="flex items-center">
-            <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-              <i className={`fa-solid ${user.avatar} text-2xl text-blue-500`}></i>
-            </div>
-            <div className="ml-3">
-              <p className="font-semibold text-slate-800 dark:text-slate-200">{user.name}</p>
-              <p className="text-sm text-slate-500 capitalize">{user.role}</p>
-            </div>
-          </div>
+          <Menu as="div" className="relative w-full">
+            <Menu.Button className="flex items-center w-full text-left rounded-lg p-2 hover:bg-slate-100 dark:hover:bg-slate-700">
+              <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                <i className={`fa-solid ${user.avatar} text-2xl text-blue-500`}></i>
+              </div>
+              <div className="ml-3 flex-grow">
+                <p className="font-semibold text-slate-800 dark:text-slate-200">{user.name}</p>
+                <p className="text-sm text-slate-500 capitalize">{user.role}</p>
+              </div>
+              <i className="fa-solid fa-chevron-down text-xs text-slate-500 ml-2"></i>
+            </Menu.Button>
+            <Transition
+              as={Fragment}
+              enter="transition ease-out duration-100"
+              enterFrom="transform opacity-0 scale-95"
+              enterTo="transform opacity-100 scale-100"
+              leave="transition ease-in duration-75"
+              leaveFrom="transform opacity-100 scale-100"
+              leaveTo="transform opacity-0 scale-95"
+            >
+              <Menu.Items className="absolute z-10 bottom-full mb-2 w-full origin-bottom-left bg-white dark:bg-slate-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <div className="py-1">
+                  <Menu.Item>
+                    {({ active }) => (
+                      <button
+                        onClick={() => setView('settings')}
+                        className={`${ active ? 'bg-slate-100 dark:bg-slate-700' : '' } group flex w-full items-center rounded-md px-4 py-2 text-sm text-slate-700 dark:text-slate-300`}
+                      >
+                        <i className="fa-solid fa-cog w-6 text-center"></i>
+                        <span className="ml-3">{t[language].settings}</span>
+                      </button>
+                    )}
+                  </Menu.Item>
+                  <Menu.Item>
+                    {({ active }) => (
+                      <button
+                        onClick={handleLogout}
+                        className={`${ active ? 'bg-slate-100 dark:bg-slate-700' : '' } group flex w-full items-center rounded-md px-4 py-2 text-sm text-red-600 dark:text-red-400`}
+                      >
+                        <i className="fa-solid fa-right-from-bracket w-6 text-center"></i>
+                        <span className="ml-3">{t[language].logout}</span>
+                      </button>
+                    )}
+                  </Menu.Item>
+                </div>
+              </Menu.Items>
+            </Transition>
+          </Menu>
         </div>
 
         <nav className="flex-1 p-4 overflow-y-auto">

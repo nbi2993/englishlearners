@@ -17,6 +17,7 @@
     "@fortawesome/react-fontawesome": "^3.0.2",
     "@google/genai": "^1.19.0",
     "@google/generative-ai": "^0.24.1",
+    "@headlessui/react": "^2.2.8",
     "@tailwindcss/postcss": "^4.1.13",
     "autoprefixer": "^10.4.21",
     "firebase": "^12.2.1",
