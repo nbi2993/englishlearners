@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../firebase'; // Adjusted the import path for firebase config
+import { auth } from '../firebase'; // Corrected the import path for firebase config
 import { Link } from 'react-router-dom';
 
 const SignUp: React.FC = () => {
