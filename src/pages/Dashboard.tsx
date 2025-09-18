@@ -1,71 +1,73 @@
 
-import React, { useEffect, useState } from 'react';
-import { auth, db } from '../firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { onAuthStateChanged } from 'firebase/auth';
-import { useLanguage } from '../contexts/LanguageContext';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../firebase';
+import { useAuth } from '../contexts/AuthContext';
+import TeacherHome from '../components/TeacherHome';
+import StudentHome from '../components/StudentHome';
+import Spinner from '../components/Spinner';
+import { User } from '../types';
 
-// This component now acts as a router guard.
-// It checks the user's role and redirects them to the appropriate dashboard.
 const Dashboard: React.FC = () => {
+  const { currentUser } = useAuth();
   const navigate = useNavigate();
-  const { t } = useLanguage();
-  const [statusMessage, setStatusMessage] = useState('Initializing...');
+  const [userData, setUserData] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setStatusMessage(t ? t('authenticating', 'Authenticating...') : 'Authenticating...');
-    
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        setStatusMessage(t ? t('fetchingProfile', 'Fetching user profile...') : 'Fetching user profile...');
-        try {
-          const userRef = doc(db, "users", user.uid);
-          const docSnap = await getDoc(userRef);
+    const fetchUserData = async () => {
+      if (currentUser) {
+        const userRef = doc(db, 'users', currentUser.uid);
+        const userSnap = await getDoc(userRef);
 
-          if (docSnap.exists()) {
-            const userData = docSnap.data();
-            
-            // Redirect based on role
-            if (userData.role === 'teacher') {
-              navigate('/teacher/home');
-            } else if (userData.role === 'student') {
-              navigate('/student/home');
-            } else {
-              // If role is not set, user may need to select it.
-              console.log("User role not found, redirecting to role selection.");
-              navigate('/select-role');
-            }
-          } else {
-            // This can happen if the Firestore document wasn't created properly during signup.
-            console.warn("User exists in Auth but not in Firestore. Redirecting to role selection.");
+        if (userSnap.exists()) {
+          const user = userSnap.data() as User;
+          setUserData(user);
+
+          // Core Logic Correction:
+          // Redirect user based on their role AFTER fetching the data.
+          if (!user.role) {
             navigate('/select-role');
-          }
-        } catch (error) {
-            console.error("Error fetching user profile:", error);
-            setStatusMessage(t ? t('errorFetchingProfile', 'Error fetching profile. Please try again.') : 'Error fetching profile. Please try again.');
-            // Optional: navigate to an error page or back to sign-in
-            // navigate('/signin');
+          } 
+          // No else-if redirection here. Let the return statement handle rendering.
+
+        } else {
+          // This could happen if the user document hasn't been created yet
+          // after sign-up. Redirecting to role selection can be a good fallback.
+          console.log('User document not found, redirecting to role selection.');
+          navigate('/select-role');
         }
       } else {
-        // No user is signed in.
+        // This case is handled by ProtectedRoute, but as a fallback:
         navigate('/signin');
       }
-    });
+      setLoading(false);
+    };
 
-    // Cleanup subscription on unmount
-    return () => unsubscribe();
-  }, [navigate, t]); // Add 't' to dependency array as it's used in the effect
+    fetchUserData();
+  }, [currentUser, navigate]);
 
-  // Render a loading state while redirection is in progress.
-  return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-center">
-        <i className="fa-solid fa-spinner fa-spin text-4xl text-indigo-500 mb-4"></i>
-        <p className="text-gray-700">{statusMessage}</p>
-      </div>
-    </div>
-  );
+  if (loading || !userData) {
+    return (
+        <div className="flex items-center justify-center h-screen bg-gray-100 dark:bg-gray-900">
+           <Spinner />
+        </div>
+    );
+  }
+
+  // Render the correct component based on the user's role.
+  // This is the single source of truth for what the user sees.
+  switch (userData.role) {
+    case 'teacher':
+      return <TeacherHome user={userData} />;
+    case 'student':
+      return <StudentHome user={userData} />; 
+    default:
+      // If role is somehow null or undefined, redirect to role selection.
+      navigate('/select-role');
+      return null; // or a loading indicator
+  }
 };
 
 export default Dashboard;
