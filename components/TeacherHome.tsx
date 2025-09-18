@@ -42,6 +42,15 @@ const TeacherHome: React.FC<TeacherHomeProps> = ({ user, onSelectCourse, languag
       return allCourses.filter(course => user.pinnedCourses?.includes(course.id));
   }, [allCourses, user.pinnedCourses]);
 
+  // NEW: Determine which courses to display on the home page.
+  const coursesToDisplay = useMemo(() => {
+      if (pinnedCourses.length > 0) {
+          return pinnedCourses;
+      }
+      // If no courses are pinned, show the first 3 available courses as a suggestion.
+      return allCourses.slice(0, 3);
+  }, [pinnedCourses, allCourses]);
+
   const todaysSchedule = useMemo(() => {
     const dayOfWeek = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date());
     const scheduleItems: (ClassScheduleItem & { className: string })[] = [];
@@ -68,9 +77,9 @@ const TeacherHome: React.FC<TeacherHomeProps> = ({ user, onSelectCourse, languag
         classHeader: "Class",
         periodHeader: "Period",
         noClasses: "No classes scheduled for today. Enjoy your day!",
-        curriculumTitle: "My Curriculum",
-        pinPrompt: "Pin the curriculum you teach here for quick access.",
-        goToCurriculum: "Go to Curriculum",
+        myCurriculumTitle: "My Curriculum",
+        exploreCurriculumTitle: "Explore Curriculum",
+        viewAll: "View All",
     },
     vi: {
         welcome: `Chào mừng, ${user.name}!`,
@@ -80,9 +89,9 @@ const TeacherHome: React.FC<TeacherHomeProps> = ({ user, onSelectCourse, languag
         classHeader: "Lớp",
         periodHeader: "Tiết",
         noClasses: "Không có lớp nào được lên lịch hôm nay. Chúc bạn một ngày tốt lành!",
-        curriculumTitle: "Chương trình của tôi",
-        pinPrompt: "Ghim các chương trình bạn dạy ở đây để truy cập nhanh chóng.",
-        goToCurriculum: "Tới trang Chương trình",
+        myCurriculumTitle: "Chương trình của tôi",
+        exploreCurriculumTitle: "Khám phá Chương trình học",
+        viewAll: "Xem tất cả",
     }
   }[language];
 
@@ -97,29 +106,35 @@ const TeacherHome: React.FC<TeacherHomeProps> = ({ user, onSelectCourse, languag
             {/* Main Content Area */}
             <main className="flex-1">
                 <section>
-                    <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-4">
-                        <i className="fa-solid fa-book-bookmark mr-2 text-green-500"></i>
-                        {t.curriculumTitle}
-                    </h2>
-                    {pinnedCourses.length > 0 ? (
+                    <div className="flex justify-between items-baseline mb-4">
+                        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-200">
+                            <i className={`fa-solid ${pinnedCourses.length > 0 ? 'fa-book-bookmark text-green-500' : 'fa-compass text-purple-500'} mr-3`}></i>
+                            {pinnedCourses.length > 0 ? t.myCurriculumTitle : t.exploreCurriculumTitle}
+                        </h2>
+                        <button onClick={() => setView('curriculum')} className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline">
+                            {t.viewAll}
+                        </button>
+                    </div>
+
+                    {coursesToDisplay.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                            {pinnedCourses.map(course => (
+                            {coursesToDisplay.map(course => (
                                 <CourseCard
                                     key={course.id}
                                     course={course}
                                     onSelect={() => onSelectCourse(course)}
-                                    isPinned={true}
-                                    onPinToggle={() => {}}
+                                    isPinned={user.pinnedCourses?.includes(course.id) ?? false}
+                                    onPinToggle={() => {}} // Pinning is handled on the main curriculum page
                                     language={language}
                                 />
                             ))}
                         </div>
                     ) : (
                         <div className="text-center py-12 card-glass">
-                            <i className="fa-solid fa-thumbtack text-4xl text-slate-400 mb-4"></i>
-                            <p className="text-slate-500 mb-6">{t.pinPrompt}</p>
+                            <i className="fa-solid fa-folder-open text-4xl text-slate-400 mb-4"></i>
+                            <p className="text-slate-500 mb-6">No curriculum has been loaded into the app yet.</p>
                             <button onClick={() => setView('curriculum')} className="btn btn-primary">
-                                {t.goToCurriculum}
+                                Go to Curriculum
                             </button>
                         </div>
                     )}
