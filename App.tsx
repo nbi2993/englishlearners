@@ -1,5 +1,5 @@
 import React from 'react';
-import SignUp from './pages/SignUp'; // Import the SignUp component
+import SignUp from './src/pages/SignUp.tsx'; // Import the SignUp component
 
 function App() {
   // For now, we will render the SignUp page directly.
