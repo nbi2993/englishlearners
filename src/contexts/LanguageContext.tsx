@@ -46,8 +46,7 @@ const translations: Record<string, { en: string; vi: string }> = {
   'yourProfile': { en: 'Your Profile', vi: 'Hồ sơ của bạn' },
   'email': { en: 'Email', vi: 'Email' },
   'userId': { en: 'User ID', vi: 'ID người dùng' },
-  'accountCreated
-': { en: 'Account Created', vi: 'Tài khoản đã tạo' },
+  'accountCreated': { en: 'Account Created', vi: 'Tài khoản đã tạo' },
   'learningGoals': { en: 'Learning Goals', vi: 'Mục tiêu học tập' },
   'level': { en: 'Level', vi: 'Cấp độ' },
   'focus': { en: 'Focus', vi: 'Trọng tâm' },
