@@ -1,3 +1,17 @@
+# Netlify configuration file
+
+# Build settings
 [build]
+  # This command is often not needed if you set it in the Netlify UI,
+  # but it's good practice to have it here.
   command = "npm run build"
+  # The directory to publish after the build command has run.
   publish = "dist"
+
+# Redirects and rewrites rules
+[[redirects]]
+  # This is the rule that fixes the SPA refresh issue.
+  # It tells Netlify to serve index.html for any path that doesn't match a file.
+  from = "/*"
+  to = "/index.html"
+  status = 200
