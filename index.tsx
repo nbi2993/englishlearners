@@ -1,7 +1,10 @@
+
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-// FIX: Explicitly adding the .tsx extension can help resolve module issues in some environments.
-import App from './App.tsx';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import App from './App';
+import SignUp from './src/pages/SignUp';
+import SignIn from './src/pages/SignIn';
 import './index.css';
 
 const container = document.getElementById('root');
@@ -9,7 +12,13 @@ if (container) {
   const root = createRoot(container);
   root.render(
     <React.StrictMode>
-      <App />
+      <Router>
+        <Routes>
+          <Route path="/" element={<App />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/signin" element={<SignIn />} />
+        </Routes>
+      </Router>
     </React.StrictMode>
   );
 

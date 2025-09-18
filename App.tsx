@@ -1,11 +1,22 @@
+
 import React from 'react';
-import SignUp from './src/pages/SignUp.tsx'; // Import the SignUp component
+import { Link } from 'react-router-dom';
 
 function App() {
-  // For now, we will render the SignUp page directly.
-  // Later, we will add routing to handle different pages.
   return (
-    <SignUp />
+    <div>
+      <h1>Welcome to the App</h1>
+      <nav>
+        <ul>
+          <li>
+            <Link to="/signup">Sign Up</Link>
+          </li>
+          <li>
+            <Link to="/signin">Sign In</Link>
+          </li>
+        </ul>
+      </nav>
+    </div>
   );
 }
 
