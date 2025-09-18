@@ -1,7 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
 import type { User, Classes } from '../types';
 import ProfileEditModal from './ProfileEditModal';
-// FIX: Removed setApiKey and clearApiKey as per API guidelines.
 import { isAiConfigured } from '../services/geminiService';
 
 interface SettingsProps {
@@ -22,15 +22,11 @@ interface SettingsProps {
 const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpdateClasses, theme, setTheme, language, setLanguage, fontSize, setFontSize, fontWeight, setFontWeight }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [aiStatus, setAiStatus] = useState(false);
-  // FIX: Removed state for API key input as it's against guidelines.
-  // const [apiKeyInput, setApiKeyInput] = useState('');
-  // const [showKey, setShowKey] = useState(false);
 
   useEffect(() => {
     setAiStatus(isAiConfigured());
   }, []);
   
-  // FIX: Updated translations to remove user-facing API key management text.
   const t = {
     en: {
         title: "Settings",
@@ -70,6 +66,7 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
         aiStatusActive: "Active",
         aiStatusInactive: "Inactive",
         aiDesc: "AI-powered features like Writing Grader and Speaking Partner are enabled by an administrator. If services are inactive, please contact support.",
+        contactForApiKey: "Contact to register API-Key",
     },
     vi: {
         title: "Cài đặt",
@@ -109,6 +106,7 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
         aiStatusActive: "Hoạt động",
         aiStatusInactive: "Không hoạt động",
         aiDesc: "Các tính năng AI như Chấm bài viết và Luyện nói được quản trị viên kích hoạt. Nếu dịch vụ không hoạt động, vui lòng liên hệ bộ phận hỗ trợ.",
+        contactForApiKey: "Liên hệ đăng ký API-Key",
     }
   }[language];
 
@@ -213,21 +211,27 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
     reader.readAsText(file);
   };
 
+  const SettingsCard: React.FC<{title: string, children: React.ReactNode}> = ({ title, children }) => (
+    <section className="bg-white dark:bg-slate-800/50 rounded-xl shadow-lg p-6 backdrop-blur-lg border border-slate-200/50 dark:border-slate-700/50">
+        <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-slate-200">{title}</h2>
+        {children}
+    </section>
+  );
+
   return (
     <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 animate-fade-in">
-        <div className="text-center mb-8">
+        <div className="text-center mb-10">
             <i className="fa-solid fa-cog text-5xl text-blue-500 mb-4"></i>
-            <h1 className="text-4xl font-bold">{t.title}</h1>
+            <h1 className="text-4xl font-bold text-slate-800 dark:text-slate-100">{t.title}</h1>
             <p className="mt-2 text-lg text-slate-600 dark:text-slate-400">{t.subtitle}</p>
         </div>
 
         <div className="space-y-8">
-            <section className="card-glass p-6">
-                <h2 className="text-2xl font-bold mb-4">{t.profileTitle}</h2>
+            <SettingsCard title={t.profileTitle}>
                 <div className="flex items-center gap-6">
                     <i className={`${user.avatar} text-6xl text-blue-500`}></i>
                     <div className="flex-grow">
-                        <p className="text-xl font-bold">{user.name}</p>
+                        <p className="text-xl font-bold text-slate-800 dark:text-slate-200">{user.name}</p>
                         <p className="text-slate-500 dark:text-slate-400 capitalize">{user.role === 'student' ? t.student : t.teacher}</p>
                         <p className="text-sm text-slate-500 dark:text-slate-400">
                           {user.role === 'student' ? `${t.grade}: ${user.gradeLevel || 'N/A'}` : `${t.subject}: ${user.subject || 'N/A'}`}
@@ -237,10 +241,9 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
                         <i className="fa-solid fa-pen-to-square mr-2"></i> {t.editProfile}
                     </button>
                 </div>
-            </section>
+            </SettingsCard>
             
-            <section className="card-glass p-6">
-                <h2 className="text-2xl font-bold mb-4">{t.roleTitle}</h2>
+            <SettingsCard title={t.roleTitle}>
                 <p className="text-slate-600 dark:text-slate-400 mb-4 text-sm">{t.roleDesc}</p>
                 <div className="flex gap-2">
                     <button onClick={() => handleRoleChange('student')} className={`btn flex-1 ${user.role === 'student' ? 'btn-primary' : 'btn-secondary-outline'}`}>
@@ -250,13 +253,12 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
                         <i className="fa-solid fa-chalkboard-user mr-2"></i> {t.teacher}
                     </button>
                 </div>
-            </section>
+            </SettingsCard>
 
-            <section className="card-glass p-6">
-                <h2 className="text-2xl font-bold mb-4">{t.appearanceTitle}</h2>
+            <SettingsCard title={t.appearanceTitle}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <h3 className="text-lg font-semibold mb-2">{t.themeTitle}</h3>
+                        <h3 className="text-lg font-semibold mb-2 text-slate-700 dark:text-slate-300">{t.themeTitle}</h3>
                         <div className="flex gap-2">
                             <button onClick={() => handleThemeChange('light')} className={`btn flex-1 ${theme === 'light' ? 'btn-primary' : 'btn-secondary-outline'}`}>
                                 <i className="fa-solid fa-sun mr-2"></i> {t.light}
@@ -267,7 +269,7 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
                         </div>
                     </div>
                      <div>
-                        <h3 className="text-lg font-semibold mb-2">{t.languageTitle}</h3>
+                        <h3 className="text-lg font-semibold mb-2 text-slate-700 dark:text-slate-300">{t.languageTitle}</h3>
                         <div className="flex gap-2">
                              <button onClick={() => setLanguage('en')} className={`btn flex-1 ${language === 'en' ? 'btn-primary' : 'btn-secondary-outline'}`}>
                                 English
@@ -278,13 +280,12 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
                         </div>
                     </div>
                 </div>
-            </section>
+            </SettingsCard>
 
-            <section className="card-glass p-6">
-                <h2 className="text-2xl font-bold mb-4">{t.fontSettingsTitle}</h2>
+            <SettingsCard title={t.fontSettingsTitle}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                      <div>
-                        <h3 className="text-lg font-semibold mb-2">{t.fontSize}</h3>
+                        <h3 className="text-lg font-semibold mb-2 text-slate-700 dark:text-slate-300">{t.fontSize}</h3>
                         <div className="flex gap-2">
                             <button onClick={() => setFontSize('14px')} className={`btn flex-1 ${fontSize === '14px' ? 'btn-primary' : 'btn-secondary-outline'}`}>{t.fontSmall}</button>
                             <button onClick={() => setFontSize('16px')} className={`btn flex-1 ${fontSize === '16px' ? 'btn-primary' : 'btn-secondary-outline'}`}>{t.fontNormal}</button>
@@ -292,19 +293,18 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
                         </div>
                     </div>
                      <div>
-                        <h3 className="text-lg font-semibold mb-2">{t.fontWeight}</h3>
+                        <h3 className="text-lg font-semibold mb-2 text-slate-700 dark:text-slate-300">{t.fontWeight}</h3>
                         <div className="flex gap-2">
                             <button onClick={() => setFontWeight(300)} className={`btn flex-1 ${fontWeight === 300 ? 'btn-primary' : 'btn-secondary-outline'}`}>{t.fontLight}</button>
                             <button onClick={() => setFontWeight(400)} className={`btn flex-1 ${fontWeight === 400 ? 'btn-primary' : 'btn-secondary-outline'}`}>{t.fontRegular}</button>
                         </div>
                     </div>
                 </div>
-            </section>
+            </SettingsCard>
 
-             <section className="card-glass p-6">
-                <h2 className="text-2xl font-bold mb-4">{t.aiSettingsTitle}</h2>
+            <SettingsCard title={t.aiSettingsTitle}>
                  <div className="flex items-center gap-3 mb-3">
-                    <span className="font-semibold">{t.aiStatusLabel}</span>
+                    <span className="font-semibold text-slate-700 dark:text-slate-300">{t.aiStatusLabel}</span>
                     {aiStatus ? (
                         <span className="flex items-center gap-2 px-3 py-1 text-sm font-medium text-green-800 bg-green-100 dark:text-green-100 dark:bg-green-700/50 rounded-full">
                             <span className="w-2 h-2 bg-green-500 rounded-full"></span>
@@ -318,23 +318,24 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser, classes, onUpda
                     )}
                 </div>
                 <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">{t.aiDesc}</p>
-            </section>
+                <a href="https://zalo.me/0795555789" target="_blank" rel="noopener noreferrer" className="btn btn-primary inline-flex items-center">
+                    <i className="fa-solid fa-key mr-2"></i>
+                    {t.contactForApiKey}
+                </a>
+            </SettingsCard>
 
-            <section className="card-glass p-6">
-                <h2 className="text-2xl font-bold mb-4">{t.dataTitle}</h2>
-                <div className="flex flex-col sm:flex-row gap-4 items-center">
-                    <button onClick={handleBackup} className="btn btn-primary w-full sm:w-auto">
+            <SettingsCard title={t.dataTitle}>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">{t.dataDesc}</p>
+                <div className="flex flex-col sm:flex-row gap-4 items-start">
+                    <button onClick={handleBackup} className="btn btn-secondary-outline w-full sm:w-auto">
                         <i className="fa-solid fa-download mr-2"></i> {t.backup}
                     </button>
-                    <label className="btn btn-secondary w-full sm:w-auto cursor-pointer">
+                    <label className="btn btn-secondary-outline w-full sm:w-auto cursor-pointer">
                         <i className="fa-solid fa-upload mr-2"></i> {t.restore}
                         <input type="file" accept=".json" onChange={handleRestore} className="hidden" />
                     </label>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 sm:mt-0 sm:ml-4">
-                        {t.dataDesc}
-                    </p>
                 </div>
-            </section>
+            </SettingsCard>
         </div>
 
         {isEditModalOpen && (
