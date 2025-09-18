@@ -1,12 +1,13 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import { onAuthStateChanged, User, signOut } from 'firebase/auth';
 import { auth } from '../firebase'; 
 
 // 1. Create the context
 interface AuthContextType {
   currentUser: User | null;
   loading: boolean;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -27,9 +28,14 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
     return () => unsubscribe();
   }, []);
 
+  const logout = async () => {
+    await signOut(auth);
+  };
+
   const value = {
     currentUser,
     loading,
+    logout
   };
 
   // Render children only when not loading to avoid showing protected content
