@@ -1,10 +1,10 @@
 
 import React from 'react';
-import StudentDashboard from '../../../components/StudentDashboard'; // Assuming this component exists
+import StudentHome from '../../../components/StudentHome';
 
 const StudentHomePage: React.FC = () => {
   return (
-    <StudentDashboard />
+    <StudentHome />
   );
 };
 
