@@ -1,66 +1,175 @@
+import React, { useState, useEffect, lazy, Suspense } from 'react';
+import type { View, User, Course, Classes } from './types';
+import { MOCK_USER, MOCK_CLASSES } from './constants';
+import { auth } from './firebaseConfig';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { useLanguage } from './src/contexts/LanguageContext';
+import Sidebar from './components/Sidebar';
+import Header from './components/Header';
+import Login from './components/Login';
+import AssistiveTouch from './components/AssistiveTouch';
+import FeedbackSkeleton from './components/FeedbackSkeleton';
+
+const Home = lazy(() => import('./components/Home'));
+const Dashboard = lazy(() => import('./components/Dashboard'));
+const CourseDetail = lazy(() => import('./components/CourseDetail'));
+const TeacherDashboard = lazy(() => import('./components/TeacherDashboard'));
+const WritingGrader = lazy(() => import('./components/WritingGrader'));
+const SpeakingPartner = lazy(() => import('./components/SpeakingPartner'));
+const Settings = lazy(() => import('./components/Settings'));
+const UserGuide = lazy(() => import('./components/UserGuide'));
 
 function App() {
-  const { language, setLanguage, t } = useLanguage();
+  const [user, setUser] = useState<User | null>(null);
+  const [classes, setClasses] = useState<Classes>(() => {
+    try {
+      const savedClasses = localStorage.getItem('ivs-classes');
+      return savedClasses ? JSON.parse(savedClasses) : MOCK_CLASSES;
+    } catch (error) {
+      return MOCK_CLASSES;
+    }
+  });
+  const [currentView, setCurrentView] = useState<View>('home');
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setLanguage(e.target.value as 'en' | 'vi');
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    const savedTheme = localStorage.getItem('ivs-theme') as 'light' | 'dark';
+    return savedTheme || 'dark';
+  });
+  const [language, setLanguage] = useState<'en' | 'vi'>(() => {
+    const savedLang = localStorage.getItem('ivs-language') as 'en' | 'vi';
+    return savedLang || 'en';
+  });
+  const [fontSize, setFontSize] = useState<string>(() => {
+    return localStorage.getItem('ivs-fontSize') || '16px';
+  });
+  const [fontWeight, setFontWeight] = useState<number>(() => {
+    return parseInt(localStorage.getItem('ivs-fontWeight') || '400', 10);
+  });
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        // For now, we'll use a mock user structure and enhance it later
+        const newUser: User = {
+          ...MOCK_USER, // Spread mock user to get default fields
+          uid: firebaseUser.uid,
+          email: firebaseUser.email || 'No email',
+          displayName: firebaseUser.displayName || 'No name',
+          photoURL: firebaseUser.photoURL || MOCK_USER.photoURL,
+          role: 'student', // Default role, can be changed later
+        };
+        setUser(newUser);
+      } else {
+        setUser(null);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('ivs-classes', JSON.stringify(classes));
+  }, [classes]);
+  
+  useEffect(() => {
+    localStorage.setItem('ivs-theme', theme);
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+  }, [theme]);
+  
+  useEffect(() => {
+    localStorage.setItem('ivs-language', language);
+  }, [language]);
+  
+  useEffect(() => {
+    document.documentElement.style.fontSize = fontSize;
+    localStorage.setItem('ivs-fontSize', fontSize);
+  }, [fontSize]);
+
+  useEffect(() => {
+    document.documentElement.style.fontWeight = fontWeight.toString();
+    localStorage.setItem('ivs-fontWeight', fontWeight.toString());
+  }, [fontWeight]);
+
+  const handleLogout = () => {
+    signOut(auth).catch((error) => console.error('Logout failed', error));
   };
 
+  const handleSetView = (view: View) => {
+    setSelectedCourse(null);
+    setCurrentView(view);
+    setIsSidebarOpen(false);
+  };
+  
+  const handleSelectCourse = (course: Course) => {
+    setSelectedCourse(course);
+  };
+  
+  const handleUpdateUser = (updatedUser: User) => {
+    setUser(updatedUser);
+  };
+
+  const renderView = () => {
+    if (selectedCourse) {
+      return <CourseDetail course={selectedCourse} onBack={() => setSelectedCourse(null)} language={language} setView={handleSetView} />;
+    }
+
+    switch (currentView) {
+      case 'home':
+        return <Home user={user!} onSelectCourse={handleSelectCourse} language={language} setView={handleSetView} classes={classes}/>;
+      case 'curriculum':
+        return <Dashboard onSelectCourse={handleSelectCourse} user={user!} onUpdateUser={handleUpdateUser} language={language}/>;
+      case 'teacher-dashboard':
+        return <TeacherDashboard classes={classes} setClasses={setClasses} language={language} />;
+      case 'writing-grader':
+        return <WritingGrader language={language} setView={handleSetView} />;
+      case 'speaking-partner':
+        return <SpeakingPartner language={language} setView={handleSetView} />;
+      case 'settings':
+        return <Settings 
+                    user={user!} 
+                    onUpdateUser={handleUpdateUser} 
+                    classes={classes}
+                    onUpdateClasses={setClasses}
+                    theme={theme}
+                    setTheme={setTheme}
+                    language={language}
+                    setLanguage={setLanguage}
+                    fontSize={fontSize}
+                    setFontSize={setFontSize}
+                    fontWeight={fontWeight}
+                    setFontWeight={setFontWeight}
+                />;
+      case 'user-guide':
+        return <UserGuide language={language} />;
+      default:
+        return <Home user={user!} onSelectCourse={handleSelectCourse} language={language} setView={handleSetView} classes={classes}/>;
+    }
+  };
+  
+  if (!user) {
+    return <Login language={language} />;
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center text-center p-4">
-      {/* Language Selector */}
-      <div className="absolute top-4 right-4">
-        <select 
-          value={language}
-          onChange={handleLanguageChange}
-          className="bg-white border border-gray-300 rounded-md py-2 px-3 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-        >
-          <option value="en">English</option>
-          <option value="vi">Tiếng Việt</option>
-        </select>
-      </div>
-
-      <div className="max-w-3xl mx-auto">
-        <img src="/assets/logo.png" alt="App Logo" className="mx-auto h-24 w-auto mb-8"/>
-        
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-          {t('welcomeTitle')}
-        </h1>
-        
-        <p className="text-lg md:text-xl text-gray-600 mb-2">
-          {t('welcomeDescription')}
-        </p>
-        
-        <p className="text-md md:text-lg text-gray-500 mb-8">
-          {t('teacherOptimization')}
-        </p>
-        
-        <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <Link 
-            to="/signup" 
-            className="px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-300"
-          >
-            {t('createAccount')}
-          </Link>
-          <Link 
-            to="/signin" 
-            className="px-8 py-3 bg-white text-indigo-600 font-semibold rounded-lg shadow-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-offset-2 transition duration-300"
-          >
-            {t('signIn')}
-          </Link>
-        </div>
-
-        {/* Quote */}
-        <div className="mt-16">
-          <p className="text-xl italic text-gray-500">
-            “{t('quoteText')}”
-          </p>
-          <p className="text-right text-gray-600 font-medium mt-2">- Minh Triet</p>
-        </div>
+    <div className="flex h-screen bg-slate-100 dark:bg-slate-900 font-sans text-slate-800 dark:text-slate-200">
+      <Sidebar 
+        user={user} 
+        currentView={currentView} 
+        setView={handleSetView} 
+        language={language} 
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        onLogout={handleLogout} // Pass logout handler to Sidebar
+      />
+      <div className="flex-1 flex flex-col h-screen">
+        <Header currentView={currentView} language={language} onMenuClick={() => setIsSidebarOpen(true)} />
+        <main className="flex-1 overflow-y-auto custom-scrollbar relative">
+          <Suspense fallback={<FeedbackSkeleton />}>
+            {renderView()}
+          </Suspense>
+          <AssistiveTouch setView={handleSetView} language={language} />
+        </main>
       </div>
     </div>
   );

@@ -16,6 +16,7 @@ const SignIn: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const navigate = useNavigate();
   const { t } = useLanguage();
 
@@ -23,27 +24,38 @@ const SignIn: React.FC = () => {
     const userRef = doc(db, "users", user.uid);
     const docSnap = await getDoc(userRef);
 
-    if (docSnap.exists()) {
+    if (docSnap.exists() && docSnap.data().role) {
       navigate('/dashboard');
     } else {
-      await createUserProfileDocument(user);
+      if (!docSnap.exists()) {
+          await createUserProfileDocument(user, user.displayName || "Google User");
+      }
       navigate('/select-role');
     }
   };
 
-  const createUserProfileDocument = async (user: User) => {
+  const createUserProfileDocument = async (user: User, name: string) => {
     const userRef = doc(db, "users", user.uid);
     const docSnap = await getDoc(userRef);
     if (!docSnap.exists()) {
       await setDoc(userRef, {
         uid: user.uid,
         email: user.email,
-        name: user.displayName || 'Unnamed User',
+        name: name,
+        avatar: 'fa-user-astronaut',
         photoURL: user.photoURL,
         createdAt: new Date(),
         role: null,
-        learningGoals: { level: 'beginner', focus: 'speaking' },
-        appSettings: { theme: 'light', notifications: true },
+        points: 0,
+        badges: [],
+        streak: 0,
+        pinnedCourses: [],
+        age: null,
+        gender: 'other',
+        level: 'beginner',
+        title: '',
+        subject: '',
+        gradeLevel: '',
       });
     }
   };
@@ -63,111 +75,114 @@ const SignIn: React.FC = () => {
   };
 
   const handleGoogleSignIn = async () => {
-    setLoading(true);
+    setGoogleLoading(true);
     setError(null);
     try {
       const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
-      await createUserProfileDocument(userCredential.user);
       await redirectUser(userCredential.user);
     } catch (err: any) {
-      setError(err.message);
+       setError(t('signInFailed') + ": " + err.message);
     } finally {
-      setLoading(false);
+      setGoogleLoading(false);
     }
   };
   
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="flex flex-col md:flex-row w-full max-w-4xl bg-white rounded-xl shadow-lg overflow-hidden">
-        {/* Left Side - Image */}
-        <div className="hidden md:block w-1/2">
-          <img 
-            src="https://images.unsplash.com/photo-1509822929063-6b6cfc9b42f2?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80" 
-            alt="Sign In illustration" 
-            className="object-cover w-full h-full"
-          />
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex flex-col justify-center items-center p-4 transition-colors duration-500">
+      <div className="w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 space-y-6 animate-fade-in-up">
+        <div className="text-center">
+          <i className="fa-solid fa-graduation-cap text-5xl text-blue-500"></i>
+          <h2 className="mt-4 text-3xl font-bold text-slate-800 dark:text-slate-100">{t('welcomeBack')}</h2>
+          <p className="text-slate-600 dark:text-slate-400 mt-2">{t('signInToContinue')}</p>
         </div>
 
-        {/* Right Side - Form */}
-        <div className="w-full md:w-1/2 p-8 flex flex-col justify-center">
-          <div className="text-center mb-8">
-            <img src="/assets/logo.png" alt="App Logo" className="mx-auto h-12 w-auto mb-4"/>
-            <h2 className="text-2xl font-bold text-gray-800">{t('welcomeBack')}</h2>
-            <p className="text-gray-600 mt-2">{t('signInToContinue')}</p>
+        <form onSubmit={handleEmailSignIn} className="space-y-4">
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300">{t('emailAddress')}</label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="input-field"
+              placeholder="you@example.com"
+            />
           </div>
-
-          <form onSubmit={handleEmailSignIn} className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">{t('emailAddress')}</label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="you@example.com"
-              />
-            </div>
-            <div>
-              <label htmlFor="password-signin" className="block text-sm font-medium text-gray-700">{t('password')}</label>
-              <input
-                id="password-signin"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Your password"
-              />
-              <div className="text-right mt-2">
-                <Link to="/forgot-password" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
-                  {t('forgotPassword')}
+          <div>
+             <div className="flex justify-between items-center">
+                <label htmlFor="password-signin" className="block text-sm font-medium text-slate-700 dark:text-slate-300">{t('password')}</label>
+                <Link to="/forgot-password" className="text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">
+                    {t('forgotPassword')}
                 </Link>
-              </div>
             </div>
-            {error && <p className="text-sm text-red-600 text-center">{error}</p>}
-            
-            <div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full px-4 py-2 text-lg font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-400 transition duration-300"
-              >
-                {loading ? t('signingIn') : t('signIn')}
-              </button>
-            </div>
-          </form>
-
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">{t('orContinueWith')}</span>
-            </div>
+            <input
+              id="password-signin"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="input-field"
+              placeholder={t('enterYourPassword')}
+            />
           </div>
 
+          {error && 
+            <div className="bg-red-100 dark:bg-red-900/50 border-l-4 border-red-500 text-red-700 dark:text-red-300 p-4 rounded-md" role="alert">
+              <p className="font-bold">{t('errorTitle')}</p>
+              <p>{error}</p>
+            </div>
+          }
+          
           <div>
             <button
-              onClick={handleGoogleSignIn}
+              type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-300"
+              className="w-full btn btn-primary py-3 text-lg font-semibold"
             >
-              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" className="h-5 w-5 mr-3" />
-              {t('signInWithGoogle')}
+                {loading ? (
+                    <><i className="fa-solid fa-spinner fa-spin mr-2"></i> {t('signingIn')}</>
+                ) : (
+                    <><i className="fa-solid fa-right-to-bracket mr-2"></i> {t('signIn')}</>
+                )}
             </button>
           </div>
+        </form>
 
-          <div className="text-center text-sm text-gray-600 mt-8">
-            <p>
-              {t('dontHaveAccount')}{' '}
-              <Link to="/signup" className="font-medium text-indigo-600 hover:text-indigo-500">
-                {t('createAccount')}
-              </Link>
-            </p>
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-300 dark:border-slate-600"></div>
           </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-2 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400">{t('orContinueWith')}</span>
+          </div>
+        </div>
+
+        <div>
+          <button
+            onClick={handleGoogleSignIn}
+            disabled={googleLoading}
+            className="w-full btn btn-secondary-outline flex items-center justify-center py-3"
+          >
+            {googleLoading ? (
+                <><i className="fa-solid fa-spinner fa-spin mr-2"></i> {t('signingIn')}</>
+            ) : (
+                <>
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" className="h-5 w-5 mr-3" />
+                    {t('signInWithGoogle')}
+                </>
+            )}
+          </button>
+        </div>
+
+        <div className="text-center text-sm text-slate-600 dark:text-slate-400">
+          <p>
+            {t('dontHaveAccount')}{' '}
+            <Link to="/signup" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">
+              {t('createAccount')}
+            </Link>
+          </p>
         </div>
       </div>
     </div>
