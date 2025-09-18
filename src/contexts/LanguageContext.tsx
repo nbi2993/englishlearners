@@ -17,6 +17,15 @@ const translations: Record<string, { en: string; vi: string }> = {
   'signIn': { en: 'Sign In', vi: 'Đăng nhập' },
   'quoteText': { en: 'For every learner, for every need.', vi: 'Dành cho mọi người học, cho mọi nhu cầu.'},
 
+  // Role Selection Page
+  'selectYourRole': { en: 'Select Your Role', vi: 'Chọn vai trò của bạn' },
+  'roleSelectionDescription': { en: 'To personalize your experience, please tell us who you are.', vi: 'Để cá nhân hóa trải nghiệm của bạn, vui lòng cho chúng tôi biết bạn là ai.' },
+  'iAmAStudent': { en: 'I am a Student', vi: 'Tôi là Học viên' },
+  'studentRoleDescription': { en: 'Personalize your learning path, track progress, and access materials.', vi: 'Cá nhân hóa lộ trình học, theo dõi tiến độ và truy cập tài liệu.' },
+  'iAmATeacher': { en: 'I am a Teacher', vi: 'Tôi là Giáo viên' },
+  'teacherRoleDescription': { en: 'Manage classes, create assignments, and monitor student performance.', vi: 'Quản lý lớp học, tạo bài tập và theo dõi hiệu suất của học viên.' },
+  'savingSelection': { en: 'Saving your selection...', vi: 'Đang lưu lựa chọn của bạn...' },
+
   // Sign Up Page
   'createYourAccount': { en: 'Create Your Account', vi: 'Tạo tài khoản của bạn' },
   'signUpDescription': { en: 'For all learners and educators, from K-12 to lifelong learning. Let\'s get started!', vi: 'Dành cho mọi người học và nhà giáo dục, từ K-12 đến học tập suốt đời. Bắt đầu nào!' },

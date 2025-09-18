@@ -5,10 +5,11 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
+  User
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
-import { useLanguage } from '../contexts/LanguageContext'; // Import the language hook
+import { useLanguage } from '../contexts/LanguageContext';
 
 const SignIn: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -16,27 +17,44 @@ const SignIn: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { t } = useLanguage(); // Use the language hook
+  const { t } = useLanguage();
 
-  const createUserProfileDocument = async (user: any) => {
+  // This function checks the user's role and redirects them accordingly.
+  const redirectUser = async (user: User) => {
     const userRef = doc(db, "users", user.uid);
     const docSnap = await getDoc(userRef);
 
+    if (docSnap.exists()) {
+      const userData = docSnap.data();
+      if (userData.role === 'student') {
+        navigate('/student/home');
+      } else if (userData.role === 'teacher') {
+        navigate('/teacher/home');
+      } else {
+        // If role is not set, go to role selection
+        navigate('/select-role');
+      }
+    } else {
+      // This is a fallback for a user authenticated but without a DB record.
+      // This can happen with Google Sign-In for the first time.
+      await createUserProfileDocument(user); // Create the profile first
+      navigate('/select-role'); // Then send to select a role
+    }
+  };
+
+  const createUserProfileDocument = async (user: User) => {
+    const userRef = doc(db, "users", user.uid);
+    const docSnap = await getDoc(userRef);
     if (!docSnap.exists()) {
       await setDoc(userRef, {
         uid: user.uid,
-        email: user.email || user.providerData[0]?.email || null,
-        displayName: user.displayName || user.providerData[0]?.displayName || null,
-        photoURL: user.photoURL || user.providerData[0]?.photoURL || null,
+        email: user.email,
+        displayName: user.displayName,
+        photoURL: user.photoURL,
         createdAt: new Date(),
-        learningGoals: {
-          level: 'beginner',
-          focus: 'speaking',
-        },
-        appSettings: {
-          theme: 'light',
-          notifications: true,
-        },
+        role: null, // Role is explicitly set to null initially
+        learningGoals: { level: 'beginner', focus: 'speaking' },
+        appSettings: { theme: 'light', notifications: true },
       });
     }
   };
@@ -45,19 +63,11 @@ const SignIn: React.FC = () => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      await createUserProfileDocument(userCredential.user);
-      alert(t('signedInSuccessfully'));
-      navigate('/dashboard');
+      await redirectUser(userCredential.user);
     } catch (err: any) {
-      console.error("Error during email sign in:", err);
-      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
-        setError(t('invalidEmailOrPassword'));
-      } else {
-        setError(err.message);
-      }
+      setError(t('invalidEmailOrPassword'));
     } finally {
       setLoading(false);
     }
@@ -69,17 +79,20 @@ const SignIn: React.FC = () => {
     try {
       const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
-      await createUserProfileDocument(userCredential.user);
-      alert(t('signedInGoogle'));
-      navigate('/dashboard');
+      // Check if a profile exists. If not, create one.
+      const userRef = doc(db, "users", userCredential.user.uid);
+      const docSnap = await getDoc(userRef);
+      if (!docSnap.exists()) {
+        await createUserProfileDocument(userCredential.user);
+      }
+      await redirectUser(userCredential.user);
     } catch (err: any) {
-      console.error("Error during Google sign in:", err);
       setError(err.message);
     } finally {
       setLoading(false);
     }
   };
-
+  
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center p-4">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-2xl shadow-lg">
@@ -90,6 +103,7 @@ const SignIn: React.FC = () => {
         </div>
 
         <form onSubmit={handleEmailSignIn} className="space-y-6">
+          {/* Email and Password Inputs */}
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">{t('emailAddress')}</label>
             <input
@@ -120,6 +134,8 @@ const SignIn: React.FC = () => {
             </div>
           </div>
           {error && <p className="text-sm text-red-600 text-center">{error}</p>}
+          
+          {/* Sign In Button */}
           <div>
             <button
               type="submit"
@@ -131,6 +147,7 @@ const SignIn: React.FC = () => {
           </div>
         </form>
 
+        {/* Social Sign In */}
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-gray-300"></div>
@@ -139,7 +156,7 @@ const SignIn: React.FC = () => {
             <span className="px-2 bg-white text-gray-500">{t('orContinueWith')}</span>
           </div>
         </div>
-        <div className="space-y-3">
+        <div>
           <button
             onClick={handleGoogleSignIn}
             disabled={loading}
@@ -150,6 +167,7 @@ const SignIn: React.FC = () => {
           </button>
         </div>
 
+        {/* Link to Sign Up */}
         <div className="text-center text-sm text-gray-600">
           <p>
             {t('dontHaveAccount')}{' '}
@@ -163,4 +181,4 @@ const SignIn: React.FC = () => {
   );
 };
 
-export default SignIn;
+export default SignIn; 

@@ -4,7 +4,7 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 import { Link, useNavigate } from 'react-router-dom';
-import { useLanguage } from '../contexts/LanguageContext'; // Import the language hook
+import { useLanguage } from '../contexts/LanguageContext';
 
 const SignUp: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -12,7 +12,7 @@ const SignUp: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { t } = useLanguage(); // Use the language hook
+  const { t } = useLanguage();
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,10 +29,14 @@ const SignUp: React.FC = () => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
+      // Create user document in Firestore with a null role
       await setDoc(doc(db, "users", user.uid), {
         uid: user.uid,
         email: user.email,
+        displayName: user.displayName,
+        photoURL: user.photoURL,
         createdAt: new Date(),
+        role: null, // Initialize role as null
         learningGoals: {
           level: 'beginner',
           focus: 'speaking',
@@ -43,12 +47,12 @@ const SignUp: React.FC = () => {
         },
       });
 
-      alert(t('signUpSuccess'));
-      navigate('/signin');
+      // Redirect new users to the role selection page
+      navigate('/select-role');
+
     } catch (err: any) {
-      // Use translation for common errors if available
       if (err.code === 'auth/email-already-in-use') {
-        setError('The email address is already in use by another account.'); // This should also be translated
+        setError(t('emailInUse'));
       } else {
         setError(err.message);
       }
@@ -64,16 +68,14 @@ const SignUp: React.FC = () => {
         <div className="text-center">
           <img src="/assets/logo.png" alt="App Logo" className="mx-auto h-16 w-auto mb-4"/>
           <h2 className="text-3xl font-bold text-gray-900">{t('createYourAccount')}</h2>
-          {/* Improved Description */}
-          <p className="text-gray-600 mt-2">
-            {t('signUpDescription')}
-          </p>
+          <p className="text-gray-600 mt-2">{t('signUpDescription')}</p>
         </div>
         <form onSubmit={handleSignUp} className="space-y-6">
+          {/* Email and Password Inputs */}
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">{t('emailAddress')}</label>
+            <label htmlFor="email-signup" className="block text-sm font-medium text-gray-700">{t('emailAddress')}</label>
             <input
-              id="email"
+              id="email-signup"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -83,9 +85,9 @@ const SignUp: React.FC = () => {
             />
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">{t('password')}</label>
+            <label htmlFor="password-signup" className="block text-sm font-medium text-gray-700">{t('password')}</label>
             <input
-              id="password"
+              id="password-signup"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -95,6 +97,8 @@ const SignUp: React.FC = () => {
             />
           </div>
           {error && <p className="text-sm text-red-600 text-center">{error}</p>}
+          
+          {/* Sign Up Button */}
           <div>
             <button
               type="submit"
@@ -105,6 +109,8 @@ const SignUp: React.FC = () => {
             </button>
           </div>
         </form>
+        
+        {/* Link to Sign In */}
         <div className="text-center text-sm text-gray-600">
           <p>
             {t('alreadyHaveAccount')}{' '}
