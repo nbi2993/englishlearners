@@ -1,14 +1,16 @@
 
 import React, { useState } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase'; // Corrected the import path for firebase config
-import { Link } from 'react-router-dom';
+import { doc, setDoc } from 'firebase/firestore'; // Import Firestore functions
+import { auth, db } from '../firebase'; // Import auth and db instances
+import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const SignUp: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,9 +24,29 @@ const SignUp: React.FC = () => {
     }
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      alert('Sign up successful!');
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Create a user document in Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        uid: user.uid,
+        email: user.email,
+        createdAt: new Date(),
+        // You can add more default user data here, e.g., learningGoals, appSettings
+        learningGoals: {
+          level: 'beginner',
+          focus: 'speaking',
+        },
+        appSettings: {
+          theme: 'light',
+          notifications: true,
+        },
+      });
+
+      alert('Sign up successful! Welcome!');
+      navigate('/signin'); // Redirect to sign-in page after successful registration
     } catch (err: any) {
+      console.error("Error during sign up:", err);
       setError(err.message);
     } finally {
       setLoading(false);

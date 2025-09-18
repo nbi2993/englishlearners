@@ -11,7 +11,7 @@ function App() {
           Welcome to Your Learning Companion
         </h1>
         <p className="text-lg md:text-xl text-gray-600 mb-8">
-          The smart platform to enhance your English learning journey, powered by AI.
+          The smart platform to enhance your English learning journey, powered by Minh Triet.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
           <Link 

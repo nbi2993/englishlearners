@@ -5,6 +5,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import App from './App';
 import SignUp from './src/pages/SignUp';
 import SignIn from './src/pages/SignIn';
+import Dashboard from './src/pages/Dashboard';
+import ForgotPassword from './src/pages/ForgotPassword'; // Import ForgotPassword
 import './index.css';
 
 const container = document.getElementById('root');
@@ -17,6 +19,8 @@ if (container) {
           <Route path="/" element={<App />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/signin" element={<SignIn />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} /> {/* Add ForgotPassword route */}
         </Routes>
       </Router>
     </React.StrictMode>
