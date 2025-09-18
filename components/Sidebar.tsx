@@ -1,7 +1,6 @@
-
 import React, { Fragment } from 'react';
 import type { User, View } from '../types';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../src/contexts/AuthContext'; // Corrected import path
 import { Menu, Transition } from '@headlessui/react';
 
 interface SidebarProps {
@@ -56,7 +55,6 @@ const Sidebar: React.FC<SidebarProps> = ({ user, currentView, setView, language,
   ];
   
   const bottomNavItems: { view: View; icon: string; label: keyof typeof t.en }[] = [
-      // { view: 'settings', icon: 'fa-cog', label: 'settings' },
       { view: 'user-guide', icon: 'fa-circle-question', label: 'userGuide' },
   ];
 
@@ -81,7 +79,6 @@ const Sidebar: React.FC<SidebarProps> = ({ user, currentView, setView, language,
   const handleLogout = async () => {
     try {
       await logout();
-      // Redirect or perform other actions after logout
     } catch (error) {
       console.error("Failed to log out: ", error);
     }
@@ -89,13 +86,11 @@ const Sidebar: React.FC<SidebarProps> = ({ user, currentView, setView, language,
 
   return (
     <>
-      {/* Backdrop for mobile */}
       <div 
         className={`fixed inset-0 bg-black bg-opacity-50 z-30 transition-opacity md:hidden ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         onClick={onClose}
       ></div>
       
-      {/* Sidebar */}
       <aside className={`fixed top-0 left-0 h-full w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 z-40 transform transition-transform md:relative md:translate-x-0 md:w-64 md:flex-shrink-0 flex flex-col ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-4 border-b border-slate-200 dark:border-slate-700 h-[var(--header-height)] flex items-center">
             <i className="fa-solid fa-graduation-cap text-3xl text-blue-500"></i>
