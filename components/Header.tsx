@@ -1,13 +1,15 @@
 import React from 'react';
-import type { View } from '../types';
+import type { View, User } from '../types';
+import { Link } from 'react-router-dom';
 
 interface HeaderProps {
   currentView: View;
   language: 'en' | 'vi';
   onMenuClick: () => void;
+  user: User | null;
 }
 
-const Header: React.FC<HeaderProps> = ({ currentView, language, onMenuClick }) => {
+const Header: React.FC<HeaderProps> = ({ currentView, language, onMenuClick, user }) => {
   const translations = {
     en: {
       home: 'Home',
@@ -17,6 +19,8 @@ const Header: React.FC<HeaderProps> = ({ currentView, language, onMenuClick }) =
       'speaking-partner': 'Speaking Partner',
       settings: 'Settings',
       'user-guide': 'User Guide',
+      signIn: 'Sign In',
+      signUp: 'Sign Up',
     },
     vi: {
       home: 'Trang chủ',
@@ -26,6 +30,8 @@ const Header: React.FC<HeaderProps> = ({ currentView, language, onMenuClick }) =
       'speaking-partner': 'Luyện nói',
       settings: 'Cài đặt',
       'user-guide': 'Hướng dẫn',
+      signIn: 'Đăng nhập',
+      signUp: 'Đăng ký',
     }
   };
 
@@ -33,11 +39,22 @@ const Header: React.FC<HeaderProps> = ({ currentView, language, onMenuClick }) =
 
   return (
     <header className="md:hidden sticky top-0 z-20 flex items-center justify-between p-4 h-[var(--header-height)] bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800">
-      <button onClick={onMenuClick} className="btn btn-icon btn-secondary">
-        <i className="fa-solid fa-bars"></i>
-      </button>
+      {user ? (
+        <button onClick={onMenuClick} className="btn btn-icon btn-secondary">
+          <i className="fa-solid fa-bars"></i>
+        </button>
+      ) : (
+        <div />
+      )}
       <h1 className="text-lg font-bold">{title}</h1>
-      <div className="w-10"></div> {/* Spacer to balance the title */}
+      {!user ? (
+        <div className="flex items-center gap-2">
+          <Link to="/signin" className="btn btn-sm btn-secondary">{translations[language].signIn}</Link>
+          <Link to="/signup" className="btn btn-sm btn-primary">{translations[language].signUp}</Link>
+        </div>
+      ) : (
+        <div className="w-10"></div> // Spacer
+      )}
     </header>
   );
 };

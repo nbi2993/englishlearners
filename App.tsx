@@ -6,7 +6,6 @@ import { onAuthStateChanged, signOut } from 'firebase/auth';
 
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
-import Login from './components/Login';
 import AssistiveTouch from './components/AssistiveTouch';
 import FeedbackSkeleton from './components/FeedbackSkeleton';
 
@@ -146,10 +145,6 @@ function App() {
         return <Home user={user!} onSelectCourse={handleSelectCourse} language={language} setView={handleSetView} classes={classes}/>;
     }
   };
-  
-  if (!user) {
-    return <Login language={language} />;
-  }
 
   return (
     <div className="flex h-screen bg-slate-100 dark:bg-slate-900 font-sans text-slate-800 dark:text-slate-200">
@@ -163,7 +158,7 @@ function App() {
         onLogout={handleLogout} // Pass logout handler to Sidebar
       />
       <div className="flex-1 flex flex-col h-screen">
-        <Header currentView={currentView} language={language} onMenuClick={() => setIsSidebarOpen(true)} />
+        <Header user={user} currentView={currentView} language={language} onMenuClick={() => setIsSidebarOpen(true)} />
         <main className="flex-1 overflow-y-auto custom-scrollbar relative">
           <Suspense fallback={<FeedbackSkeleton />}>
             {renderView()}
