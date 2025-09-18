@@ -7,13 +7,15 @@ interface LanguageContextType {
   t: (key: string) => string; // Translation function
 }
 
-// Default translation data (can be loaded from external files later)
+// Default translation data
 const translations: Record<string, { en: string; vi: string }> = {
   // General & App Page
   'welcomeTitle': { en: 'Welcome to Your Learning Companion', vi: 'Chào mừng đến với Trợ lý học tập của bạn' },
-  'welcomeDescription': { en: 'The smart platform to enhance your English learning journey, from K-12 and beyond.', vi: 'Nền tảng thông minh giúp bạn nâng cao hành trình học tiếng Anh, từ K-12 và hơn thế nữa.' },
+  'welcomeDescription': { en: 'The smart platform to enhance your English learning and teaching journey, from K-12 and beyond.', vi: 'Nền tảng thông minh giúp nâng cao hành trình học và dạy tiếng Anh của bạn, từ K-12 và hơn thế nữa.' },
+  'teacherOptimization': { en: 'Perfectly optimized for both students and teachers at all levels.', vi: 'Được tối ưu hóa cho cả học viên và giáo viên ở mọi cấp độ.' },
   'createAccount': { en: 'Create Account', vi: 'Tạo tài khoản' },
   'signIn': { en: 'Sign In', vi: 'Đăng nhập' },
+  'quoteText': { en: 'For every learner, for every need.', vi: 'Dành cho mọi người học, cho mọi nhu cầu.'},
 
   // Sign Up Page
   'createYourAccount': { en: 'Create Your Account', vi: 'Tạo tài khoản của bạn' },
@@ -41,7 +43,7 @@ const translations: Record<string, { en: string; vi: string }> = {
 
   // Dashboard
   'loadingDashboard': { en: 'Loading dashboard...', vi: 'Đang tải bảng điều khiển...' },
-  'welcomeUser': { en: 'Welcome, {user}!', vi: 'Chào mừng, {user}!' }, // Note: we need to replace {user}
+  'welcomeUser': { en: 'Welcome, {user}!', vi: 'Chào mừng, {user}!' },
   'signOut': { en: 'Sign Out', vi: 'Đăng xuất' },
   'yourProfile': { en: 'Your Profile', vi: 'Hồ sơ của bạn' },
   'email': { en: 'Email', vi: 'Email' },

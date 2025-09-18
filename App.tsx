@@ -1,10 +1,10 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useLanguage } from './src/contexts/LanguageContext'; // Import useLanguage
+import { useLanguage } from './src/contexts/LanguageContext';
 
 function App() {
-  const { language, setLanguage, t } = useLanguage(); // Use the language context
+  const { language, setLanguage, t } = useLanguage();
 
   const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setLanguage(e.target.value as 'en' | 'vi');
@@ -24,14 +24,21 @@ function App() {
         </select>
       </div>
 
-      <div className="max-w-2xl">
+      <div className="max-w-3xl mx-auto">
         <img src="/assets/logo.png" alt="App Logo" className="mx-auto h-24 w-auto mb-8"/>
+        
         <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
           {t('welcomeTitle')}
         </h1>
-        <p className="text-lg md:text-xl text-gray-600 mb-8">
+        
+        <p className="text-lg md:text-xl text-gray-600 mb-2">
           {t('welcomeDescription')}
         </p>
+        
+        <p className="text-md md:text-lg text-gray-500 mb-8">
+          {t('teacherOptimization')}
+        </p>
+        
         <div className="flex flex-col sm:flex-row justify-center gap-4">
           <Link 
             to="/signup" 
@@ -44,7 +51,15 @@ function App() {
             className="px-8 py-3 bg-white text-indigo-600 font-semibold rounded-lg shadow-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-offset-2 transition duration-300"
           >
             {t('signIn')}
-          </Link>
+          </áLink>
+        </div>
+
+        {/* Quote */}
+        <div className="mt-16">
+          <p className="text-xl italic text-gray-500">
+            “{t('quoteText')}”
+          </p>
+          <p className="text-right text-gray-600 font-medium mt-2">- Minh Triet</p>
         </div>
       </div>
     </div>
