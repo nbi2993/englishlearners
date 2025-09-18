@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
-import { auth, db } from '../firebase';
+import { db } from '../firebase';
 import { useAuth } from '../contexts/AuthContext';
 import TeacherHome from '../components/TeacherHome';
 import StudentHome from '../components/StudentHome';
@@ -17,56 +17,62 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (currentUser) {
-        const userRef = doc(db, 'users', currentUser.uid);
-        const userSnap = await getDoc(userRef);
-
-        if (userSnap.exists()) {
-          const user = userSnap.data() as User;
-          setUserData(user);
-
-          // Core Logic Correction:
-          // Redirect user based on their role AFTER fetching the data.
-          if (!user.role) {
-            navigate('/select-role');
-          } 
-          // No else-if redirection here. Let the return statement handle rendering.
-
-        } else {
-          // This could happen if the user document hasn't been created yet
-          // after sign-up. Redirecting to role selection can be a good fallback.
-          console.log('User document not found, redirecting to role selection.');
-          navigate('/select-role');
-        }
-      } else {
-        // This case is handled by ProtectedRoute, but as a fallback:
-        navigate('/signin');
+      // currentUser might be null initially, so we need to wait for it.
+      if (!currentUser) {
+        // The AuthContext is still loading, so we wait.
+        return;
       }
-      setLoading(false);
+
+      const userRef = doc(db, 'users', currentUser.uid);
+      const userSnap = await getDoc(userRef);
+      setLoading(false); // Stop loading once we have a response
+
+      if (userSnap.exists()) {
+        const user = userSnap.data() as User;
+        setUserData(user);
+        // If the user exists but has no role, the render logic will handle navigation.
+      } else {
+        // This case can happen for a brand new user (e.g., social sign-in).
+        // The render logic will redirect them to select a role.
+        console.log('User document not found.');
+        setUserData(null); // Explicitly set userData to null
+      }
     };
 
     fetchUserData();
-  }, [currentUser, navigate]);
+  }, [currentUser]); // Depend only on currentUser
 
-  if (loading || !userData) {
+  // 1. Loading State
+  if (loading) {
     return (
-        <div className="flex items-center justify-center h-screen bg-gray-100 dark:bg-gray-900">
-           <Spinner />
-        </div>
+      <div className="flex items-center justify-center h-screen bg-white">
+        <Spinner />
+      </div>
     );
   }
 
-  // Render the correct component based on the user's role.
-  // This is the single source of truth for what the user sees.
+  // 2. No user data / No role -> Redirect to select role
+  if (!userData || !userData.role) {
+    // We must use navigate inside a component body or a useEffect, not directly in render.
+    // To solve this, we can use a small component that performs the navigation.
+    React.useEffect(() => {
+      navigate('/select-role');
+    }, [navigate]);
+    return null; // Render nothing while redirecting
+  }
+
+  // 3. Render dashboard based on role
   switch (userData.role) {
     case 'teacher':
       return <TeacherHome user={userData} />;
     case 'student':
-      return <StudentHome user={userData} />; 
+      return <StudentHome user={userData} />;
     default:
-      // If role is somehow null or undefined, redirect to role selection.
-      navigate('/select-role');
-      return null; // or a loading indicator
+      // This is a fallback, already handled by the logic above.
+      React.useEffect(() => {
+        navigate('/select-role');
+      }, [navigate]);
+      return null;
   }
 };
 
