@@ -51,7 +51,7 @@ function App() {
             className="px-8 py-3 bg-white text-indigo-600 font-semibold rounded-lg shadow-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-offset-2 transition duration-300"
           >
             {t('signIn')}
-          </áLink>
+          </Link>
         </div>
 
         {/* Quote */}
