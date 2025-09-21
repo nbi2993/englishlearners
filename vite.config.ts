@@ -15,6 +15,7 @@ export default defineConfig(({ mode }) => {
       build: {
         sourcemap: mode !== 'production',
         rollupOptions: {
+            external: ['react-router-dom'],
           output: {
             manualChunks: {
               'vendor': ['react', 'react-dom'],
