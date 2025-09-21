@@ -1,36 +1,43 @@
 
 import React, { useState } from 'react';
 import { doc, updateDoc } from 'firebase/firestore';
-import { auth, db } from '../firebase';
+import { db } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const RoleSelection: React.FC = () => {
   const [loading, setLoading] = useState<'student' | 'teacher' | null>(null);
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const user = auth.currentUser;
+  const { currentUser, setCurrentUser } = useAuth(); // Use useAuth hook
 
   const handleRoleSelect = async (role: 'student' | 'teacher') => {
-    if (loading) return;
+    if (loading || !currentUser) return;
     setLoading(role);
     
-    if (user) {
-      try {
-        const userRef = doc(db, 'users', user.uid);
-        await updateDoc(userRef, { role });
-        navigate('/dashboard');
-      } catch (error) {
-        console.error('Error updating user role:', error);
-        // Optionally, show an error message to the user
-        setLoading(null);
-      }
-    } else {
-      console.error('No user is signed in.');
+    try {
+      const userRef = doc(db, 'users', currentUser.uid);
+      await updateDoc(userRef, { role });
+      
+      // Optimistically update the user context
+      setCurrentUser({ ...currentUser, role });
+
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Error updating user role:', error);
+      // Optionally, show an error message to the user
       setLoading(null);
-      navigate('/signin'); // Redirect to sign-in if no user is found
     }
   };
+
+  // Redirect if user is not logged in
+  if (!currentUser) {
+    React.useEffect(() => {
+      navigate('/signin');
+    }, [navigate]);
+    return null; // Render nothing while redirecting
+  }
 
   const RoleCard = ({ 
     role, 
@@ -71,7 +78,7 @@ const RoleSelection: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex flex-col justify-center items-center p-4 transition-colors duration-500">
       <div className="w-full max-w-4xl text-center p-8 animate-fade-in">
-        <h1 className="text-4xl font-extrabold text-slate-800 dark:text-slate-100 mb-3">{t('oneLastStep')}, {user?.displayName || t('guest')}!</h1>
+        <h1 className="text-4xl font-extrabold text-slate-800 dark:text-slate-100 mb-3">{t('oneLastStep')}, {currentUser?.name || t('guest')}!</h1>
         <p className="text-lg text-slate-600 dark:text-slate-400 mb-12">{t('roleSelectionDescription')}</p>
         
         <div className="flex flex-col sm:flex-row justify-center gap-8">

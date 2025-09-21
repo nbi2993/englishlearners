@@ -68,7 +68,13 @@ const SignIn: React.FC = () => {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       await redirectUser(userCredential.user);
     } catch (err: any) {
-      setError(t('invalidEmailOrPassword'));
+      if (err.code === 'auth/user-not-found') {
+        setError(t('userNotFound'));
+      } else if (err.code === 'auth/wrong-password') {
+        setError(t('wrongPassword'));
+      } else {
+        setError(t('invalidEmailOrPassword'));
+      }
     } finally {
       setLoading(false);
     }
