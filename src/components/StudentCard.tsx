@@ -1,12 +1,9 @@
 
 import React from 'react';
+import { Student } from '../../types'; // Import the Student type
 
 interface StudentCardProps {
-  student: {
-    id: string;
-    name: string;
-    avatar: string;
-  };
+  student: Student;
 }
 
 const StudentCard: React.FC<StudentCardProps> = ({ student }) => {
@@ -15,7 +12,13 @@ const StudentCard: React.FC<StudentCardProps> = ({ student }) => {
       <img src={student.avatar} alt={student.name} className="w-12 h-12 rounded-full" />
       <div>
         <p className="font-bold">{student.name}</p>
-        <button className="text-sm text-blue-500 hover:underline">View Profile</button>
+        <p className="text-sm text-gray-500">Last active: {student.lastActivity}</p>
+        <div className="w-full bg-gray-200 rounded-full h-1.5 mt-2">
+          <div
+            className="bg-green-500 h-1.5 rounded-full"
+            style={{ width: `${student.progress}%` }}
+          ></div>
+        </div>
       </div>
     </div>
   );
