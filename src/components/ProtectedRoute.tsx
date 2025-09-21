@@ -1,21 +1,28 @@
 
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import Spinner from './Spinner'; // Make sure the path is correct
 
 interface ProtectedRouteProps {
-  children: React.ReactElement;
+  children: ReactNode;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { currentUser } = useAuth();
+  const { currentUser, loading } = useAuth();
 
-  if (!currentUser) {
-    // User is not authenticated, redirect to sign-in page
-    return <Navigate to="/signin" />;
+  if (loading) {
+    // Display a spinner or a loading screen while checking authentication status
+    return <Spinner />;
   }
 
-  return children; // User is authenticated, render the requested component
+  if (!currentUser) {
+    // If the user is not authenticated, redirect to the sign-in page
+    return <Navigate to="/signin" replace />;
+  }
+
+  // If the user is authenticated, render the protected content
+  return <>{children}</>;
 };
 
 export default ProtectedRoute;
