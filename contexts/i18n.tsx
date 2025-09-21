@@ -72,7 +72,7 @@ const translations = {
     correctAnswer: 'Correct answer: {answer}',
     tryNewQuiz: 'Try a New Quiz',
     submitAnswers: 'Submit Answers',
-    quizPassedMessage: "Congratulations! You've passed and this lesson is now marked as complete.",
+    quizPassedMessage: "Congratulations! You\'ve passed and this lesson is now marked as complete.",
     // Footer
     dunsNumber: "D-U-N-S Number: 646434880",
     copyright: "© 2025 IVS JSC. All rights reserved.",
@@ -90,7 +90,7 @@ const translations = {
     pronunciationPractice: "Pronunciation Practice",
     tryAgain: "Try Again",
     recording: "Recording...",
-    pronunciationFeedbackError: "Sorry, I couldn't generate feedback. Please check your microphone and try again.",
+    pronunciationFeedbackError: "Sorry, I couldn\'t generate feedback. Please check your microphone and try again.",
     micError: "Could not access microphone. Please check your browser permissions.",
     tapToRecord: "Tap to record:",
     generatingFeedback: "Generating feedback...",
@@ -105,6 +105,15 @@ const translations = {
     resetProgressConfirm: "Are you sure you want to delete all your completed lessons? This action cannot be undone.",
     reset: "Reset",
     cancel: "Cancel",
+    // Forgot Password
+    forgotYourPassword: 'Forgot Your Password?',
+    enterEmailForReset: 'Enter your email address to receive a password reset link.',
+    emailAddress: 'Email Address',
+    passwordResetSent: 'A password reset email has been sent to your email address. Please check your inbox.',
+    sending: 'Sending...',
+    sendResetEmail: 'Send Reset Email',
+    rememberPassword: 'Remember your password?',
+    signIn: 'Sign In',
   },
   vi: {
     // App Welcome
@@ -207,6 +216,15 @@ const translations = {
     resetProgressConfirm: "Bạn có chắc chắn muốn xóa tất cả các bài học đã hoàn thành không? Hành động này không thể hoàn tác.",
     reset: "Xóa",
     cancel: "Hủy",
+    // Forgot Password
+    forgotYourPassword: 'Quên mật khẩu?',
+    enterEmailForReset: 'Nhập địa chỉ email của bạn để nhận liên kết đặt lại mật khẩu.',
+    emailAddress: 'Địa chỉ email',
+    passwordResetSent: 'Một email đặt lại mật khẩu đã được gửi đến địa chỉ email của bạn. Vui lòng kiểm tra hộp thư đến của bạn.',
+    sending: 'Đang gửi...',
+    sendResetEmail: 'Gửi email đặt lại',
+    rememberPassword: 'Nhớ mật khẩu của bạn?',
+    signIn: 'Đăng nhập',
   },
 };
 
