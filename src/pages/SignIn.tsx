@@ -95,100 +95,108 @@ const SignIn: React.FC = () => {
   };
   
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex flex-col justify-center items-center p-4 transition-colors duration-500">
-      <div className="w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 space-y-6 animate-fade-in-up">
-        <div className="text-center">
-          <i className="fa-solid fa-graduation-cap text-5xl text-blue-500"></i>
-          <h2 className="mt-4 text-3xl font-bold text-slate-800 dark:text-slate-100">{t('welcomeBack')}</h2>
-          <p className="text-slate-600 dark:text-slate-400 mt-2">{t('signInToContinue')}</p>
+    <div className="min-h-screen w-full bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-50 flex">
+      {/* Left decorative panel */}
+      <div className="hidden lg:flex w-1/2 bg-blue-600 dark:bg-blue-800 items-center justify-center p-12 text-white relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-600 to-indigo-800 opacity-70"></div>
+        <div className="z-10 text-center space-y-6">
+            <i className="fa-solid fa-graduation-cap text-7xl"></i>
+            <h1 className="text-4xl font-bold tracking-tight">Chào mừng bạn trở lại</h1>
+            <p className="text-blue-100 text-lg max-w-md">
+                Đăng nhập để tiếp tục cuộc hành trình học tập của bạn và khám phá những chân trời kiến thức mới.
+            </p>
         </div>
+      </div>
 
-        <form onSubmit={handleEmailSignIn} className="space-y-4">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300">{t('emailAddress')}</label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="input-field"
-              placeholder="you@example.com"
-            />
-          </div>
-          <div>
-             <div className="flex justify-between items-center">
-                <label htmlFor="password-signin" className="block text-sm font-medium text-slate-700 dark:text-slate-300">{t('password')}</label>
-                <Link to="/forgot-password" className="text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">
-                    {t('forgotPassword')}
-                </Link>
+      {/* Right sign-in form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12">
+        <div className="w-full max-w-md space-y-8">
+            <div className="text-center lg:text-left">
+                <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 dark:text-slate-100">{t('signIn')}</h2>
+                <p className="text-slate-600 dark:text-slate-400 mt-2">{t('dontHaveAccount')} <Link to="/signup" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">{t('createAccount')}</Link></p>
             </div>
-            <input
-              id="password-signin"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="input-field"
-              placeholder={t('enterYourPassword')}
-            />
-          </div>
-
-          {error && 
-            <div className="bg-red-100 dark:bg-red-900/50 border-l-4 border-red-500 text-red-700 dark:text-red-300 p-4 rounded-md" role="alert">
-              <p className="font-bold">{t('errorTitle')}</p>
-              <p>{error}</p>
-            </div>
-          }
-          
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full btn btn-primary py-3 text-lg font-semibold"
-            >
-                {loading ? (
+            
+            {/* Social Login */}
+            <div>
+              <button
+                onClick={handleGoogleSignIn}
+                disabled={googleLoading}
+                className="w-full btn btn-secondary-outline flex items-center justify-center py-3 text-base"
+              >
+                {googleLoading ? (
                     <><i className="fa-solid fa-spinner fa-spin mr-2"></i> {t('signingIn')}</>
                 ) : (
-                    <><i className="fa-solid fa-right-to-bracket mr-2"></i> {t('signIn')}</>
+                    <>
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" className="h-5 w-5 mr-3" />
+                        {t('signInWithGoogle')}
+                    </>
                 )}
-            </button>
-          </div>
-        </form>
+              </button>
+            </div>
+            
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300 dark:border-slate-700"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white dark:bg-slate-950 text-slate-500 dark:text-slate-400">{t('orContinueWith')}</span>
+              </div>
+            </div>
 
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300 dark:border-slate-600"></div>
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400">{t('orContinueWith')}</span>
-          </div>
-        </div>
-
-        <div>
-          <button
-            onClick={handleGoogleSignIn}
-            disabled={googleLoading}
-            className="w-full btn btn-secondary-outline flex items-center justify-center py-3"
-          >
-            {googleLoading ? (
-                <><i className="fa-solid fa-spinner fa-spin mr-2"></i> {t('signingIn')}</>
-            ) : (
-                <>
-                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" className="h-5 w-5 mr-3" />
-                    {t('signInWithGoogle')}
-                </>
-            )}
-          </button>
-        </div>
-
-        <div className="text-center text-sm text-slate-600 dark:text-slate-400">
-          <p>
-            {t('dontHaveAccount')}{' '}
-            <Link to="/signup" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">
-              {t('createAccount')}
-            </Link>
-          </p>
+            {/* Email Form */}
+            <form onSubmit={handleEmailSignIn} className="space-y-6">
+              <div className="space-y-4">
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t('emailAddress')}</label>
+                    <input
+                      id="email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="form-input"
+                      placeholder="you@example.com"
+                    />
+                  </div>
+                  <div>
+                     <div className="flex justify-between items-center mb-1">
+                        <label htmlFor="password-signin" className="block text-sm font-medium text-slate-700 dark:text-slate-300">{t('password')}</label>
+                        <Link to="/forgot-password" className="text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">
+                            {t('forgotPassword')}?
+                        </Link>
+                    </div>
+                    <input
+                      id="password-signin"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="form-input"
+                      placeholder="••••••••"
+                    />
+                  </div>
+              </div>
+              
+              {error && 
+                <div className="alert-danger" role="alert">
+                  <p>{error}</p>
+                </div>
+              }
+              
+              <div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full btn btn-primary py-3 text-base font-semibold"
+                >
+                    {loading ? (
+                        <><i className="fa-solid fa-spinner fa-spin mr-2"></i> {t('signingIn')}</>
+                    ) : (
+                       t('signIn')
+                    )}
+                </button>
+              </div>
+            </form>
         </div>
       </div>
     </div>
